@@ -48,20 +48,34 @@ docs/
 ## Current state (update this section as you go)
 
 **Done:**
-- Full calculation engine: valuation, financing/DSCR, returns/cash flow, scenario modeling, acquisition scoring — all pure, typed, unit-tested (35 tests passing).
+- Manifest V3 Chrome/Edge extension: click-only listing capture, editable review, on-device ratios, local draft, JSON export, and fragment handoff to the website.
+- Shared conservative USD listing extractor with ambiguity and missing-value handling; saved source metadata and explicit remaining-assumptions review.
+- Installable web app manifest, mobile-friendly input sizing, and `/install` instructions/download route.
+- Extension packaging is reproducible with `npm run build:extension`; `npm run build` runs it automatically.
+- September 5 checkpoint: 82 unit tests pass and the Next.js production build passes; browser/device acceptance still pending.
+- Full calculation engine: valuation, financing/DSCR, returns/cash flow, scenario modeling, acquisition scoring, funding-gap validation, and explainable diligence insights — all pure, typed, unit-tested (40 tests passing).
 - `runAnalysis()` orchestrator ties every module together into one `AnalysisResult`.
 - Project scaffolding: Next.js 14 + TypeScript + Tailwind, Vitest configured with `@/` path alias, industry benchmark dataset with 10 industries.
+- Responsive acquisition workspace with business and financing inputs, live deal scoring, and sample-data reset.
+- Investment memo dashboard with valuation, DSCR, cash-on-cash ROI, payback period, score transparency, valuation cross-checks, and five-year scenario charts/tables.
+- Private IndexedDB deal snapshots plus versioned JSON import/export.
+- Seller-financing inputs with combined debt-service modeling and a sources-and-uses funding check.
+- Side-by-side comparison workspace for ranking up to four saved acquisitions by score, ROI, DSCR, cash flow, valuation, and payback.
+- Investor-style PDF memo export, custom one-to-ten-year scenarios, an earnings/rate sensitivity matrix, and deterministic due-diligence priorities with next-step guidance.
+- AI research modules and regression fixtures preserved. Cloud AI is disabled for this release; the route returns 503 with no network call. See `docs/AI_METHODOLOGY.md`.
+- Unit-tested Gemini transport boundary covering structured request configuration, compact evidence transmission, and defensive response extraction.
+- Initial accessibility pass: skip navigation, semantic tab panels, screen-reader field help, keyboard focus visibility, polite status announcements, and reduced-motion support.
+- Deterministic AI regression rubric with scenario-specific verdict gates, confidence limits, evidence-citation checks, and CI-ready fixtures.
+- Private field-level evidence provenance for key financial claims, persisted through saved deals and versioned JSON exports and included in the AI evidence packet.
+- Evidence-quality appendix in the PDF investment memo, with explicit verification flags and a user-selected-label disclaimer.
+- Deterministic input-integrity preflight that blocks unusable core inputs and flags unusual earnings relationships or mismatched funding before memo and AI interpretation.
 
 **Not yet built (in priority order — this is the roadmap):**
-1. `components/inputs/BusinessInfoForm.tsx` + `FinancingForm.tsx` — the actual data entry UI
-2. `components/results/*` — dashboard showing valuation, DSCR, cash flow, ROI, payback, break-even chart (use Recharts)
-3. `app/analysis/[id]/page.tsx` — wire the form + results together into one working single-business analysis flow (this completes the MVP)
-4. `lib/storage/` — IndexedDB persistence (use the `idb` package, already in package.json) + JSON export/import
-5. `components/scenarios/*` — scenario toggle/slider + comparison table/chart
-6. `app/compare/page.tsx` — multi-business side-by-side comparison
-7. `components/results/ScoreBreakdown.tsx` — visualize the acquisition score with its sub-score breakdown (transparency matters here — show the weights, not just the number)
-8. PDF report export via `@react-pdf/renderer`
-9. Polish: screenshots, demo GIF for README, deploy to Vercel
+1. Browser acceptance testing of the extension and phone installation on actual devices
+2. Accessible keyboard navigation and lossless validation for saved-deal JSON
+3. Extend listing extraction using representative, permitted fixtures; preserve unknown values
+4. PDF document extraction with evidence review
+5. Offline web app support; cloud AI requires a separately eligible operator
 
 ## Commands
 

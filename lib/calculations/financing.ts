@@ -127,6 +127,17 @@ export function summarizeLoan(financing: FinancingInputs): LoanSummary {
   };
 }
 
+/** Purchase price not covered by the proposed sources of funds. */
+export function calculateFundingGap(
+  purchasePrice: number,
+  financing: FinancingInputs
+): number {
+  const sellerAmount = financing.sellerFinancing?.amount ?? 0;
+  return roundToCents(
+    purchasePrice - financing.downPayment - financing.loanAmount - sellerAmount
+  );
+}
+
 function sumInterest(schedule: AmortizationRow[]): number {
   return schedule.reduce((total, row) => total + row.interest, 0);
 }

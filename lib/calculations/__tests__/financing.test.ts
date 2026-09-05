@@ -4,6 +4,7 @@ import {
   buildAmortizationSchedule,
   summarizeLoan,
   calculateDSCR,
+  calculateFundingGap,
 } from "@/lib/calculations/financing";
 import type { BusinessInputs, FinancingInputs } from "@/types/business";
 
@@ -67,6 +68,24 @@ describe("summarizeLoan", () => {
     const withoutSeller = summarizeLoan(financing);
     const with_ = summarizeLoan(withSeller);
     expect(with_.monthlyPayment).toBeGreaterThan(withoutSeller.monthlyPayment);
+  });
+});
+
+describe("calculateFundingGap", () => {
+  it("returns zero when the proposed sources balance", () => {
+    expect(calculateFundingGap(450000, {
+      downPayment: 100000,
+      loanAmount: 300000,
+      interestRate: 0.09,
+      loanTermYears: 10,
+      sellerFinancing: { amount: 50000, interestRate: 0.06, termYears: 5 },
+    })).toBe(0);
+  });
+
+  it("identifies a gap and excess funding", () => {
+    const financing = { downPayment: 50000, loanAmount: 300000, interestRate: 0.09, loanTermYears: 10 };
+    expect(calculateFundingGap(400000, financing)).toBe(50000);
+    expect(calculateFundingGap(300000, financing)).toBe(-50000);
   });
 });
 

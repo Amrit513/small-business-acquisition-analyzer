@@ -47,6 +47,14 @@ Implementation: `lib/calculations/financing.ts` → `calculateMonthlyLoanPayment
 
 If seller financing is present, it's calculated as a second, independent amortizing loan and combined with the primary loan (`summarizeLoan()`).
 
+The funding check verifies that the proposed sources match the purchase price:
+```
+Funding Gap = Purchase Price − Down Payment − Primary Loan − Seller Note
+```
+A positive result is still unfunded; a negative result means the proposed sources exceed the purchase price.
+
+Implementation: `lib/calculations/financing.ts` → `calculateFundingGap()`
+
 ## 5. Debt Service Coverage Ratio (DSCR)
 
 The single most important number to a lender:
@@ -149,3 +157,7 @@ Implementation: `lib/calculations/scoring.ts` → `calculateAcquisitionScore()`,
 ---
 
 **A note on precision:** every number this tool produces is an estimate built from the inputs a user provides and general market benchmark data. It is not a substitute for a professional valuation, accountant, attorney, or lender's own underwriting. The goal is to help someone reason clearly about a potential deal — not to replace due diligence.
+
+## Listing screening ratios
+
+The extension reports asking price / SDE when both figures are present and SDE is positive. SDE margin is SDE / annual revenue when both are present and revenue is positive. Missing, nonfinite or negative inputs produce no ratio. These describe reported listing claims; they are not valuations or investment recommendations. Implementation: `lib/calculations/listingScreen.ts`.

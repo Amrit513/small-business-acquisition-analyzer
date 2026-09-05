@@ -1,6 +1,6 @@
 {
   "name": "small-business-acquisition-analyzer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "An open-source tool that simulates the financial due-diligence process an entrepreneur or investor performs before acquiring a small business.",
   "license": "MIT",
@@ -11,7 +11,11 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:ai-evals": "vitest run lib/ai/__tests__",
+    "test:coverage": "vitest run --coverage",
+    "prebuild": "npm run build:extension",
+    "build:extension": "node scripts/build-extension.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "next": "^14.2.5",
@@ -35,6 +39,7 @@
     "vitest": "^2.0.4",
     "@vitest/coverage-v8": "^2.0.4",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.5"
+    "eslint-config-next": "^14.2.5",
+    "esbuild": "0.21.5"
   }
 }
