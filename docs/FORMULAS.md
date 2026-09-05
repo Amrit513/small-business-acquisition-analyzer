@@ -110,9 +110,18 @@ Growth is applied compounding, year over year:
 ```
 Revenue(year n) = Revenue(year 0) × (1 + revenue growth rate)ⁿ
 Expenses(year n) = Expenses(year 0) × (1 + expense growth rate)ⁿ
-SDE(year n) = Revenue(year n) − Expenses(year n)
+Reconciliation = Entered SDE − (Revenue(year 0) − Expenses(year 0))
+SDE(year n) = Revenue(year n) − Expenses(year n) + Reconciliation
+Debt service(year n) = sum of scheduled payments in months 12(n−1)+1 through 12n
+Pretax cash flow after debt(year n) = SDE(year n) − Debt service(year n)
 ```
-Debt service is held constant (fixed-rate loans don't change with performance), so an improved SDE flows directly through to improved cash flow.
+The reconciliation is held constant in nominal dollars and displayed explicitly. It preserves the entered earnings baseline; it does not authenticate add-backs or resolve contradictory evidence. A nonzero value requires diligence. Revenue and expenses compound independently with annual cent rounding; the model does not assume a constant earnings margin.
+
+Debt service uses the combined bank/seller amortization schedule, including partial years and the final payment adjustment, and becomes zero after both debts mature. It does not use the initial monthly payment multiplied by twelve forever. Supported horizons are 1–10 whole years; growth inputs are finite decimals from -1 to 10. These are technical bounds, not recommended assumptions.
+
+Independent examples: $24,000 bank debt at zero interest for two years plus $12,000 seller debt at zero interest for one year gives annual payments of $24,000, $12,000, then $0. With flat SDE of $180,000 the corresponding cash flows are $156,000, $168,000, and $180,000. A baseline of $800,000 revenue, $620,000 expenses and $150,000 entered SDE has a -$30,000 reconciliation; zero-growth scenarios must retain $150,000 SDE.
+
+These outputs remain simplified pretax screening cash flows. Buyer labor, replacement management, maintenance capex, working capital and taxes are not separately deducted in this milestone; they are outstanding model work, not assumed to be zero economic costs.
 
 | Scenario | Default revenue growth | Default expense growth |
 |---|---|---|

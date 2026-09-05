@@ -47,14 +47,17 @@ docs/
 
 ## Current state (update this section as you go)
 
+**Release direction:** follow `docs/REDESIGN-RELEASE.md` for the owner's master-spec milestones and evidence gates. Preserve production until the redesign and required verification are ready. Do not enable cloud AI.
+
 **Done:**
+- Scenario projections preserve entered SDE with an explicit fixed-dollar reconciliation and stop debt service at bank/seller maturities. Reconciliation and scheduled debt are visible in the scenario workspace; labor/capex/working-capital exclusions remain explicit.
 - Manifest V3 Chrome/Edge extension: click-only listing capture, editable review, on-device ratios, local draft, JSON export, and fragment handoff to the website.
 - Shared conservative USD listing extractor with ambiguity and missing-value handling; saved source metadata and explicit remaining-assumptions review.
 - Installable web app manifest, mobile-friendly input sizing, and `/install` instructions/download route.
 - Extension packaging is reproducible with `npm run build:extension`; `npm run build` runs it automatically.
 - Saved-deal JSON import validates nested fields and metadata before persistence, caps file reads at 256 KiB, and bounds amortization work. Valid version-one/two exports preserve financial values and source evidence.
 - Workspace tabs use one keyboard tab stop plus Arrow/Home/End navigation, skipping the locked memo. The defect was reproduced in the public desktop app before the local fix.
-- September 5 checkpoint: 115 unit tests pass; TypeScript, extension packaging and Next.js production build verified locally. Phone and extension acceptance on physical devices still pending.
+- September 5 checkpoint: 128 unit tests pass; TypeScript, extension packaging and Next.js production build verified locally. Phone and extension acceptance on physical devices still pending.
 - Full calculation engine: valuation, financing/DSCR, returns/cash flow, scenario modeling, acquisition scoring, funding-gap validation, and explainable diligence insights — all pure, typed, unit-tested (40 tests passing).
 - `runAnalysis()` orchestrator ties every module together into one `AnalysisResult`.
 - Project scaffolding: Next.js 14 + TypeScript + Tailwind, Vitest configured with `@/` path alias, industry benchmark dataset with 10 industries.
