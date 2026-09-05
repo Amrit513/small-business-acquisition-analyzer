@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { buildScenarioAssumptions, buildSensitivityMatrix, calculateFundingGap, generateDealInsights, projectAllStandardScenarios, projectScenario, runAnalysis, summarizeInputIntegrity, validateDealInputs } from "@/lib/calculations";
-import { deleteDeal, listDeals, parseDealExport, saveDeal, serializeDeal, type SavedDeal } from "@/lib/storage/analyses";
+import { deleteDeal, listDeals, readDealExport, saveDeal, serializeDeal, type SavedDeal } from "@/lib/storage/analyses";
 import type { BusinessInputs, FinancingInputs, Industry } from "@/types/business";
 import { defaultEvidence, evidenceOptions, normalizeEvidence, summarizeEvidence, type EvidenceField, type EvidenceMap } from "@/lib/evidence/provenance";
 import { ListingImport } from "@/components/ListingImport";
@@ -88,7 +88,7 @@ export function AcquisitionAnalyzer() {
     const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${slugify(analysis.businessName)}-investment-memo.pdf`; anchor.click(); URL.revokeObjectURL(url); showNotice("PDF investment memo downloaded.");
   }
   async function handleImport(file: File) {
-    try { const deal = parseDealExport(await file.text()); await saveDeal(deal); handleLoad(deal); await refreshSavedDeals(); showNotice("Analysis imported successfully."); } catch (error) { showNotice(error instanceof Error ? error.message : "Import failed."); }
+    try { const deal = await readDealExport(file); await saveDeal(deal); handleLoad(deal); await refreshSavedDeals(); showNotice("Analysis imported successfully."); } catch (error) { showNotice(error instanceof Error ? error.message : "Import failed."); }
   }
   async function handleAIReview() {
     if (!canGenerateMemo) { setAiError("Resolve blocking input issues before running the AI review."); return; }

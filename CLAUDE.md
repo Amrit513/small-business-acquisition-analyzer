@@ -36,7 +36,7 @@ lib/
     index.ts                 runAnalysis() — the single orchestrator, wires everything together
     __tests__/                one test file per module above
   benchmarks/               industry multiple datasets (sourced)
-  storage/                  IndexedDB read/write, export/import (not yet built)
+  storage/                  IndexedDB read/write, validated versioned JSON export/import
 types/business.ts           the shared contract — BusinessInputs, FinancingInputs, AnalysisResult, etc.
 docs/
   FORMULAS.md                every formula explained, must match code
@@ -52,7 +52,8 @@ docs/
 - Shared conservative USD listing extractor with ambiguity and missing-value handling; saved source metadata and explicit remaining-assumptions review.
 - Installable web app manifest, mobile-friendly input sizing, and `/install` instructions/download route.
 - Extension packaging is reproducible with `npm run build:extension`; `npm run build` runs it automatically.
-- September 5 checkpoint: 82 unit tests pass and the Next.js production build passes; browser/device acceptance still pending.
+- Saved-deal JSON import validates nested fields and metadata before persistence, caps file reads at 256 KiB, and bounds amortization work. Valid version-one/two exports preserve financial values and source evidence.
+- September 5 checkpoint: 105 unit tests pass; TypeScript, extension packaging and Next.js production build verified locally. Browser/device acceptance still pending.
 - Full calculation engine: valuation, financing/DSCR, returns/cash flow, scenario modeling, acquisition scoring, funding-gap validation, and explainable diligence insights — all pure, typed, unit-tested (40 tests passing).
 - `runAnalysis()` orchestrator ties every module together into one `AnalysisResult`.
 - Project scaffolding: Next.js 14 + TypeScript + Tailwind, Vitest configured with `@/` path alias, industry benchmark dataset with 10 industries.
@@ -72,12 +73,16 @@ docs/
 
 **Not yet built (in priority order — this is the roadmap):**
 1. Browser acceptance testing of the extension and phone installation on actual devices
-2. Accessible keyboard navigation and lossless validation for saved-deal JSON
+2. Accessible keyboard navigation and browser acceptance of saved-deal JSON import/error recovery
 3. Extend listing extraction using representative, permitted fixtures; preserve unknown values
 4. PDF document extraction with evidence review
 5. Offline web app support; cloud AI requires a separately eligible operator
 
 ## Commands
+
+### Saved-deal import limits
+
+Imports reject malformed data rather than coercing strings or inventing missing numbers. Technical supported bounds: 256 KiB UTF-8, monetary magnitudes up to $1 trillion (negative SDE/EBITDA allowed), growth from -100% to 1000%, nonnegative integer employee counts up to 10 million, interest rates from 0% to 100%, and loan terms from 0 to 100 years (at most 1,200 schedule rows per loan). These are parser/resource limits, not underwriting recommendations. Zero or economically inconsistent inputs still go through the existing financial preflight. IDs must be nonblank and at most 256 characters; names at most 1,000 characters; timestamps must be parseable. Listing source objects use the separate listing validator. No cloud call is involved.
 
 ```bash
 npm run dev              # local dev server
