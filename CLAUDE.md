@@ -53,7 +53,8 @@ docs/
 - Installable web app manifest, mobile-friendly input sizing, and `/install` instructions/download route.
 - Extension packaging is reproducible with `npm run build:extension`; `npm run build` runs it automatically.
 - Saved-deal JSON import validates nested fields and metadata before persistence, caps file reads at 256 KiB, and bounds amortization work. Valid version-one/two exports preserve financial values and source evidence.
-- September 5 checkpoint: 105 unit tests pass; TypeScript, extension packaging and Next.js production build verified locally. Browser/device acceptance still pending.
+- Workspace tabs use one keyboard tab stop plus Arrow/Home/End navigation, skipping the locked memo. The defect was reproduced in the public desktop app before the local fix.
+- September 5 checkpoint: 115 unit tests pass; TypeScript, extension packaging and Next.js production build verified locally. Phone and extension acceptance on physical devices still pending.
 - Full calculation engine: valuation, financing/DSCR, returns/cash flow, scenario modeling, acquisition scoring, funding-gap validation, and explainable diligence insights — all pure, typed, unit-tested (40 tests passing).
 - `runAnalysis()` orchestrator ties every module together into one `AnalysisResult`.
 - Project scaffolding: Next.js 14 + TypeScript + Tailwind, Vitest configured with `@/` path alias, industry benchmark dataset with 10 industries.
@@ -73,7 +74,7 @@ docs/
 
 **Not yet built (in priority order — this is the roadmap):**
 1. Browser acceptance testing of the extension and phone installation on actual devices
-2. Accessible keyboard navigation and browser acceptance of saved-deal JSON import/error recovery
+2. Browser acceptance of saved-deal JSON import/error recovery
 3. Extend listing extraction using representative, permitted fixtures; preserve unknown values
 4. PDF document extraction with evidence review
 5. Offline web app support; cloud AI requires a separately eligible operator
