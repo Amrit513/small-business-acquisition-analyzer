@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+The active workbench uses lib/calculations/workbench.ts and docs/WORKBENCH-MODEL.md. Legacy financial code remains for historical tests; its old lender flags and benchmark blends do not drive the current interface. Cloud AI remains disabled.
+
 This file gives Claude Code (or any contributor) the context needed to work on this project correctly. Read this before making changes.
 
 ## What this project is

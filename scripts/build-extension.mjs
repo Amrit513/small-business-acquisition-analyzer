@@ -45,6 +45,8 @@ for (const size of [180,192,512]) await writeFile(`public/icons/icon-${size}.png
 for (const name of ["manifest.json", "popup.html", "popup.css"]) await copyFile(`extension/${name}`, `${output}/${name}`);
 await copyFile("docs/EXTENSION.md", `${output}/README.md`);
 await build({ entryPoints: ["extension/popup.ts"], outfile: `${output}/popup.js`, bundle: true, minify: true, platform: "browser", target: "chrome110", format: "iife", sourcemap: false });
-const files = ["manifest.json", "popup.html", "popup.css", "popup.js", "README.md", "icons/icon-16.png", "icons/icon-48.png", "icons/icon-128.png"];
+await copyFile("LICENSE", `${output}/LICENSE`);
+await copyFile("extension/PRIVACY.txt", `${output}/PRIVACY.txt`);
+const files = ["LICENSE","PRIVACY.txt","manifest.json", "popup.html", "popup.css", "popup.js", "README.md", "icons/icon-16.png", "icons/icon-48.png", "icons/icon-128.png"];
 await writeFile("public/downloads/acquisition-lens-extension.zip", await zipFiles(output, files));
 console.log(`Extension built: ${files.length} files; app icons and downloadable ZIP ready.`);

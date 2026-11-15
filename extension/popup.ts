@@ -13,7 +13,7 @@ function readReviewed(): ListingDraft {
   for (const field of listingFields) {
     const input = inputs.get(field);
     const raw = input?.value.trim() ?? "";
-    const amount = raw ? parseListingAmount(raw) : undefined;
+    const amount = raw ? parseListingAmount(raw, field) : undefined;
     input?.setAttribute("aria-invalid", String(Boolean(raw && amount === undefined)));
     if (raw && amount === undefined) throw new Error(`Review ${listingLabels[field].toLowerCase()}: use one USD amount or leave it blank.`);
     if (amount !== undefined) values[field] = amount;
@@ -48,8 +48,16 @@ async function capture() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id || !tab.url || !/^https?:\/\//.test(tab.url)) throw new Error("Open a regular business listing webpage first. Browser settings and PDF viewers cannot be captured.");
-    const [capture] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => ({ title: document.title, url: location.href, text: (window.getSelection()?.toString().trim() || document.body.innerText).slice(0, 60001) }) });
-    if (!capture?.result) throw new Error("This page could not be read. Select listing text and try again.");
+    const [capture] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => {
+      const active = document.activeElement;
+      if (active?.closest("input, textarea, [contenteditable=true]")) return { title:"", url:location.href, text:"" };
+      const selection = window.getSelection()?.toString().trim();
+      const main = document.querySelector<HTMLElement>("article, main, [role=main]");
+      return { title:document.title, url:location.href, text:(selection || main?.innerText || "").slice(0,60001) };
+    } });
+    const [current] = await chrome.tabs.query({ active:true, currentWindow:true });
+    if (tab.id !== current?.id || capture?.result?.url !== tab.url || current?.url !== tab.url) throw new Error("The active page changed. Capture the listing again.");
+    if (!capture?.result?.text.trim()) throw new Error("This page could not be read. Select listing text and try again.");
     render(extractListing(capture.result.text, capture.result.title, capture.result.url)); status("Review the extracted amounts before using them.");
   } catch (error) { status(error instanceof Error ? error.message : "Capture failed. The website may restrict extension access."); }
   finally { button.disabled = false; }
@@ -66,4 +74,6 @@ $("export").addEventListener("click", () => void action(() => {
   const anchor = document.createElement("a"); anchor.href = url; anchor.download = "acquisition-lens-listing.json"; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); status("Listing exported. Import it on the website whenever you are ready.");
 }));
 $("clear").addEventListener("click", () => void action(async () => { await chrome.storage.local.remove("listingDraft"); draft = undefined; $("review").hidden = true; inputs.clear(); status("Draft cleared from this browser."); }));
-void action(async () => { const saved = await chrome.storage.local.get("listingDraft"); if (saved.listingDraft) { render(parseListingDraft(JSON.stringify(saved.listingDraft))); status("Restored your saved draft."); } });
+void action(async () => { const saved = await chrome.storage.local.get("listingDraft"); if (saved.listingDraft) { try { render(parseListingDraft(JSON.stringify(saved.listingDraft))); status("Restored your saved draft."); } catch { $("recovery").hidden = false; status("The saved draft could not be read. You can clear it or capture a new listing."); } } });
+
+$("discard-corrupt").addEventListener("click", () => void action(async () => {await chrome.storage.local.remove("listingDraft"); $("recovery").hidden=true;status("Unreadable draft removed.");}));

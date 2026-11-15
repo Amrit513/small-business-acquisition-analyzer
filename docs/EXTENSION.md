@@ -16,12 +16,12 @@ Choose Capture this listing. Selecting the listing's financial text before captu
 
 Save draft stores a single draft in this browser. Clear deletes it. Export listing downloads JSON you can later import through Import listing on the website. Review in full analyzer opens https://acquisition-lens.vercel.app with a compact fragment handoff. The analyzer removes the fragment from the current history entry and requires a review before applying it. Fragments are not HTTP query parameters, but the destination page and browser can read them; only use this with listing information you intend to bring into Acquisition Lens.
 
-The analyzer starts a new deal with missing assumptions at zero, never values from the sample business. Set industry, expenses, owner compensation, growth and financing before acknowledging the review and generating a memo. Save your existing unsaved deal before applying an import.
+The redesigned workspace starts a new deal with unknown assumptions blank. Confirm the annual reporting period, assumptions and financing before preparing the memo. Review asks for confirmation before replacing an unsaved deal.
 
 ## Privacy and permissions
 
 - activeTab: temporary access to the page selected by your toolbar click.
-- scripting: reads visible page text or the current text selection when Capture is clicked.
+- scripting: reads the current text selection or visible main listing content when Capture is clicked.
 - storage: saves a draft locally, only after Save draft.
 - No broad host permissions, automatic content scripts, browsing history, cookies, account login or background network requests.
 - Extracted numbers, the source URL without query parameters, capture time and short evidence excerpts are retained. Full page text is not saved.

@@ -23,14 +23,19 @@ const labels: Record<ListingField, string> = {
   ebitda: "(?:adjusted\\s+ebitda|ebitda)",
 };
 
-/** Deliberately conservative: USD, one exact nonnegative amount, no ranges or multiples. */
-export function parseListingAmount(raw: string): number | undefined {
-  const match = raw.trim().match(/^(?:USD\s*|US\s*\$\s*|\$\s*)?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s*(k|m|million|thousand|billion|b)?(?:\s*USD)?$/i);
+/** One USD amount; a leading minus or accounting parentheses can mean an earnings loss. */
+export function parseListingAmount(raw: string, field?: ListingField): number | undefined {
+  let text = raw.trim();
+  const signed = field === "sde" || field === "ebitda";
+  const negative = text.startsWith("-") || /^\(.+\)$/.test(text);
+  if (negative && !signed) return undefined;
+  if (negative) text = text[0] === "(" ? text.slice(1, -1).trim() : text.slice(1).trim();
+  const match = text.match(/^(?:USD\s*|US\s*\$\s*|\$\s*)?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s*(k|m|million|thousand|billion|b)?(?:\s*USD)?$/i);
   if (!match?.[1]) return undefined;
   const suffix = match[2]?.toLowerCase();
   const factor = suffix === "k" || suffix === "thousand" ? 1e3 : suffix === "m" || suffix === "million" ? 1e6 : suffix === "b" || suffix === "billion" ? 1e9 : 1;
   const value = Number(match[1].replace(/,/g, "")) * factor;
-  return Number.isFinite(value) && value >= 0 && value <= 1e12 ? Math.round(value * 100) / 100 : undefined;
+  return Number.isFinite(value) && value >= 0 && value <= 1e12 ? (negative ? -1 : 1) * Math.round(value * 100) / 100 : undefined;
 }
 
 export function safeListingUrl(raw: string): string {
@@ -50,12 +55,12 @@ export function extractListing(text: string, title = "", url = ""): ListingDraft
   for (const field of listingFields) {
     const candidates: Array<{ value: number; quote: string }> = [];
     let uncertain = false;
-    const pattern = new RegExp(`^${labels[field]}(?:\\s*\\((?:TTM|annual|USD)\\))?\\s*(?::|\\t|[-–—])?\\s*(.*)$`, "i");
+    const pattern = new RegExp(`^${labels[field]}(?:\\s*\\((?:TTM|annual|USD)\\))?\\s*(?::|\\t|[-–—]\\s+)?\\s*(.*)$`, "i");
     lines.forEach((line, index) => {
       const match = line.match(pattern);
       if (!match) return;
       const amountText = match[1]?.trim() || lines[index + 1] || "";
-      const value = parseListingAmount(amountText);
+      const value = parseListingAmount(amountText, field);
       if (value === undefined) uncertain = true;
       else candidates.push({ value, quote: `${line}${match[1]?.trim() ? "" : ` ${amountText}`}`.slice(0, 180) });
     });
@@ -74,7 +79,7 @@ export function extractListing(text: string, title = "", url = ""): ListingDraft
 
 /** Whitelist external input; never accept evidence levels, HTML or extra financial fields. */
 export function parseListingDraft(raw: string): ListingDraft {
-  if (raw.length > 12000) throw new Error("This listing is too large to import.");
+  if (raw.length > 12000 || new TextEncoder().encode(raw).length > 12000) throw new Error("This listing is too large to import.");
   const data: unknown = JSON.parse(raw);
   if (!data || typeof data !== "object") throw new Error("Invalid listing file.");
   const value = data as Record<string, unknown>;
@@ -84,11 +89,11 @@ export function parseListingDraft(raw: string): ListingDraft {
   for (const field of listingFields) {
     const amount = (value.values as Record<string, unknown>)[field];
     if (amount !== undefined) {
-      if (typeof amount !== "number" || !Number.isFinite(amount) || amount < 0 || amount > 1e12) throw new Error(`Invalid ${listingLabels[field].toLowerCase()} in listing.`);
+      if (typeof amount !== "number" || !Number.isFinite(amount) || amount < ((field === "sde" || field === "ebitda") ? -1e12 : 0) || amount > 1e12) throw new Error(`Invalid ${listingLabels[field].toLowerCase()} in listing.`);
       values[field] = amount;
     }
     const quote = value.quotes && typeof value.quotes === "object" ? (value.quotes as Record<string, unknown>)[field] : undefined;
-    if (typeof quote === "string") quotes[field] = quote.slice(0, 180);
+    if (amount !== undefined && typeof quote === "string") quotes[field] = quote.slice(0, 180);
   }
   return {
     kind: "acquisition-lens-listing", version: 1,
@@ -96,7 +101,7 @@ export function parseListingDraft(raw: string): ListingDraft {
     url: typeof value.url === "string" ? safeListingUrl(value.url) : "",
     capturedAt: typeof value.capturedAt === "string" && Number.isFinite(Date.parse(value.capturedAt)) ? new Date(value.capturedAt).toISOString() : new Date().toISOString(),
     values, quotes,
-    warnings: ["Review every amount. Imported listing claims have not been independently verified."],
+    warnings: [...new Set([...(Array.isArray(value.warnings) ? value.warnings.filter((w): w is string => typeof w === "string" && w.length <= 220).slice(0, 8) : []), "Review every amount. Imported listing claims have not been independently verified."])],
   };
 }
 

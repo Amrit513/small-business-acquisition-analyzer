@@ -1,4 +1,6 @@
-# Financial Formulas Reference
+# Historical engine formulas (not the current workbench)
+
+The active version 3.0 model is documented in [WORKBENCH-MODEL.md](WORKBENCH-MODEL.md). The definitions below apply only to retained legacy library code and tests; the current interface and memo do not use its blended benchmark valuation, lender flag, or score.
 
 This document is the source of truth for every calculation in the engine. If code and this doc ever disagree, that's a bug — file it. Every formula below links to its implementation.
 

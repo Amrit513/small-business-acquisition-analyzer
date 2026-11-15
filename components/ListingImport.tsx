@@ -36,8 +36,8 @@ export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => v
     for (const field of listingFields) {
       const raw = amounts[field]?.trim() ?? "";
       if (raw) {
-        const amount = parseListingAmount(raw);
-        if (amount === undefined) { setError(`Enter one nonnegative USD amount for ${listingLabels[field].toLowerCase()}, or leave it blank.`); return; }
+        const amount = parseListingAmount(raw, field);
+        if (amount === undefined) { setError(`Enter one supported USD amount for ${listingLabels[field].toLowerCase()}, or leave it blank.`); return; }
         values[field] = amount;
       }
       if (values[field] !== draft.values[field]) delete quotes[field];

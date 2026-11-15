@@ -1,60 +1,34 @@
 # Acquisition Lens
 
-A private workspace for screening small business acquisitions. Built with Next.js, TypeScript and a reusable financial engine.
+A local-first educational workbench for screening small business acquisitions. Version 3 explains the inputs behind a number before presenting it in a memo.
 
-## What it does
+## Three-minute demo
 
-- Models valuation, loan payments, debt coverage, owner cash flow and returns.
-- Compares scenarios and shows a sensitivity matrix and an explainable diligence checklist.
-- Saves deal snapshots locally in IndexedDB and exports JSON and PDF investment memos.
-- Imports business listing text through a conservative on-device extractor, with source excerpts and a review step.
-- Includes a Chrome/Edge extension for click-only listing capture, editable figures, local drafts, screening ratios and export.
-- Supports home-screen web app installation on phones and desktop through `/install`.
+Open the clearly fictional Atlas Home Services sample. Inspect pretax cash to equity and the SDE source note. Try the scenario preset for a 10% revenue decline and 3% expense increase. Save a copy, change an assumption, use **Save as alternative**, and compare both snapshots. In **Memo**, choose **Prepare PDF memo**, then **Save prepared PDF**.
 
-This is a screening and educational tool, not a substitute for verified financial records or professional due diligence. Benchmark inputs are directional estimates. Read the evidence labels and formula documentation before interpreting an output.
+New deals begin with unknown values blank. The financial model separates seller add-backs from buyer pay, reconciles purchase funding, respects each note's maturity, and uses an editable educational valuation range. [The active formulas and hand checks](docs/WORKBENCH-MODEL.md) state inclusions and exclusions. The old model code and historical formulas remain for reference but do not drive the current interface.
 
-## Run locally
+## Privacy and limitations
+
+Calculations, local IndexedDB snapshots, listing extraction and PDF/JSON export run on the device. Export JSON to keep a separate backup; local storage does not sync. Cloud AI is disabled. An extension handoff URL fragment is visible to the site and browser history, so use manual JSON transfer for sensitive listings. Source annotations are not authenticated verification. This educational screen is not legal, tax, lender, appraisal or investment advice. See [release risks](docs/RELEASE-RISK.md), [dependency notices](public/downloads/THIRD-PARTY-NOTICES.txt) and the [case study](app/case-study/page.tsx).
+
+## Develop and verify
+
+Use Node 24, as in CI.
 
 ```sh
 npm ci
-npm run dev
-```
-
-Open the local address printed by Next.js. No API key is required. The optional cloud AI endpoint is disabled in this release; the research modules and evaluation fixtures remain in `lib/ai`. No submitted financial data is forwarded by the API route.
-
-## Validate and package
-
-```sh
 npm test
-npm run build
 npm run typecheck
+npm run build:extension
+npm run build
+npm audit --omit=dev
 ```
 
-The production build also creates the extension, its ZIP, and app icons. For the extension alone, run `npm run build:extension`. Load `dist/extension` as an unpacked extension on a desktop browser, or download the ZIP from `/install`. This is a developer preview, not a published Chrome Web Store package.
+`npm run dev` starts Next.js. The production build packages a Manifest V3 extension at `dist/extension` and `/downloads/acquisition-lens-extension.zip`. The extension can be loaded unpacked on desktop Chrome/Edge; it is not store-approved. `/install` provides web app installation guidance, but there is no native mobile package or tested offline shell.
 
-The web app needs a connection to open. Saved deals and extension drafts do not sync across browsers or devices; move them with JSON exports. There is no native App Store package or offline shell in this release.
+The active pure financial model is `lib/calculations/workbench.ts`, validated storage is `lib/storage/workspace.ts`, shared listing extraction is `lib/import/listing.ts`, and the PDF is in `components/workbench/Report.tsx`. This project was developed with AI assistance and does not claim external user research or professional model validation.
 
-## Deploy
-
-The project includes `vercel.json` with the Next.js framework, `npm run build`, and `.next` output directory. Deploy the source root containing `package.json` to the existing Acquisition Lens project. Do not upload a parent directory, old ZIP, or an empty output folder. A correct deployment log shows the Next.js build and the `/`, `/install`, and `/manifest.webmanifest` routes. A READY status by itself does not prove the website works; verify the actual route and extension download.
-
-## Project map
-
-| Location | Responsibility |
-| --- | --- |
-| `lib/calculations` | Pure financial engine and tested screening ratios |
-| `lib/import` | Shared listing extraction, validation and handoff |
-| `lib/storage` | IndexedDB snapshots and JSON exchange |
-| `lib/evidence` | User-labeled evidence provenance |
-| `components` | Web workspace, report and review flows |
-| `extension` | Manifest V3 popup and permission declarations |
-| `scripts/build-extension.mjs` | Reproducible extension ZIP and app icons |
-| `docs` | Formulas, architecture, extension guide and AI research methodology |
-
-See [CLAUDE.md](CLAUDE.md) for contributor rules, [formula definitions](docs/FORMULAS.md) for the model, and [extension documentation](docs/EXTENSION.md) for permissions and data handling.
-
-## Verification checkpoint
-
-September 5, 2026: unit suite, TypeScript and production build checks. Real-device extension installation, phone installation and a full accessibility audit remain acceptance work. CI runs tests and the build on pull requests.
+The source is reviewed on [draft PR #1](https://github.com/Amrit513/small-business-acquisition-analyzer/pull/1). A local build or preview does not prove the production site is ready; verify the actual deployed commit, routes and ZIP separately. Real phone installation, live extension loading and manual accessibility checks are still release gates.
 
 MIT licensed. See [LICENSE](LICENSE).

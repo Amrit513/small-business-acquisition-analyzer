@@ -1,5 +1,5 @@
-import { AcquisitionAnalyzer } from "@/components/AcquisitionAnalyzer";
+import { Workbench } from "@/components/Workbench";
 
 export default function HomePage() {
-  return <AcquisitionAnalyzer />;
+  return <Workbench />;
 }

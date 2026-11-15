@@ -1,0 +1,10 @@
+import React from "react";
+import {renderToFile} from "@react-pdf/renderer";
+import {Report,registerReportFont} from "../components/workbench/Report";
+import {sampleDeal} from "../lib/workspace/deal";
+import {calculate} from "../lib/calculations/workbench";
+import {mkdirSync} from "node:fs";
+const d=sampleDeal();registerReportFont(process.cwd()+"/public/fonts");
+mkdirSync("tmp/pdfs",{recursive:true});
+await renderToFile(<Report deal={d} result={calculate(d)} generated="2026-11-15"/>,"tmp/pdfs/atlas-sample.pdf");
+console.log("Rendered fictional sample PDF to tmp/pdfs/atlas-sample.pdf");
