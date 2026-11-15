@@ -1,5 +1,6 @@
 import { extractListing, listingFields, listingFragment, listingLabels, parseListingAmount, parseListingDraft, type ListingDraft } from "../lib/import/listing";
 import { screenListing } from "../lib/calculations/listingScreen";
+import { readListingPage } from "./pageCapture";
 
 let draft: ListingDraft | undefined;
 const $ = (id: string) => { const element = document.getElementById(id); if (!element) throw new Error(`Missing control ${id}`); return element; };
@@ -48,16 +49,12 @@ async function capture() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id || !tab.url || !/^https?:\/\//.test(tab.url)) throw new Error("Open a regular business listing webpage first. Browser settings and PDF viewers cannot be captured.");
-    const [capture] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => {
-      const active = document.activeElement;
-      if (active?.closest("input, textarea, [contenteditable=true]")) return { title:"", url:location.href, text:"" };
-      const selection = window.getSelection()?.toString().trim();
-      const main = document.querySelector<HTMLElement>("article, main, [role=main]");
-      return { title:document.title, url:location.href, text:(selection || main?.innerText || "").slice(0,60001) };
-    } });
+    const [capture] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: readListingPage });
     const [current] = await chrome.tabs.query({ active:true, currentWindow:true });
     if (tab.id !== current?.id || capture?.result?.url !== tab.url || current?.url !== tab.url) throw new Error("The active page changed. Capture the listing again.");
-    if (!capture?.result?.text.trim()) throw new Error("This page could not be read. Select listing text and try again.");
+    if (!capture?.result?.text.trim()) throw new Error(capture?.result?.ambiguousArticles
+      ? "This page has several listing cards. Select the text for one listing and capture again."
+      : "This page could not be read. Select listing text and try again.");
     render(extractListing(capture.result.text, capture.result.title, capture.result.url)); status("Review the extracted amounts before using them.");
   } catch (error) { status(error instanceof Error ? error.message : "Capture failed. The website may restrict extension access."); }
   finally { button.disabled = false; }

@@ -57,3 +57,7 @@ Pending release gates: actual phone reflow/installation, 200% zoom and full keyb
 ## Keyboard interaction follow-up
 
 The financial metric inspector now uses the browser's modal dialog behavior instead of a visually modal overlay. In supervised desktop Chrome, opening it restricted the accessibility tree to the dialog, Tab remained inside, Escape closed it, and focus returned to the original Inspect button. This is a targeted manual check, not a full WCAG audit or phone acceptance.
+
+## Extension capture selection follow-up
+
+Click-to-capture now prefers an explicit selection, then a nonempty main region, then a single article. Multiple article cards without a main region require explicit selection rather than silently importing the first card. Editable controls are excluded, and the tab-change check and 60,001-character transfer cap remain. Five synthetic page-selection tests, 144 total unit tests, strict TypeScript, extension packaging and the Next.js production build passed locally on November 15. This does not establish that the unpacked extension has been exercised on a real listing in Chrome or Edge; that release gate remains pending.
