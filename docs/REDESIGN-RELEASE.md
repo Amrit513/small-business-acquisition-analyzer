@@ -91,3 +91,7 @@ Capturing a new listing after an unreadable saved draft now dismisses the stale 
 ## Narrow reflow safeguards
 
 Below 420 CSS pixels, the brand and site navigation now reflow into separate rows instead of competing for one fixed header line. Long user-controlled deal names, saved-deal labels and evidence metadata can wrap without forcing page-level horizontal overflow; formula-inspector rows also stack at that width. These safeguards target narrow phone layouts and zoom reflow, but physical-device and manual 200% zoom acceptance remain pending.
+
+## Listing reporting-period warnings
+
+The shared web/extension extractor now detects monthly revenue, SDE and EBITDA claims even when “monthly” appears in the label rather than the amount. It does not multiply them into annual values. A generic revenue label that supplies a usable amount but does not say annual or TTM receives a separate reporting-period warning. Users must confirm and enter annual USD values during review; unknown figures remain unknown.

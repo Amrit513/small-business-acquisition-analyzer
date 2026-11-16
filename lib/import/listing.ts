@@ -22,6 +22,11 @@ const labels: Record<ListingField, string> = {
   sde: "(?:seller['’]?s?\\s+discretionary\\s+earnings|sde|cash\\s+flow\\s*\\(\\s*sde\\s*\\))",
   ebitda: "(?:adjusted\\s+ebitda|ebitda)",
 };
+const monthlyClaims: Partial<Record<ListingField, RegExp>> = {
+  annualRevenue: /(?:\bmonthly\s+(?:revenue|sales|gross\s+income)\b|\b(?:revenue|sales|gross\s+income)\b[^\n]{0,80}(?:\/\s*(?:mo(?:nth)?|month)|per\s+month|monthly))/i,
+  sde: /(?:\bmonthly\s+sde\b|\bsde\b[^\n]{0,80}(?:\/\s*(?:mo(?:nth)?|month)|per\s+month|monthly))/i,
+  ebitda: /(?:\bmonthly\s+(?:adjusted\s+)?ebitda\b|\bebitda\b[^\n]{0,80}(?:\/\s*(?:mo(?:nth)?|month)|per\s+month|monthly))/i,
+};
 
 /** One USD amount; a leading minus or accounting parentheses can mean an earnings loss. */
 export function parseListingAmount(raw: string, field?: ListingField): number | undefined {
@@ -78,6 +83,10 @@ export function extractListing(text: string, title = "", url = ""): ListingDraft
     } else if (unique.length > 1 || uncertain) {
       draft.warnings.push(`${listingLabels[field]} is ambiguous or not an exact annual USD amount. Enter it manually.`);
     }
+    if (monthlyClaims[field]?.test(text)) draft.warnings.push(`${listingLabels[field]} includes a monthly claim. It was not annualized; confirm and enter an annual USD amount manually.`);
+  }
+  if (draft.quotes.annualRevenue && !/\b(?:annual|annually|ttm|yearly|fiscal\s+year|fy\s*\d{2,4})\b/i.test(draft.quotes.annualRevenue)) {
+    draft.warnings.push("The revenue label did not state an annual or TTM period. Confirm its reporting period before use.");
   }
   if (/\bcash\s+flow\b/i.test(text) && draft.values.sde === undefined) draft.warnings.push("Cash flow was not assumed to mean SDE. Confirm the seller's earnings definition.");
   draft.warnings.push("Listing claims are unverified. Confirm USD currency and annual reporting periods before use.");

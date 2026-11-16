@@ -17,6 +17,18 @@ describe("listing import boundary", () => {
   it("does not hide an uncertain amount behind another matching label", () => {
     expect(extractListing("Asking Price: $500K\nAsking Price: $400K-$600K").values.purchasePrice).toBeUndefined();
   });
+  it("flags monthly claims without annualizing them", () => {
+    const draft = extractListing("Monthly Revenue: $50K\nAnnual Revenue: $600K\nSDE per month: $10K\nEBITDA: $120K / mo");
+    expect(draft.values).toEqual({ annualRevenue: 600000 });
+    expect(draft.warnings).toContain("Annual revenue includes a monthly claim. It was not annualized; confirm and enter an annual USD amount manually.");
+    expect(draft.warnings).toContain("SDE includes a monthly claim. It was not annualized; confirm and enter an annual USD amount manually.");
+    expect(draft.warnings).toContain("EBITDA includes a monthly claim. It was not annualized; confirm and enter an annual USD amount manually.");
+  });
+  it("flags a revenue amount whose label does not state its period", () => {
+    const draft = extractListing("Revenue: $300K");
+    expect(draft.values.annualRevenue).toBe(300000);
+    expect(draft.warnings).toContain("The revenue label did not state an annual or TTM period. Confirm its reporting period before use.");
+  });
   it("round-trips unicode through a fragment without putting values in a server query", () => {
     const draft = extractListing("Asking Price: $20K", "Café & co.");
     const fragment = listingFragment(draft);
