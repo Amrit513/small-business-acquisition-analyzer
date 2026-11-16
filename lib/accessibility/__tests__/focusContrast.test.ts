@@ -25,4 +25,10 @@ describe("focus indicator contrast", () => {
     expect(contrast(outline, "#ffffff")).toBeGreaterThanOrEqual(3);
     expect(contrast(outline, canvas)).toBeGreaterThanOrEqual(3);
   });
+
+  it("shows focus on keyboard-scrollable tables and the active tab panel", () => {
+    const css = readFileSync("app/workbench.css", "utf8");
+    expect(css).toMatch(/\.tablescroll:focus-visible[^{}]*\{[^}]*outline:/);
+    expect(css).toMatch(/\[role=tabpanel\]:focus-visible[^{}]*\{[^}]*outline:/);
+  });
 });

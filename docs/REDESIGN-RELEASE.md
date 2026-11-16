@@ -115,3 +115,7 @@ The workbench focus outline now uses brand green rather than the lighter lime, r
 ## Remaining compact touch targets
 
 The downside sliders, checkbox rows and primary site navigation now provide at least 44 CSS pixels of interactive height. The extension source link uses the same minimum target while preserving long-URL wrapping. These are source and build safeguards for phone-sized layouts; physical touch testing, 200% zoom review and the complete keyboard/assistive-technology acceptance remain pending.
+
+## Focusable result regions
+
+The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.
