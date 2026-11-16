@@ -95,3 +95,7 @@ Below 420 CSS pixels, the brand and site navigation now reflow into separate row
 ## Listing reporting-period warnings
 
 The shared web/extension extractor now detects monthly revenue, SDE and EBITDA claims even when “monthly” appears in the label rather than the amount. It does not multiply them into annual values. A generic revenue label that supplies a usable amount but does not say annual or TTM receives a separate reporting-period warning. Users must confirm and enter annual USD values during review; unknown figures remain unknown.
+
+## PDF provenance labels
+
+The memo header now prints “Period not recorded” when a deal has no reporting period. Source-appendix entries likewise label missing location, period and review date instead of rendering empty separators. The repeatable PDF fixture script includes a fictional missing-period/date case so Poppler text extraction can verify these labels without treating an import or generation time as source provenance.

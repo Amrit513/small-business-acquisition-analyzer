@@ -7,4 +7,7 @@ import {mkdirSync} from "node:fs";
 const d=sampleDeal();registerReportFont(process.cwd()+"/public/fonts");
 mkdirSync("tmp/pdfs",{recursive:true});
 await renderToFile(<Report deal={d} result={calculate(d)} generated="2026-11-15"/>,"tmp/pdfs/atlas-sample.pdf");
-console.log("Rendered fictional sample PDF to tmp/pdfs/atlas-sample.pdf");
+const unknownSource=sampleDeal();unknownSource.id="unknown-source-fixture";unknownSource.isSample=false;unknownSource.period="";
+unknownSource.evidence.sde={...unknownSource.evidence.sde!,period:"",date:""};
+await renderToFile(<Report deal={unknownSource} result={calculate(unknownSource)} generated="2026-11-16"/>,"tmp/pdfs/unknown-source-fixture.pdf");
+console.log("Rendered fictional PDF fixtures to tmp/pdfs");
