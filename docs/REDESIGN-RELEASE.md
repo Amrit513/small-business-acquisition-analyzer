@@ -83,3 +83,7 @@ The compact saved-deal controls, evidence actions and extension buttons now meet
 ## Listing capture provenance
 
 Listing JSON with a missing, malformed or ambiguous capture timestamp now keeps the capture time unknown instead of substituting the import time. Valid timezone-aware ISO timestamps are normalized to UTC, while the extension and evidence view label unavailable capture time explicitly. This prevents imported evidence from appearing more recent than its source supports. The source excerpt, field value and listing-claim status remain unchanged.
+
+## Extension draft recovery
+
+Capturing a new listing after an unreadable saved draft now dismisses the stale recovery action and tells the user to save to replace that draft. Saving, clearing or explicitly discarding also resets the recovery state. This prevents the old recovery control from deleting a newly saved valid capture. Browser-installed acceptance still distinguishes a source/build check from exercised Chrome or Edge behavior.
