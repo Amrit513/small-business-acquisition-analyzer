@@ -111,3 +111,7 @@ The popup integration fixture now exercises an unreadable saved draft followed b
 ## Focus-indicator contrast
 
 The workbench focus outline now uses brand green rather than the lighter lime, raising calculated contrast from 2.20:1 to 9.25:1 against white and from 2.05:1 to 8.61:1 against the canvas. A regression test reads the actual web and extension CSS and requires at least 3:1 against white and each product canvas. This verifies color math, not a complete keyboard or assistive-technology review.
+
+## Remaining compact touch targets
+
+The downside sliders, checkbox rows and primary site navigation now provide at least 44 CSS pixels of interactive height. The extension source link uses the same minimum target while preserving long-URL wrapping. These are source and build safeguards for phone-sized layouts; physical touch testing, 200% zoom review and the complete keyboard/assistive-technology acceptance remain pending.
