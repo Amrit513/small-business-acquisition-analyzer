@@ -135,3 +135,7 @@ The on-screen memo and exported PDF now print the actual user-selected debt-cove
 ## Extension storage-failure recovery
 
 Extension save, clear, corrupt-draft deletion and startup restore failures now use actionable messages instead of exposing raw browser errors. A failed deletion leaves the reviewed draft visible and accurately states that it may still be stored; a failed save directs the user to JSON export. Popup integration coverage exercises rejected storage writes and deletion while confirming that the reviewed draft is retained.
+
+## Saved-library action recovery
+
+Saved-record JSON export now reports preparation failures without changing the local snapshot. Deletion success removes the record from the visible library immediately; a later database refresh can no longer turn a completed deletion into a false failure message. A rejected deletion keeps the record visible and explicitly says it remains on this device.
