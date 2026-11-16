@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { listingFromFragment } from "@/lib/import/listing";
 
 class ElementStub {
   hidden = false;
@@ -10,27 +11,33 @@ class ElementStub {
   placeholder = "";
   href = "";
   download = "";
+  clickCount = 0;
   private listeners = new Map<string, Array<() => void>>();
   addEventListener(type: string, listener: () => void) { this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]); }
   setAttribute() {}
   append() {}
   replaceChildren() {}
-  click() { for (const listener of this.listeners.get("click") ?? []) listener(); }
+  click() { this.clickCount++; for (const listener of this.listeners.get("click") ?? []) listener(); }
 }
 
-describe("extension popup draft recovery", () => {
-  afterEach(() => { vi.unstubAllGlobals(); vi.resetModules(); });
+const ids = ["status", "recovery", "review", "title", "source", "captured", "fields", "warnings", "multiple", "margin", "capture", "open", "save", "export", "clear", "discard-corrupt"];
+function popupDocument() {
+  const elements = Object.fromEntries(ids.map(id => [id, new ElementStub()])) as Record<string, ElementStub>;
+  const created: ElementStub[] = [];
+  elements.recovery!.hidden = true; elements.review!.hidden = true; elements.source!.hidden = true;
+  return { elements, created, document: {
+    getElementById: (id: string) => elements[id] ?? null,
+    createElement: () => { const element = new ElementStub(); created.push(element); return element; },
+  } };
+}
 
-  it("hides stale recovery after recapture and replaces the unreadable draft on save", async () => {
-    const ids = ["status", "recovery", "review", "title", "source", "captured", "fields", "warnings", "multiple", "margin", "capture", "open", "save", "export", "clear", "discard-corrupt"];
-    const elements = Object.fromEntries(ids.map(id => [id, new ElementStub()])) as Record<string, ElementStub>;
-    elements.recovery!.hidden = true; elements.review!.hidden = true; elements.source!.hidden = true;
-    vi.stubGlobal("document", {
-      getElementById: (id: string) => elements[id] ?? null,
-      createElement: () => new ElementStub(),
-    });
+describe("extension popup local workflow", () => {
+  afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.resetModules(); });
+
+  it("recovers, captures, saves, exports, hands off and restores a reviewed draft", async () => {
+    const first = popupDocument(); vi.stubGlobal("document", first.document);
     let stored: unknown = { malformed: true };
-    vi.stubGlobal("chrome", {
+    const chromeStub = {
       storage: { local: {
         get: vi.fn(async () => ({ listingDraft: stored })),
         set: vi.fn(async (value: { listingDraft: unknown }) => { stored = value.listingDraft; }),
@@ -38,26 +45,49 @@ describe("extension popup draft recovery", () => {
       } },
       tabs: {
         query: vi.fn(async () => [{ id: 7, url: "https://example.com/listing" }]),
-        create: vi.fn(async () => undefined),
+        create: vi.fn(async (_input: { url: string }) => undefined),
       },
       scripting: { executeScript: vi.fn(async () => [{ result: {
         text: "Asking Price: $425,000\nSDE: $170,000",
         title: "Fixture listing", url: "https://example.com/listing", ambiguousArticles: false,
       } }]) },
-    });
+    };
+    vi.stubGlobal("chrome", chromeStub);
+    const createUrl = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:fixture-export");
+    vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => undefined);
 
     await import("../popup");
-    await vi.waitFor(() => expect(elements.recovery!.hidden).toBe(false));
-    expect(elements.status!.textContent).toContain("could not be read");
+    await vi.waitFor(() => expect(first.elements.recovery!.hidden).toBe(false));
+    expect(first.elements.status!.textContent).toContain("could not be read");
 
-    elements.capture!.click();
-    await vi.waitFor(() => expect(elements.status!.textContent).toContain("save to replace"));
-    expect(elements.recovery!.hidden).toBe(true);
-    expect(elements.review!.hidden).toBe(false);
+    first.elements.capture!.click();
+    await vi.waitFor(() => expect(first.elements.status!.textContent).toContain("save to replace"));
+    expect(first.elements.recovery!.hidden).toBe(true);
+    expect(first.elements.review!.hidden).toBe(false);
 
-    elements.save!.click();
-    await vi.waitFor(() => expect(elements.status!.textContent).toBe("Draft saved in this browser."));
-    expect(elements.recovery!.hidden).toBe(true);
+    first.elements.save!.click();
+    await vi.waitFor(() => expect(first.elements.status!.textContent).toBe("Draft saved in this browser."));
+    expect(first.elements.recovery!.hidden).toBe(true);
     expect(stored).toMatchObject({ kind: "acquisition-lens-listing", title: "Fixture listing", values: { purchasePrice: 425000, sde: 170000 } });
+
+    first.elements.export!.click();
+    await vi.waitFor(() => expect(first.elements.status!.textContent).toContain("Listing exported"));
+    const anchor = first.created.find(element => element.download === "acquisition-lens-listing.json");
+    expect(anchor).toMatchObject({ href: "blob:fixture-export", clickCount: 1 });
+    const exported = JSON.parse(await (createUrl.mock.calls[0]![0] as Blob).text());
+    expect(exported).toMatchObject({ title: "Fixture listing", values: { purchasePrice: 425000, sde: 170000 } });
+
+    first.elements.open!.click();
+    await vi.waitFor(() => expect(first.elements.status!.textContent).toBe("Opened a review in Acquisition Lens."));
+    const handoff = chromeStub.tabs.create.mock.calls[0]![0].url;
+    expect(new URL(handoff).search).toBe("");
+    expect(listingFromFragment(new URL(handoff).hash)?.values).toMatchObject({ purchasePrice: 425000, sde: 170000 });
+
+    vi.resetModules();
+    const reopened = popupDocument(); vi.stubGlobal("document", reopened.document);
+    await import("../popup");
+    await vi.waitFor(() => expect(reopened.elements.status!.textContent).toBe("Restored your saved draft."));
+    expect(reopened.elements.review!.hidden).toBe(false);
+    expect(reopened.elements.title!.value).toBe("Fixture listing");
   });
 });

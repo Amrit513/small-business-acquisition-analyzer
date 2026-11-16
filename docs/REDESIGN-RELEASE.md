@@ -103,3 +103,7 @@ The memo header now prints “Period not recorded” when a deal has no reportin
 ## Unknown evidence-date round trip
 
 An imported listing with no trustworthy capture timestamp can now be saved, exported and reimported while its linked evidence date remains empty. The validator still rejects malformed or impossible dates, and source notes entered in the Evidence form still require an explicit review date. This closes a failure where honest unknown provenance passed listing review but then made the deal fail snapshot serialization.
+
+## Extension workflow integration coverage
+
+The popup integration fixture now exercises an unreadable saved draft followed by capture, local save, JSON export, fragment handoff and a fresh popup restore. It verifies the exported allowlisted values, download filename, fragment-only transfer and restored title. This covers the extension logic with browser APIs simulated in Vitest; it does not replace loading the package and exercising the workflow in Chrome or Edge.
