@@ -64,6 +64,12 @@ Click-to-capture now prefers an explicit selection, then a nonempty main region,
 
 In a supervised local Chrome workbench session on November 15, the fictional Atlas sample exported a JSON download. Importing that same browser-downloaded file displayed “Imported as a new unsaved deal. Review its assumptions,” and the primary save control changed to “Save deal.” This checks one real export/import path only; malformed-file recovery, persistence after a fresh browser session, phone reflow and physical-device installation still need separate acceptance.
 
+## PDF cash-flow and funding transparency
+
+The investment memo now shows bank and seller notes separately, states total sources, and no longer combines unknown note amounts by substituting zero. Its scenario page adds an exact first-year pretax cash-flow bridge from SDE through buyer compensation, replacement labor, maintenance capital expenditure, working-capital increase and scheduled debt to cash returned on equity. The bridge explicitly separates pay for work from investment return and keeps taxes and sale proceeds outside scope. The report footer is anchored inside the second page so the added explanation cannot create a nearly empty trailing page.
+
+Local verification on November 15 rendered the fictional Atlas memo to two A4 pages, extracted the expected funding and cash-flow labels with Poppler, and visually inspected both rendered pages for clipping and page breaks. All 144 unit tests, strict TypeScript, the 10-file extension package and the Next.js production build also passed. This is local fixture evidence, not public-deployment, physical-phone or installed-extension verification.
+
 ## Import recovery and unsaved work follow-up
 
 The workbench now tracks unsaved edits independently of the status message. An invalid import leaves the current deal untouched and gives a file-format/size recovery message; a valid import is parsed before asking to replace an unsaved deal. A rejected replacement retains the current deal, and a successful import remains protected until it is saved. Opening a saved version clears the unsaved flag; opening a migrated legacy copy does not. This corrects a path where an error or a successful import changed the status text and accidentally disabled the discard warning. Local unit, type, extension-package and production-build checks passed. Browser acceptance for malformed imports could not run in this checkout because Chromium failed to open its process socket; it remains an open manual acceptance check.
