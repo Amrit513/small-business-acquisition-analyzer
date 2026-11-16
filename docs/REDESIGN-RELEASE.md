@@ -119,3 +119,7 @@ The downside sliders, checkbox rows and primary site navigation now provide at l
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.
+
+## Financial-setting validation feedback
+
+Out-of-range valuation multiples, coverage targets, projection lengths and scenario percentages now expose an invalid state and an associated range/step message. The calculator still retains the last valid assumption while a rejected value is being corrected, but no longer does so silently. This is source and build validation; browser and assistive-technology acceptance remains pending.

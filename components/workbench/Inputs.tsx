@@ -13,8 +13,8 @@ export function AmountInput({d,k,set}:{k:Field}&Editor){
  return <label className="amount"><span>{fields[k][0]}</span><span className="inputwrap"><input type="number" step="any" inputMode="decimal" value={v??""} placeholder="Unknown" onChange={e=>set(editValue(d,k,e.target.value===""?null:Number(e.target.value)))} aria-invalid={bad} aria-describedby={bad?"err-"+k:undefined}/><small>{fields[k][1]}</small></span>{bad&&<span className="error" id={"err-"+k}>Outside the supported range. Terms must be whole months.</span>}</label>;
 }
 export function Setting({d,set,k,label,min,max,step=0.01}:{k:keyof Settings;label:string;min:number;max:number;step?:number}&Editor){
- const [draft,change]=useState<string|null>(null);const n=d.settings[k];
- return <label className="amount"><span>{label}</span><input type="number" min={min} max={max} step={step} value={draft??String(n)} onChange={e=>{const raw=e.target.value;change(raw);if(raw!==""&&e.target.validity.valid)set({...d,settings:{...d.settings,[k]:Number(raw)}});}} onBlur={()=>change(null)}/></label>;
+ const [draft,change]=useState<string|null>(null),[bad,setBad]=useState(false);const n=d.settings[k],errorId=`setting-err-${k}`;
+ return <label className="amount"><span>{label}</span><input type="number" min={min} max={max} step={step} value={draft??String(n)} aria-invalid={bad} aria-describedby={bad?errorId:undefined} onChange={e=>{const raw=e.target.value,invalid=raw!==""&&!e.target.validity.valid;change(raw);setBad(invalid);if(raw!==""&&!invalid)set({...d,settings:{...d.settings,[k]:Number(raw)}});}} onBlur={()=>{change(null);setBad(false);}}/>{bad&&<span className="error" id={errorId} role="alert">Enter a value from {min} to {max} in steps of {step}.</span>}</label>;
 }
 export function Inputs({d,set,r}:Editor&{r:Result}){
  return <><section className="sheet"><div className="sectionhead"><span className="folio">01 / INPUTS</span><h2>Deal assumptions</h2><p>Enter what you know. Leave anything else blank.</p></div>
