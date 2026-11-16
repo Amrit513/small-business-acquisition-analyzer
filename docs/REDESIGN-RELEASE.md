@@ -107,3 +107,7 @@ An imported listing with no trustworthy capture timestamp can now be saved, expo
 ## Extension workflow integration coverage
 
 The popup integration fixture now exercises an unreadable saved draft followed by capture, local save, JSON export, fragment handoff and a fresh popup restore. It verifies the exported allowlisted values, download filename, fragment-only transfer and restored title. This covers the extension logic with browser APIs simulated in Vitest; it does not replace loading the package and exercising the workflow in Chrome or Edge.
+
+## Focus-indicator contrast
+
+The workbench focus outline now uses brand green rather than the lighter lime, raising calculated contrast from 2.20:1 to 9.25:1 against white and from 2.05:1 to 8.61:1 against the canvas. A regression test reads the actual web and extension CSS and requires at least 3:1 against white and each product canvas. This verifies color math, not a complete keyboard or assistive-technology review.
