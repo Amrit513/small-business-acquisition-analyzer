@@ -127,3 +127,7 @@ Out-of-range valuation multiples, coverage targets, projection lengths and scena
 ## Exact version-three import structure
 
 Version-three deal imports now reject unknown properties in the export envelope, deal, settings, values, evidence map and evidence rows. This prevents a typo or unsupported newer field from being silently discarded and then lost on re-export. Listing payloads continue through their separate allowlisting parser. Regression cases cover every tightened object boundary.
+
+## Coverage-target disclosure in reports
+
+The on-screen memo and exported PDF now print the actual user-selected debt-coverage comparison target beside a qualification that it is a screening assumption, not a lender standard. This keeps the threshold visible where a reader evaluates the reported coverage instead of relying on general footer language. The fictional fixture remains two A4 pages after spacing correction; Poppler text extraction and visual review confirmed the disclosure, valuation paragraph, footer and page breaks.
