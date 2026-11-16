@@ -79,3 +79,7 @@ The listing-review handoff now keeps the reviewed listing and amounts visible wh
 ## Touch targets and saved-deal action names
 
 The compact saved-deal controls, evidence actions and extension buttons now meet the product’s approximately 44-pixel touch-target goal. Saved-deal Open, Export and Delete controls also expose the deal name in their accessible names, so repeated controls are distinguishable to screen-reader and voice-control users. This is source and build validation; phone touch testing and a complete assistive-technology pass remain pending.
+
+## Listing capture provenance
+
+Listing JSON with a missing, malformed or ambiguous capture timestamp now keeps the capture time unknown instead of substituting the import time. Valid timezone-aware ISO timestamps are normalized to UTC, while the extension and evidence view label unavailable capture time explicitly. This prevents imported evidence from appearing more recent than its source supports. The source excerpt, field value and listing-claim status remain unchanged.

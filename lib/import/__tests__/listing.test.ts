@@ -40,4 +40,10 @@ describe("listing import boundary", () => {
     expect(safeListingUrl("javascript:alert(1)")).toBe("");
     expect(safeListingUrl("https://user:password@example.com")).toBe("");
   });
+  it("keeps missing or malformed capture provenance unknown", () => {
+    const base = { ...extractListing("Asking Price: $200K"), capturedAt: undefined };
+    expect(parseListingDraft(JSON.stringify(base)).capturedAt).toBe("");
+    expect(parseListingDraft(JSON.stringify({ ...base, capturedAt: "January 1" })).capturedAt).toBe("");
+    expect(parseListingDraft(JSON.stringify({ ...base, capturedAt: "2026-11-15T12:30:00-05:00" })).capturedAt).toBe("2026-11-15T17:30:00.000Z");
+  });
 });

@@ -33,7 +33,7 @@ function updateRatios() {
 function render(next: ListingDraft) {
   draft = next; $("review").hidden = false; ($("title") as HTMLInputElement).value = next.title;
   const source = $("source") as HTMLAnchorElement; source.hidden = !next.url; if (next.url) source.href = next.url;
-  $("captured").textContent = `Captured ${new Date(next.capturedAt).toLocaleString()}`;
+  $("captured").textContent = next.capturedAt ? `Captured ${new Date(next.capturedAt).toLocaleString()}` : "Capture time unavailable";
   $("fields").replaceChildren(); inputs.clear();
   for (const field of listingFields) {
     const label = document.createElement("label"); label.textContent = `${listingLabels[field]} · USD`;

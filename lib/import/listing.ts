@@ -48,6 +48,13 @@ export function safeListingUrl(raw: string): string {
   } catch { return ""; }
 }
 
+/** Preserve an actual capture instant; never replace missing provenance with import time. */
+function captureTimestamp(value: unknown): string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(value)) return "";
+  const time = Date.parse(value);
+  return Number.isFinite(time) ? new Date(time).toISOString() : "";
+}
+
 export function extractListing(text: string, title = "", url = ""): ListingDraft {
   const draft: ListingDraft = { kind: "acquisition-lens-listing", version: 1, title: title.trim().slice(0, 160) || "Imported listing", url: safeListingUrl(url), capturedAt: new Date().toISOString(), values: {}, quotes: {}, warnings: [] };
   const lines = text.slice(0, 60000).replace(/\u00a0/g, " ").split(/\r?\n/).map(line => line.trim()).filter(Boolean);
@@ -99,7 +106,7 @@ export function parseListingDraft(raw: string): ListingDraft {
     kind: "acquisition-lens-listing", version: 1,
     title: typeof value.title === "string" ? value.title.slice(0, 160) : "Imported listing",
     url: typeof value.url === "string" ? safeListingUrl(value.url) : "",
-    capturedAt: typeof value.capturedAt === "string" && Number.isFinite(Date.parse(value.capturedAt)) ? new Date(value.capturedAt).toISOString() : new Date().toISOString(),
+    capturedAt: captureTimestamp(value.capturedAt),
     values, quotes,
     warnings: [...new Set([...(Array.isArray(value.warnings) ? value.warnings.filter((w): w is string => typeof w === "string" && w.length <= 220).slice(0, 8) : []), "Review every amount. Imported listing claims have not been independently verified."])],
   };
