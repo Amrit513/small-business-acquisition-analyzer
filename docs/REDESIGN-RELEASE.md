@@ -131,3 +131,7 @@ Version-three deal imports now reject unknown properties in the export envelope,
 ## Coverage-target disclosure in reports
 
 The on-screen memo and exported PDF now print the actual user-selected debt-coverage comparison target beside a qualification that it is a screening assumption, not a lender standard. This keeps the threshold visible where a reader evaluates the reported coverage instead of relying on general footer language. The fictional fixture remains two A4 pages after spacing correction; Poppler text extraction and visual review confirmed the disclosure, valuation paragraph, footer and page breaks.
+
+## Extension storage-failure recovery
+
+Extension save, clear, corrupt-draft deletion and startup restore failures now use actionable messages instead of exposing raw browser errors. A failed deletion leaves the reviewed draft visible and accurately states that it may still be stored; a failed save directs the user to JSON export. Popup integration coverage exercises rejected storage writes and deletion while confirming that the reviewed draft is retained.

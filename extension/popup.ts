@@ -69,12 +69,12 @@ $("open").addEventListener("click", () => void action(async () => {
   const reviewed = readReviewed(); if (!Object.keys(reviewed.values).length) throw new Error("Enter at least one amount first.");
   await chrome.tabs.create({ url: `https://acquisition-lens.vercel.app/${listingFragment(reviewed)}` }); status("Opened a review in Acquisition Lens.");
 }));
-$("save").addEventListener("click", () => void action(async () => { await chrome.storage.local.set({ listingDraft: readReviewed() }); showRecovery(false); status("Draft saved in this browser."); }));
+$("save").addEventListener("click", () => void action(async () => { try { await chrome.storage.local.set({ listingDraft: readReviewed() }); } catch { throw new Error("Draft could not be saved in this browser. Export JSON to keep a backup."); } showRecovery(false); status("Draft saved in this browser."); }));
 $("export").addEventListener("click", () => void action(() => {
   const url = URL.createObjectURL(new Blob([JSON.stringify(readReviewed(), null, 2)], { type: "application/json" }));
   const anchor = document.createElement("a"); anchor.href = url; anchor.download = "acquisition-lens-listing.json"; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); status("Listing exported. Import it on the website whenever you are ready.");
 }));
-$("clear").addEventListener("click", () => void action(async () => { await chrome.storage.local.remove("listingDraft"); draft = undefined; showRecovery(false); $("review").hidden = true; inputs.clear(); status("Draft cleared from this browser."); }));
-void action(async () => { const saved = await chrome.storage.local.get("listingDraft"); if (saved.listingDraft) { try { render(parseListingDraft(JSON.stringify(saved.listingDraft))); status("Restored your saved draft."); } catch { showRecovery(true); status("The saved draft could not be read. You can clear it or capture a new listing."); } } });
+$("clear").addEventListener("click", () => void action(async () => { try { await chrome.storage.local.remove("listingDraft"); } catch { throw new Error("Draft could not be cleared. It remains visible and may still be stored in this browser."); } draft = undefined; showRecovery(false); $("review").hidden = true; inputs.clear(); status("Draft cleared from this browser."); }));
+void action(async () => { let saved: Record<string, unknown>; try { saved = await chrome.storage.local.get("listingDraft"); } catch { throw new Error("Local draft storage is unavailable. Capture and export still work, but saving may fail."); } if (saved.listingDraft) { try { render(parseListingDraft(JSON.stringify(saved.listingDraft))); status("Restored your saved draft."); } catch { showRecovery(true); status("The saved draft could not be read. You can clear it or capture a new listing."); } } });
 
-$("discard-corrupt").addEventListener("click", () => void action(async () => {await chrome.storage.local.remove("listingDraft");showRecovery(false);status("Unreadable draft removed.");}));
+$("discard-corrupt").addEventListener("click", () => void action(async () => {try { await chrome.storage.local.remove("listingDraft"); } catch { throw new Error("Unreadable draft could not be removed from browser storage."); }showRecovery(false);status("Unreadable draft removed.");}));

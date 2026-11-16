@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { listingFromFragment } from "@/lib/import/listing";
+import { extractListing, listingFromFragment } from "@/lib/import/listing";
 
 class ElementStub {
   hidden = false;
@@ -89,5 +89,28 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(() => expect(reopened.elements.status!.textContent).toBe("Restored your saved draft."));
     expect(reopened.elements.review!.hidden).toBe(false);
     expect(reopened.elements.title!.value).toBe("Fixture listing");
+  });
+
+  it("keeps the reviewed draft visible when browser storage writes or deletion fail", async () => {
+    const popup = popupDocument(); vi.stubGlobal("document", popup.document);
+    const set = vi.fn(async () => { throw new Error("browser-internal save error"); });
+    const remove = vi.fn(async () => { throw new Error("browser-internal remove error"); });
+    vi.stubGlobal("chrome", {
+      storage: { local: { get: vi.fn(async () => ({ listingDraft: extractListing("Asking Price: $425,000", "Stored listing") })), set, remove } },
+      tabs: { query: vi.fn(), create: vi.fn() }, scripting: { executeScript: vi.fn() },
+    });
+
+    await import("../popup");
+    await vi.waitFor(() => expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+
+    popup.elements.save!.click();
+    await vi.waitFor(() => expect(popup.elements.status!.textContent).toContain("Export JSON"));
+    expect(popup.elements.status!.textContent).not.toContain("browser-internal");
+    expect(popup.elements.review!.hidden).toBe(false);
+
+    popup.elements.clear!.click();
+    await vi.waitFor(() => expect(popup.elements.status!.textContent).toContain("remains visible"));
+    expect(popup.elements.status!.textContent).not.toContain("browser-internal");
+    expect(popup.elements.review!.hidden).toBe(false);
   });
 });
