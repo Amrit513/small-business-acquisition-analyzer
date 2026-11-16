@@ -123,3 +123,7 @@ The active tab panel and each keyboard-scrollable scenario, sensitivity and comp
 ## Financial-setting validation feedback
 
 Out-of-range valuation multiples, coverage targets, projection lengths and scenario percentages now expose an invalid state and an associated range/step message. The calculator still retains the last valid assumption while a rejected value is being corrected, but no longer does so silently. This is source and build validation; browser and assistive-technology acceptance remains pending.
+
+## Exact version-three import structure
+
+Version-three deal imports now reject unknown properties in the export envelope, deal, settings, values, evidence map and evidence rows. This prevents a typo or unsupported newer field from being silently discarded and then lost on re-export. Listing payloads continue through their separate allowlisting parser. Regression cases cover every tightened object boundary.

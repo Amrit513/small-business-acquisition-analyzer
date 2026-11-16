@@ -5,22 +5,24 @@ import { blankDeal, fieldKeys, newId, statuses, validAmount, type Deal, type Fie
 
 const obj=(x:unknown):x is Record<string,unknown>=>!!x&&typeof x==="object"&&!Array.isArray(x);
 const str=(x:unknown,len:number):x is string=>typeof x==="string"&&x.length<=len;
+const only=(x:Record<string,unknown>,keys:readonly string[])=>Object.keys(x).every(k=>keys.includes(k));
 const evidenceDate=(x:unknown):x is string=>str(x,10)&&(x===""||(/^\d{4}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x))&&new Date(x).toISOString().slice(0,10)===x));
 const invalid=():never=>{throw new Error("Unsupported or invalid deal file. Your current deal has not been changed.");};
 export function validSettings(s:unknown):s is Settings {
-  if(!obj(s))return false;
+  if(!obj(s)||!only(s,["coverageTarget","low","high","revenueChange","expenseChange","years"]))return false;
   return ([["coverageTarget",0.01,10],["low",0.01,50],["high",0.01,50],["revenueChange",-100,100],["expenseChange",-100,100],["years",1,10]] as const).every(([k,min,max])=>typeof s[k]==="number"&&Number.isFinite(s[k])&&s[k]>=min&&s[k]<=max)&&Number.isInteger(s.years);
 }
 export function validateDeal(x:unknown):Deal {
-  if(!obj(x)||x.version!==3||x.currency!=="USD"||!str(x.id,256)||!x.id.trim()||!str(x.name,180)||!x.name.trim()||
+  if(!obj(x)||!only(x,["version","id","name","updatedAt","isSample","currency","period","values","evidence","settings","earningsNote","assumptionsReviewed","listing","migrationNote"])||x.version!==3||x.currency!=="USD"||!str(x.id,256)||!x.id.trim()||!str(x.name,180)||!x.name.trim()||
     !str(x.updatedAt,40)||!Number.isFinite(Date.parse(x.updatedAt))||typeof x.isSample!=="boolean"||!str(x.period,100)||!str(x.earningsNote,1500)||
     typeof x.assumptionsReviewed!=="boolean"||!validSettings(x.settings)||!obj(x.values)||!obj(x.evidence))return invalid();
   const v=x.values,e=x.evidence,d=blankDeal(x.id,x.updatedAt);
+  if(!only(v,fieldKeys)||Object.keys(v).length!==fieldKeys.length||!only(e,fieldKeys))return invalid();
   Object.assign(d,{name:x.name,isSample:x.isSample,period:x.period,earningsNote:x.earningsNote,assumptionsReviewed:x.assumptionsReviewed,settings:Object.fromEntries(Object.keys(d.settings).map(k=>[k,x.settings && (x.settings as Settings)[k as keyof Settings]]))});
   for(const k of fieldKeys) {
     const n=v[k];if(n!==null&&!validAmount(k,n))return invalid();d.values[k]=n;
     const row=e[k];if(row===undefined)continue;
-    if(!obj(row)||n===null||row.value!==n||!str(row.period,100)||row.period!==d.period||!str(row.location,800)||!str(row.excerpt,600)||
+    if(!obj(row)||!only(row,["value","period","location","excerpt","date","status"])||n===null||row.value!==n||!str(row.period,100)||row.period!==d.period||!str(row.location,800)||!str(row.excerpt,600)||
       !evidenceDate(row.date)||!statuses.some(status=>status===row.status))return invalid();
     d.evidence[k]={value:n,period:row.period,location:row.location,excerpt:row.excerpt,date:row.date,status:row.status as Evidence["status"]};
   }
@@ -47,7 +49,7 @@ export function serialize(d:Deal):string {return JSON.stringify({schemaVersion:3
 export function parseSnapshot(raw:string):Deal {
   if(raw.length>MAX_DEAL_IMPORT_BYTES||new TextEncoder().encode(raw).length>MAX_DEAL_IMPORT_BYTES)throw new Error("Files must be 256 KiB or smaller.");
   const x:unknown=JSON.parse(raw);
-  return obj(x)&&x.schemaVersion===3?validateDeal(x.deal):migrate(parseDealExport(raw));
+  return obj(x)&&x.schemaVersion===3?(only(x,["schemaVersion","deal"])?validateDeal(x.deal):invalid()):migrate(parseDealExport(raw));
 }
 async function db(){return openDB("acquisition-lens",1,{upgrade(data){const store=data.createObjectStore("deals",{keyPath:"id"});store.createIndex("by-updated","updatedAt");}});}
 export type Stored={id:string;name:string;deal:Deal|null;original:string;legacy:boolean};
