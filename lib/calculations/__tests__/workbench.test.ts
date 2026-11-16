@@ -1,7 +1,7 @@
 import {describe,it,expect} from "vitest";
 import {calculate,scheduledPayments,sensitivity,metricText} from "../workbench";
 import {blankDeal,sampleDeal,editValue,editPeriod,fromListing} from "@/lib/workspace/deal";
-import {serialize,parseSnapshot,readStored} from "@/lib/storage/workspace";
+import {serialize,parseSnapshot,readStored,journalEntry} from "@/lib/storage/workspace";
 import {extractListing,parseListingDraft} from "@/lib/import/listing";
 
 describe("v3 workbench against independent examples",()=>{
@@ -12,8 +12,9 @@ describe("v3 workbench against independent examples",()=>{
  it("retains losses and flags unexplained earnings, without inventing a valuation",()=>{const d=editValue(sampleDeal(),"sde",-3000);const r=calculate(d);expect(r.valuationLow).toBeNull();expect(r.distribution).toBeLessThan(0);expect(r.coverage).toBeLessThan(0);expect(r.payback).toBeNull();expect(r.issues.some(s=>s.includes("bridge"))).toBe(true);expect(r.linked).toEqual([]);});
  it("matches a sensitivity cell to a separately rebuilt deal",()=>{const d=sampleDeal(),cell=sensitivity(d).find(s=>s.earningsPct===80&&s.rateChange===2);d.values.sde=136000;d.values.bankRate=11.5;expect(cell?.distribution).toBe(calculate(d).distribution);});
  it("preserves unknowns and explicit zero across JSON; clears source linkage on edits",()=>{const d=fromListing(extractListing("Asking price: $0"),"test","2026-06-01");const copy=parseSnapshot(serialize(d));expect(copy.values.purchasePrice).toBe(0);expect(copy.values.sde).toBeNull();expect(calculate(copy).ready).toBe(false);expect(editValue(copy,"purchasePrice",9).evidence.purchasePrice).toBeUndefined();expect(editPeriod(sampleDeal(),"FY 2026").evidence).toEqual({});});
- it("does not invent an evidence date when imported capture time is unknown",()=>{const listing=parseListingDraft(JSON.stringify({...extractListing("Asking price: $200K"),capturedAt:undefined}));const d=fromListing(listing,"test","2026-06-01");expect(d.listing?.capturedAt).toBe("");expect(d.evidence.purchasePrice?.date).toBe("");});
- it("rejects unsupported currency, nonfinite values, fractional months and forged evidence",()=>{for(const change of [(d:ReturnType<typeof sampleDeal>)=>Object.assign(d,{currency:"EUR"}),(d:ReturnType<typeof sampleDeal>)=>{d.values.sde=Infinity;},(d:ReturnType<typeof sampleDeal>)=>{d.values.bankYears=1.15;},(d:ReturnType<typeof sampleDeal>)=>{d.evidence.sde!.value=99;}]){const d=sampleDeal();change(d);expect(()=>serialize(d)).toThrow();}});
+ it("round-trips an unknown imported evidence date without inventing one",()=>{const listing=parseListingDraft(JSON.stringify({...extractListing("Asking price: $200K"),capturedAt:undefined}));const d=fromListing(listing,"test","2026-06-01");const copy=parseSnapshot(serialize(d));expect(copy.listing?.capturedAt).toBe("");expect(copy.evidence.purchasePrice?.date).toBe("");});
+ it("requires a review date for a newly entered source note",()=>{const d=sampleDeal();expect(()=>journalEntry(d,"sde","User assumption","Workbook p. 2","Entered SDE: $170,000","")).toThrow(/review date/);});
+ it("rejects unsupported currency, nonfinite values, fractional months and forged evidence",()=>{for(const change of [(d:ReturnType<typeof sampleDeal>)=>Object.assign(d,{currency:"EUR"}),(d:ReturnType<typeof sampleDeal>)=>{d.values.sde=Infinity;},(d:ReturnType<typeof sampleDeal>)=>{d.values.bankYears=1.15;},(d:ReturnType<typeof sampleDeal>)=>{d.evidence.sde!.value=99;},(d:ReturnType<typeof sampleDeal>)=>{d.evidence.sde!.date="2026-02-30";}]){const d=sampleDeal();change(d);expect(()=>serialize(d)).toThrow();}});
  it("makes corrupted local records recoverable without silently overwriting them",()=>{const item=readStored({id:"bad",version:3,name:"broken",saved:"untouched"});expect(item?.deal).toBeNull();expect(item?.original).toContain("untouched");});
  it("does not score unknown data or silently substitute sample values",()=>{const r=calculate(blankDeal("test","2026-01-01"));expect(r.distribution).toBeNull();expect(r.coverage).toBeNull();expect(r.sources).toBeNull();expect(r.ready).toBe(false);});
 });

@@ -99,3 +99,7 @@ The shared web/extension extractor now detects monthly revenue, SDE and EBITDA c
 ## PDF provenance labels
 
 The memo header now prints “Period not recorded” when a deal has no reporting period. Source-appendix entries likewise label missing location, period and review date instead of rendering empty separators. The repeatable PDF fixture script includes a fictional missing-period/date case so Poppler text extraction can verify these labels without treating an import or generation time as source provenance.
+
+## Unknown evidence-date round trip
+
+An imported listing with no trustworthy capture timestamp can now be saved, exported and reimported while its linked evidence date remains empty. The validator still rejects malformed or impossible dates, and source notes entered in the Evidence form still require an explicit review date. This closes a failure where honest unknown provenance passed listing review but then made the deal fail snapshot serialization.

@@ -5,6 +5,7 @@ import { blankDeal, fieldKeys, newId, statuses, validAmount, type Deal, type Fie
 
 const obj=(x:unknown):x is Record<string,unknown>=>!!x&&typeof x==="object"&&!Array.isArray(x);
 const str=(x:unknown,len:number):x is string=>typeof x==="string"&&x.length<=len;
+const evidenceDate=(x:unknown):x is string=>str(x,10)&&(x===""||(/^\d{4}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x))&&new Date(x).toISOString().slice(0,10)===x));
 const invalid=():never=>{throw new Error("Unsupported or invalid deal file. Your current deal has not been changed.");};
 export function validSettings(s:unknown):s is Settings {
   if(!obj(s))return false;
@@ -20,8 +21,7 @@ export function validateDeal(x:unknown):Deal {
     const n=v[k];if(n!==null&&!validAmount(k,n))return invalid();d.values[k]=n;
     const row=e[k];if(row===undefined)continue;
     if(!obj(row)||n===null||row.value!==n||!str(row.period,100)||row.period!==d.period||!str(row.location,800)||!str(row.excerpt,600)||
-      !str(row.date,10)||!/^\d{4}-\d{2}-\d{2}$/.test(row.date)||!Number.isFinite(Date.parse(row.date))||
-      new Date(row.date).toISOString().slice(0,10)!==row.date||!statuses.some(status=>status===row.status))return invalid();
+      !evidenceDate(row.date)||!statuses.some(status=>status===row.status))return invalid();
     d.evidence[k]={value:n,period:row.period,location:row.location,excerpt:row.excerpt,date:row.date,status:row.status as Evidence["status"]};
   }
   if(x.migrationNote!==undefined){if(!str(x.migrationNote,1600))return invalid();d.migrationNote=x.migrationNote;}
@@ -62,6 +62,6 @@ export async function persist(deal:Deal){const d=validateDeal(deal),dbi=await db
 export async function erase(id:string){const dbi=await db();try{await dbi.delete("deals",id);}finally{dbi.close();}}
 export function asCopy(d:Deal):Deal{return {...d,id:newId(),updatedAt:new Date().toISOString()};}
 export function journalEntry(d:Deal,k:Field,status:Evidence["status"],location:string,excerpt:string,date:string):Deal {
-  const value=d.values[k];if(value===null||!location.trim()||!excerpt.trim())throw new Error("Enter the figure, source location and excerpt first.");
+  const value=d.values[k];if(value===null||!location.trim()||!excerpt.trim()||!date.trim())throw new Error("Enter the figure, source location, excerpt and review date first.");
   return validateDeal({...d,evidence:{...d.evidence,[k]:{value,period:d.period,status,location:location.trim(),excerpt:excerpt.trim(),date}},assumptionsReviewed:false});
 }
