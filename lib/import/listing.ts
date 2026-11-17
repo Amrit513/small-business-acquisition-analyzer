@@ -97,27 +97,39 @@ export function extractListing(text: string, title = "", url = ""): ListingDraft
 export function parseListingDraft(raw: string): ListingDraft {
   if (raw.length > 12000 || new TextEncoder().encode(raw).length > 12000) throw new Error("This listing is too large to import.");
   const data: unknown = JSON.parse(raw);
-  if (!data || typeof data !== "object") throw new Error("Invalid listing file.");
+  if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid listing file.");
   const value = data as Record<string, unknown>;
+  const topKeys = new Set(["kind", "version", "title", "url", "capturedAt", "values", "quotes", "warnings"]);
+  if (Object.keys(value).some(key => !topKeys.has(key))) throw new Error("This listing contains unsupported fields.");
   if (value.kind !== "acquisition-lens-listing" || value.version !== 1 || !value.values || typeof value.values !== "object" || Array.isArray(value.values)) throw new Error("This is not an Acquisition Lens listing file.");
+  const rawValues = value.values as Record<string, unknown>;
+  if (Object.keys(rawValues).some(key => !listingFields.includes(key as ListingField))) throw new Error("This listing contains unsupported financial fields.");
+  if (value.quotes !== undefined && (!value.quotes || typeof value.quotes !== "object" || Array.isArray(value.quotes))) throw new Error("Invalid listing excerpts.");
+  const rawQuotes = (value.quotes ?? {}) as Record<string, unknown>;
+  if (Object.keys(rawQuotes).some(key => !listingFields.includes(key as ListingField))) throw new Error("This listing contains unsupported excerpt fields.");
+  if (value.title !== undefined && (typeof value.title !== "string" || value.title.length > 160)) throw new Error("Invalid listing title.");
+  if (value.url !== undefined && (typeof value.url !== "string" || value.url.length > 800)) throw new Error("Invalid listing source URL.");
+  if (value.capturedAt !== undefined && typeof value.capturedAt !== "string") throw new Error("Invalid listing capture time.");
+  if (value.warnings !== undefined && (!Array.isArray(value.warnings) || value.warnings.length > 20 || value.warnings.some(warning => typeof warning !== "string" || warning.length > 220))) throw new Error("Invalid listing warnings.");
   const values: ListingDraft["values"] = {};
   const quotes: ListingDraft["quotes"] = {};
   for (const field of listingFields) {
-    const amount = (value.values as Record<string, unknown>)[field];
+    const amount = rawValues[field];
     if (amount !== undefined) {
       if (typeof amount !== "number" || !Number.isFinite(amount) || amount < ((field === "sde" || field === "ebitda") ? -1e12 : 0) || amount > 1e12) throw new Error(`Invalid ${listingLabels[field].toLowerCase()} in listing.`);
       values[field] = amount;
     }
-    const quote = value.quotes && typeof value.quotes === "object" ? (value.quotes as Record<string, unknown>)[field] : undefined;
+    const quote = rawQuotes[field];
+    if (quote !== undefined && (typeof quote !== "string" || quote.length > 180)) throw new Error(`Invalid ${listingLabels[field].toLowerCase()} excerpt in listing.`);
     if (amount !== undefined && typeof quote === "string") quotes[field] = quote.slice(0, 180);
   }
   return {
     kind: "acquisition-lens-listing", version: 1,
-    title: typeof value.title === "string" ? value.title.slice(0, 160) : "Imported listing",
+    title: typeof value.title === "string" ? value.title : "Imported listing",
     url: typeof value.url === "string" ? safeListingUrl(value.url) : "",
     capturedAt: captureTimestamp(value.capturedAt),
     values, quotes,
-    warnings: [...new Set([...(Array.isArray(value.warnings) ? value.warnings.filter((w): w is string => typeof w === "string" && w.length <= 220).slice(0, 8) : []), "Review every amount. Imported listing claims have not been independently verified."])],
+    warnings: [...new Set([...(value.warnings as string[] | undefined ?? []), "Review every amount. Imported listing claims have not been independently verified."])],
   };
 }
 

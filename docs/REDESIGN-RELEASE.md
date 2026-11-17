@@ -120,6 +120,10 @@ The downside sliders, checkbox rows and primary site navigation now provide at l
 
 Invalid money, interest-rate and loan-term inputs now expose guidance for their own supported boundary instead of giving every field a loan-term message. The shared validation boundary supplies the message, and the associated error uses an alert role while the input retains `aria-invalid` and `aria-describedby`. This improves error recovery in source; assistive-technology and physical-device acceptance remain pending.
 
+## Strict listing import shape
+
+Listing JSON and extension handoffs now reject unknown top-level, financial-value and excerpt fields instead of silently dropping unsupported data. Optional metadata is type- and length-checked, while a missing or malformed string capture timestamp still remains explicitly unknown. This keeps the narrow listing schema separate from saved-deal and evidence schemas.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.

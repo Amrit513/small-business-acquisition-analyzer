@@ -40,8 +40,17 @@ describe("listing import boundary", () => {
     expect(() => parseListingDraft('{"kind":"acquisition-lens-listing","version":1,"values":{"sde":1e999}}')).toThrow();
     expect(() => listingFromFragment("#listing=%BAD")).toThrow();
   });
-  it("never imports evidence claims or stale sample assumptions", () => {
-    const draft = parseListingDraft(JSON.stringify({ ...extractListing("Asking Price: $200K"), evidence: { purchasePrice: "document-supported" }, values: { purchasePrice: 200000, ownerSalary: 50000 } }));
+  it("rejects unsupported structure instead of silently discarding it", () => {
+    const base = extractListing("Asking Price: $200K");
+    for (const change of [
+      { ...base, evidence: { purchasePrice: "document-supported" } },
+      { ...base, values: { purchasePrice: 200000, ownerSalary: 50000 } },
+      { ...base, quotes: { purchasePrice: "Asking Price: $200K", ownerSalary: "Seller pay: $50K" } },
+      { ...base, warnings: [5] },
+    ]) expect(() => parseListingDraft(JSON.stringify(change))).toThrow();
+  });
+  it("never fills missing listing values with sample assumptions", () => {
+    const draft = parseListingDraft(JSON.stringify(extractListing("Asking Price: $200K")));
     const result = listingToInputs(draft);
     expect(result.business.ownerSalary).toBe(0);
     expect(result.business.sde).toBe(0);
