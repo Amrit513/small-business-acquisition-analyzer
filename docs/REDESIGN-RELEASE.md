@@ -148,6 +148,10 @@ Current deal exports, legacy deal exports and extension listing JSON now accept 
 
 Comparison, the on-screen memo and the PDF now share one formatter for each bank and seller note's amount, annual rate and term. Zero debt is labeled as no note, while missing amounts, rates and terms remain explicit unknowns. The exported memo therefore retains the financing assumptions that explain its scheduled debt and coverage outputs.
 
+## Extension validation focus
+
+When extension review rejects an edited amount during save, export or handoff, focus now moves to that exact field and the input references the live error message. Correct fields clear the temporary relationship. Popup integration coverage confirms that invalid data is neither saved nor transferred while the rejected field is exposed to keyboard and assistive-technology users.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.

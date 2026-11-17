@@ -11,10 +11,15 @@ class ElementStub {
   placeholder = "";
   href = "";
   download = "";
+  id = "";
   clickCount = 0;
+  focusCount = 0;
+  attributes = new Map<string, string>();
   private listeners = new Map<string, Array<() => void>>();
   addEventListener(type: string, listener: () => void) { this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]); }
-  setAttribute() {}
+  setAttribute(name: string, value: string) { this.attributes.set(name, value); }
+  removeAttribute(name: string) { this.attributes.delete(name); }
+  focus() { this.focusCount++; }
   append() {}
   replaceChildren() {}
   click() { this.clickCount++; for (const listener of this.listeners.get("click") ?? []) listener(); }
@@ -64,6 +69,16 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(() => expect(first.elements.status!.textContent).toContain("save to replace"));
     expect(first.elements.recovery!.hidden).toBe(true);
     expect(first.elements.review!.hidden).toBe(false);
+
+    const purchasePrice = first.created.find(element => element.id === "listing-purchasePrice")!;
+    purchasePrice.value = "$400K-$500K";
+    first.elements.save!.click();
+    await vi.waitFor(() => expect(first.elements.status!.textContent).toContain("one USD amount"));
+    expect(purchasePrice.attributes.get("aria-invalid")).toBe("true");
+    expect(purchasePrice.attributes.get("aria-describedby")).toBe("status");
+    expect(purchasePrice.focusCount).toBe(1);
+    expect(stored).toEqual({ malformed: true });
+    purchasePrice.value = "425000";
 
     first.elements.save!.click();
     await vi.waitFor(() => expect(first.elements.status!.textContent).toBe("Draft saved in this browser."));

@@ -12,8 +12,8 @@ function showRecovery(show: boolean) { unreadableSavedDraft = show; $("recovery"
 function readReviewed(): ListingDraft {
   if (!draft) throw new Error("Capture a listing first.");
   const reviewed=reviewListingAmounts(draft,Object.fromEntries(listingFields.map(field=>[field,inputs.get(field)?.value??""])));
-  for(const field of listingFields)inputs.get(field)?.setAttribute("aria-invalid",String(!reviewed.ok&&reviewed.field===field));
-  if(!reviewed.ok)throw new Error(reviewed.message);
+  for(const field of listingFields){const input=inputs.get(field),invalid=!reviewed.ok&&reviewed.field===field;input?.setAttribute("aria-invalid",String(invalid));if(invalid)input?.setAttribute("aria-describedby","status");else input?.removeAttribute("aria-describedby");}
+  if(!reviewed.ok){inputs.get(reviewed.field)?.focus();throw new Error(reviewed.message);}
   return { ...reviewed.draft, title: ($("title") as HTMLInputElement).value.trim() || "Imported listing" };
 }
 function updateRatios() {
@@ -31,7 +31,7 @@ function render(next: ListingDraft) {
   $("fields").replaceChildren(); inputs.clear();
   for (const field of listingFields) {
     const label = document.createElement("label"); label.textContent = `${listingLabels[field]} · USD`;
-    const input = document.createElement("input"); input.inputMode = "decimal"; input.placeholder = "Not found"; input.value = next.values[field]?.toString() ?? "";
+    const input = document.createElement("input"); input.id = `listing-${field}`; input.inputMode = "decimal"; input.placeholder = "Not found"; input.value = next.values[field]?.toString() ?? "";
     input.addEventListener("input", updateRatios); label.append(input); inputs.set(field, input);
     if (next.quotes[field]) { const quote = document.createElement("span"); quote.className = "quote"; quote.textContent = `Source: ${next.quotes[field]}`; label.append(quote); }
     $("fields").append(label);
@@ -61,7 +61,7 @@ $("open").addEventListener("click", () => void action(async () => {
   const reviewed = readReviewed(); if (!Object.keys(reviewed.values).length) throw new Error("Enter at least one amount first.");
   await chrome.tabs.create({ url: `https://acquisition-lens.vercel.app/${listingFragment(reviewed)}` }); status("Opened a review in Acquisition Lens.");
 }));
-$("save").addEventListener("click", () => void action(async () => { try { await chrome.storage.local.set({ listingDraft: readReviewed() }); } catch { throw new Error("Draft could not be saved in this browser. Export JSON to keep a backup."); } showRecovery(false); status("Draft saved in this browser."); }));
+$("save").addEventListener("click", () => void action(async () => { const reviewed=readReviewed();try { await chrome.storage.local.set({ listingDraft: reviewed }); } catch { throw new Error("Draft could not be saved in this browser. Export JSON to keep a backup."); } showRecovery(false); status("Draft saved in this browser."); }));
 $("export").addEventListener("click", () => void action(() => {
   const url = URL.createObjectURL(new Blob([JSON.stringify(readReviewed(), null, 2)], { type: "application/json" }));
   const anchor = document.createElement("a"); anchor.href = url; anchor.download = "acquisition-lens-listing.json"; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); status("Listing exported. Import it on the website whenever you are ready.");
