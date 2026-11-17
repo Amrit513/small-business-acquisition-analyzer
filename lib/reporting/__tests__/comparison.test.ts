@@ -14,5 +14,7 @@ describe("comparison reporting",()=>{
   expect(row("Seller note · rate · term")?.[0]).toBe("No note");
   expect(row("Coverage comparison target")?.[0]).toBe("1.25× user assumption");
   expect(row("Reporting period")?.[1]).toBe("Not recorded");
+  expect(row("Current source-note links")).toEqual(["1 current source-note link","None linked"]);
+  expect(row("Linked evidence figures")).toBeUndefined();
  });
 });

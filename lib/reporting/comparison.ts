@@ -4,6 +4,10 @@ import {formatDebtTerms} from "@/lib/reporting/transaction";
 
 export interface ComparisonRow { label:string; values:string[] }
 
+export function sourceNoteSummary(count:number):string {
+  return count===0?"None linked":`${count} current source-note link${count===1?"":"s"}`;
+}
+
 export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
   const results=deals.map(calculate);
   const value=(field:Field)=>deals.map(deal=>usd(deal.values[field]));
@@ -24,6 +28,6 @@ export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
     {label:"Screening debt coverage",values:results.map(result=>metricText("coverage",result))},
     {label:"Pretax cash to equity",values:results.map(result=>metricText("distribution",result))},
     {label:"Cash-on-cash return",values:results.map(result=>metricText("roi",result))},
-    {label:"Linked evidence figures",values:results.map(result=>String(result.linked.length))},
+    {label:"Current source-note links",values:results.map(result=>sourceNoteSummary(result.linked.length))},
   ];
 }

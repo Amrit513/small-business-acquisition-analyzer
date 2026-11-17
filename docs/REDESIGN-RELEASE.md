@@ -199,3 +199,7 @@ Starting another page capture while a listing is already under review now asks b
 ## Narrow memo and summary reflow
 
 Below 420 CSS pixels, memo metrics and sidebar metric buttons now stack their labels and values instead of forcing long text into competing columns. Values such as “No scheduled debt” can wrap within their own region, and a stylesheet regression protects the breakpoint. This reduces a source-level phone and zoom overflow risk; manual 200% zoom and physical-device acceptance remain pending.
+
+## Honest evidence status in comparison
+
+Deal comparison now labels evidence as current user-linked source notes instead of implying that a count represents verified evidence. A deal with no current links says “None linked,” while the comparison introduction explains that a source note records what a user reviewed and does not authenticate a seller or document. This keeps evidence support separate from economic readiness and model outputs.
