@@ -132,6 +132,10 @@ The on-screen memo now shows each linked figure's source location, reporting per
 
 The website and extension now use one pure validator for edited listing amounts and excerpt invalidation. The website associates a rejected amount with the exact input through `aria-invalid` and `aria-describedby`, while both surfaces keep unknown values blank and reject ranges or unsupported currency text.
 
+## Assumption-led comparison
+
+Deal comparison now exposes the reporting period, replacement labor, maintenance capex, working-capital increase, note rate and term, funding difference and each deal's coverage comparison target. Incomplete deals remain visibly incomplete and unranked; the table explains differences without calling the highest number the best acquisition.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.
