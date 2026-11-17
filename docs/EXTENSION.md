@@ -14,6 +14,8 @@ Desktop developer preview for Chrome and Edge. No store submission or developer 
 
 Choose Capture this listing. A text selection takes priority; otherwise capture reads a nonempty main region, or a single article when there is no main region. Pages with several article cards and no main region require you to select one listing first. Review the amounts, edit anything that needs correcting, and leave unknown figures blank. Annual USD amounts only. Ranges, monthly amounts, foreign currency and conflicting values need manual review. Cash flow is only treated as SDE when explicitly labeled SDE.
 
+Capturing again while a listing is under review asks before replacing it. Cancel keeps the current reviewed values and does not read the active page.
+
 Save draft stores a single draft in this browser. Clear deletes it. Export listing downloads JSON you can later import through Import listing on the website. Review in full analyzer opens https://acquisition-lens.vercel.app with a compact fragment handoff. The analyzer removes the fragment from the current history entry and requires a review before applying it. Fragments are not HTTP query parameters, but the destination page and browser can read them; only use this with listing information you intend to bring into Acquisition Lens.
 
 The redesigned workspace starts a new deal with unknown assumptions blank. Confirm the annual reporting period, assumptions and financing before preparing the memo. Review asks for confirmation before replacing an unsaved deal.

@@ -39,6 +39,10 @@ function render(next: ListingDraft) {
   $("warnings").replaceChildren(...next.warnings.map(message => { const item = document.createElement("li"); item.textContent = message; return item; })); updateRatios();
 }
 async function capture() {
+  if (draft && !globalThis.confirm("Replace the current reviewed listing? Save or export it first if you need a backup.")) {
+    status("Current reviewed listing kept.");
+    return;
+  }
   const button = $("capture") as HTMLButtonElement; button.disabled = true; status("Reading the selected page…");
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

@@ -191,3 +191,7 @@ Evidence removal undo now records the source deal identifier as well as the figu
 ## Strict UTF-8 file decoding
 
 Deal and listing JSON file imports now decode bytes with a fatal UTF-8 boundary before JSON parsing. Malformed byte sequences are rejected instead of being silently replaced inside names or evidence excerpts. Declared and actual byte lengths are both checked, and a valid leading UTF-8 byte-order mark remains supported.
+
+## Extension capture replacement guard
+
+Starting another page capture while a listing is already under review now asks before replacing it. Cancelling retains the current edited values and stops before querying the active tab or injecting the capture function. This protects unsaved extension work in source and simulated browser-API integration tests; installed Chrome/Edge acceptance remains pending because Chromium cannot create its process socket in this workspace.
