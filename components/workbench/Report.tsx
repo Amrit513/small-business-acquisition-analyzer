@@ -1,6 +1,7 @@
 import {Document,Page,Text,View,StyleSheet,Font} from "@react-pdf/renderer";
 import {metrics,metricText,modelVersion,usd,type Metric, type Result} from "@/lib/calculations/workbench";
 import {fields,type Deal} from "@/lib/workspace/deal";
+import {evidenceMetadata} from "@/lib/reporting/provenance";
 let registered=false;
 export function registerReportFont(base="/fonts"){
  if(registered)return;
@@ -30,7 +31,7 @@ export function Report({deal:d,result:r,generated}:{deal:Deal;result:Result;gene
  <Text style={st.section}>Scenario assumptions and results</Text><Text style={st.paragraph}>Annual revenue {d.settings.revenueChange}%, expenses {d.settings.expenseChange}%. Debt uses scheduled payments at each maturity; flat baseline retains current operating figures.</Text>
  {r.years.map(y=>row("Year "+y.year+": cash / flat / debt",usd(y.distribution)+" / "+usd(y.baseline)+" / "+usd(y.debt)))}
  <Text style={st.section}>Diligence questions</Text>{(r.issues.length?r.issues:["Obtain and independently reconcile source statements, earnings adjustments, labor, capital expenditure and funding terms."]).map((q,i)=><Text style={st.item} key={i}>• {q}</Text>)}
- <Text style={st.section}>Source appendix</Text>{r.linked.length?r.linked.map(k=><View style={st.item} key={k} wrap={false}><Text style={st.metric}>{fields[k][0]}: {usd(d.values[k])} · {d.evidence[k]!.status}</Text><Text>{recorded(d.evidence[k]!.location,"Location not recorded")} · {recorded(d.evidence[k]!.period,"Period not recorded")} · {recorded(d.evidence[k]!.date,"Date not recorded")}</Text><Text>“{d.evidence[k]!.excerpt}”</Text></View>):<Text style={st.item}>No linked source excerpts.</Text>}
+ <Text style={st.section}>Source appendix</Text>{r.linked.length?r.linked.map(k=>{const evidence=d.evidence[k]!,metadata=evidenceMetadata(evidence);return <View style={st.item} key={k} wrap={false}><Text style={st.metric}>{fields[k][0]}: {usd(d.values[k])} · {evidence.status}</Text><Text>{metadata.location} · {metadata.period} · {metadata.date}</Text><Text>“{evidence.excerpt}”</Text></View>; }):<Text style={st.item}>No linked source excerpts.</Text>}
  <Text style={st.footer} fixed>Acquisition Lens · Model {modelVersion} · Generated {generated}. On-device, educational screen. No recommendation, lender determination, tax or legal opinion.</Text>
  </Page></Document>;
 }
