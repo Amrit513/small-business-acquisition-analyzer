@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { extractListing, listingFields, listingFromFragment, listingLabels, parseListingDraft, reviewListingAmounts, type ListingDraft, type ListingField } from "@/lib/import/listing";
+import { extractListing, listingFields, listingFromFragment, listingLabels, MAX_LISTING_IMPORT_BYTES, parseListingDraft, reviewListingAmounts, type ListingDraft, type ListingField } from "@/lib/import/listing";
+import { readUtf8File } from "@/lib/import/utf8";
 
 export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => boolean }) {
   const [open, setOpen] = useState(false);
@@ -26,8 +27,8 @@ export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => b
 
   async function readFile(file: File) {
     try {
-      if (file.size > 12000) throw new Error("Listing files must be smaller than 12 KB.");
-      review(parseListingDraft(await file.text()));
+      const raw=await readUtf8File(file,MAX_LISTING_IMPORT_BYTES,"Listing files must be 12 KB or smaller.");
+      review(parseListingDraft(raw));
     } catch (err) { setError(err instanceof Error ? err.message : "Could not read listing."); }
   }
   function apply() {

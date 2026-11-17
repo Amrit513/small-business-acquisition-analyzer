@@ -187,3 +187,7 @@ Saved-record JSON export now reports preparation failures without changing the l
 ## Deal-scoped evidence undo
 
 Evidence removal undo now records the source deal identifier as well as the figure and source note. Restoration is rejected if the active deal has been replaced, even when the new deal happens to use the same value and reporting period. The existing value and period checks still prevent edited figures from silently regaining stale provenance.
+
+## Strict UTF-8 file decoding
+
+Deal and listing JSON file imports now decode bytes with a fatal UTF-8 boundary before JSON parsing. Malformed byte sequences are rejected instead of being silently replaced inside names or evidence excerpts. Declared and actual byte lengths are both checked, and a valid leading UTF-8 byte-order mark remains supported.
