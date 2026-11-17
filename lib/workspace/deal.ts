@@ -50,10 +50,14 @@ export function editPeriod(deal:Deal,period:string):Deal {
   return deal.period===period?deal:{...deal,period,evidence:{},assumptionsReviewed:false};
 }
 export function validAmount(k:Field,v:unknown):v is number {
-  if(typeof v!=="number" || !Number.isFinite(v)) return false;
-  if(k==="bankRate"||k==="sellerRate") return v>=0&&v<=100;
-  if(k==="bankYears"||k==="sellerYears") return v>=0&&v<=100&&Math.abs(v*12-Math.round(v*12))<1e-7;
-  return v>=(["sde","ebitda","annualWorkingCapital"].includes(k)?-1e12:0)&&v<=1e12;
+  return amountValidationMessage(k,v)===null;
+}
+export function amountValidationMessage(k:Field,v:unknown):string|null {
+  if(typeof v!=="number" || !Number.isFinite(v)) return "Enter a finite number.";
+  if(k==="bankRate"||k==="sellerRate") return v>=0&&v<=100?null:"Enter an interest rate from 0% to 100%.";
+  if(k==="bankYears"||k==="sellerYears") return v>=0&&v<=100&&Math.abs(v*12-Math.round(v*12))<1e-7?null:"Enter a term from 0 to 100 years in whole-month increments.";
+  const allowsLoss=["sde","ebitda","annualWorkingCapital"].includes(k);
+  return v>=(allowsLoss?-1e12:0)&&v<=1e12?null:allowsLoss?"Enter an amount from −$1 trillion to $1 trillion.":"Enter an amount from $0 to $1 trillion.";
 }
 export function fromListing(listing:ListingDraft,id:string,now:string):Deal {
   const d=blankDeal(id,now);d.name=listing.title||"Imported listing";d.listing=listing;

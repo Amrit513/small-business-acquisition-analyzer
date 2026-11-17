@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Deal, Field, Settings } from "@/lib/workspace/deal";
-import { editValue, editPeriod, fields, validAmount } from "@/lib/workspace/deal";
+import { amountValidationMessage, editValue, editPeriod, fields } from "@/lib/workspace/deal";
 import { usd, type Result } from "@/lib/calculations/workbench";
 export type Editor={d:Deal;set:(next:Deal)=>void};
 const groups:{title:string;info:string;keys:Field[]}[]=[
@@ -9,8 +9,8 @@ const groups:{title:string;info:string;keys:Field[]}[]=[
  {title:"Sources & uses",info:"The price covers operating assets, excluding seller cash and existing debt. Include startup cash separately.",keys:["equity","bankDebt","sellerDebt","closingCosts","initialWorkingCapital"]},
 ];
 export function AmountInput({d,k,set}:{k:Field}&Editor){
- const v=d.values[k],bad=v!==null&&!validAmount(k,v);
- return <label className="amount"><span>{fields[k][0]}</span><span className="inputwrap"><input type="number" step="any" inputMode="decimal" value={v??""} placeholder="Unknown" onChange={e=>set(editValue(d,k,e.target.value===""?null:Number(e.target.value)))} aria-invalid={bad} aria-describedby={bad?"err-"+k:undefined}/><small>{fields[k][1]}</small></span>{bad&&<span className="error" id={"err-"+k}>Outside the supported range. Terms must be whole months.</span>}</label>;
+ const v=d.values[k],message=v===null?null:amountValidationMessage(k,v),bad=message!==null;
+ return <label className="amount"><span>{fields[k][0]}</span><span className="inputwrap"><input type="number" step="any" inputMode="decimal" value={v??""} placeholder="Unknown" onChange={e=>set(editValue(d,k,e.target.value===""?null:Number(e.target.value)))} aria-invalid={bad} aria-describedby={bad?"err-"+k:undefined}/><small>{fields[k][1]}</small></span>{message&&<span className="error" id={"err-"+k} role="alert">{message}</span>}</label>;
 }
 export function Setting({d,set,k,label,min,max,step=0.01}:{k:keyof Settings;label:string;min:number;max:number;step?:number}&Editor){
  const [draft,change]=useState<string|null>(null),[bad,setBad]=useState(false);const n=d.settings[k],errorId=`setting-err-${k}`;

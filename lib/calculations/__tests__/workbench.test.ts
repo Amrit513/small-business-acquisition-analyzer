@@ -1,6 +1,6 @@
 import {describe,it,expect} from "vitest";
 import {calculate,scheduledPayments,sensitivity,metricText} from "../workbench";
-import {blankDeal,sampleDeal,editValue,editPeriod,fromListing} from "@/lib/workspace/deal";
+import {amountValidationMessage,blankDeal,sampleDeal,editValue,editPeriod,fromListing} from "@/lib/workspace/deal";
 import {serialize,parseSnapshot,readStored,journalEntry} from "@/lib/storage/workspace";
 import {extractListing,parseListingDraft} from "@/lib/import/listing";
 
@@ -23,6 +23,13 @@ describe("v3 workbench against independent examples",()=>{
  ]){const imported=JSON.parse(serialize(sampleDeal())) as Record<string,unknown>;mutate(imported);expect(()=>parseSnapshot(JSON.stringify(imported))).toThrow(/invalid deal file/);}});
  it("requires a review date for a newly entered source note",()=>{const d=sampleDeal();expect(()=>journalEntry(d,"sde","User assumption","Workbook p. 2","Entered SDE: $170,000","")).toThrow(/review date/);});
  it("rejects unsupported currency, nonfinite values, fractional months and forged evidence",()=>{for(const change of [(d:ReturnType<typeof sampleDeal>)=>Object.assign(d,{currency:"EUR"}),(d:ReturnType<typeof sampleDeal>)=>{d.values.sde=Infinity;},(d:ReturnType<typeof sampleDeal>)=>{d.values.bankYears=1.15;},(d:ReturnType<typeof sampleDeal>)=>{d.evidence.sde!.value=99;},(d:ReturnType<typeof sampleDeal>)=>{d.evidence.sde!.date="2026-02-30";}]){const d=sampleDeal();change(d);expect(()=>serialize(d)).toThrow();}});
+ it("explains each rejected field with its actual supported boundary",()=>{
+  expect(amountValidationMessage("bankRate",100.01)).toBe("Enter an interest rate from 0% to 100%.");
+  expect(amountValidationMessage("bankYears",1.1)).toBe("Enter a term from 0 to 100 years in whole-month increments.");
+  expect(amountValidationMessage("purchasePrice",-1)).toBe("Enter an amount from $0 to $1 trillion.");
+  expect(amountValidationMessage("sde",-1)).toBeNull();
+  expect(amountValidationMessage("sde",Number.POSITIVE_INFINITY)).toBe("Enter a finite number.");
+ });
  it("makes corrupted local records recoverable without silently overwriting them",()=>{const item=readStored({id:"bad",version:3,name:"broken",saved:"untouched"});expect(item?.deal).toBeNull();expect(item?.original).toContain("untouched");});
  it("does not score unknown data or silently substitute sample values",()=>{const r=calculate(blankDeal("test","2026-01-01"));expect(r.distribution).toBeNull();expect(r.coverage).toBeNull();expect(r.sources).toBeNull();expect(r.ready).toBe(false);});
 });
