@@ -207,3 +207,7 @@ Deal comparison now labels evidence as current user-linked source notes instead 
 ## Shared memo readiness and evidence status
 
 Comparison, the on-screen memo and the exported PDF now use one tested reporting status for model completeness and a separate status for current source-note support. A complete model screen can still state “No current source-note links,” and incomplete work reports its unresolved issue count. The preparation message now calls the output a screening memo rather than implying that completing inputs alone makes an acquisition decision-ready. The fictional memo remained two A4 pages after the compact PDF status line was rendered, text-extracted and visually inspected.
+
+## Correct next-action routing
+
+The prominent next-action button now opens Deal inputs for missing figures, funding differences, financing terms and other model-input blockers. Earnings-bridge explanations and the review acknowledgement continue to open Evidence; a complete model opens Scenarios. A pure resolver and regression cases protect the touch and keyboard path from returning to the previous hard-coded Evidence destination.
