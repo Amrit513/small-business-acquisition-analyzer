@@ -144,6 +144,10 @@ Each repeated source-note removal control now includes the figure in its accessi
 
 Current deal exports, legacy deal exports and extension listing JSON now accept the single leading byte-order mark that some Windows editors add to otherwise valid UTF-8 files. File-size limits and strict schema validation still run on the original input, and markers anywhere else remain invalid JSON. This improves file recovery without coercing values or silently discarding unsupported fields.
 
+## Consistent financing terms in reports
+
+Comparison, the on-screen memo and the PDF now share one formatter for each bank and seller note's amount, annual rate and term. Zero debt is labeled as no note, while missing amounts, rates and terms remain explicit unknowns. The exported memo therefore retains the financing assumptions that explain its scheduled debt and coverage outputs.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.

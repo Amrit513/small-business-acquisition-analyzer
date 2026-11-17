@@ -1,16 +1,8 @@
 import {calculate,metricText,usd} from "@/lib/calculations/workbench";
 import type {Deal,Field} from "@/lib/workspace/deal";
+import {formatDebtTerms} from "@/lib/reporting/transaction";
 
 export interface ComparisonRow { label:string; values:string[] }
-
-function note(deal:Deal,kind:"bank"|"seller") {
-  const amount=deal.values[kind==="bank"?"bankDebt":"sellerDebt"];
-  const rate=deal.values[kind==="bank"?"bankRate":"sellerRate"];
-  const years=deal.values[kind==="bank"?"bankYears":"sellerYears"];
-  if(amount===null)return "Unknown";
-  if(amount===0)return "No note";
-  return `${usd(amount)} · ${rate===null?"rate unknown":rate+"%"} · ${years===null?"term unknown":years+" years"}`;
-}
 
 export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
   const results=deals.map(calculate);
@@ -25,8 +17,8 @@ export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
     {label:"Maintenance capex",values:value("capex")},
     {label:"Annual working-capital increase",values:value("annualWorkingCapital")},
     {label:"SDE",values:value("sde")},
-    {label:"Bank note · rate · term",values:deals.map(deal=>note(deal,"bank"))},
-    {label:"Seller note · rate · term",values:deals.map(deal=>note(deal,"seller"))},
+    {label:"Bank note · rate · term",values:deals.map(deal=>formatDebtTerms(deal,"bank"))},
+    {label:"Seller note · rate · term",values:deals.map(deal=>formatDebtTerms(deal,"seller"))},
     {label:"Funding difference (uses − sources)",values:results.map(result=>usd(result.gap))},
     {label:"Coverage comparison target",values:deals.map(deal=>deal.settings.coverageTarget+"× user assumption")},
     {label:"Screening debt coverage",values:results.map(result=>metricText("coverage",result))},

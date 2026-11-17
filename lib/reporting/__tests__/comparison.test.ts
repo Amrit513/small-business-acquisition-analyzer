@@ -9,8 +9,9 @@ describe("comparison reporting",()=>{
   const row=(label:string)=>rows.find(item=>item.label===label)?.values;
   expect(row("Screen")?.[0]).toBe("Assumptions reviewed");
   expect(row("Screen")?.[1]).toMatch(/^Incomplete · \d+ issues$/);
-  expect(row("Bank note · rate · term")?.[0]).toBe("$340,000 · 9.5% · 10 years");
-  expect(row("Bank note · rate · term")?.[1]).toBe("Unknown");
+  expect(row("Bank note · rate · term")?.[0]).toBe("$340,000 · 9.5% annual · 10 years");
+  expect(row("Bank note · rate · term")?.[1]).toBe("Unknown amount");
+  expect(row("Seller note · rate · term")?.[0]).toBe("No note");
   expect(row("Coverage comparison target")?.[0]).toBe("1.25× user assumption");
   expect(row("Reporting period")?.[1]).toBe("Not recorded");
  });
