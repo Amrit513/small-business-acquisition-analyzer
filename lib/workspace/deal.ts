@@ -54,7 +54,8 @@ export function removeEvidence(deal:Deal,k:Field):Deal {
   const evidence={...deal.evidence};delete evidence[k];
   return {...deal,evidence,assumptionsReviewed:false};
 }
-export function restoreEvidence(deal:Deal,k:Field,entry:Evidence):Deal {
+export function restoreEvidence(deal:Deal,k:Field,entry:Evidence,sourceDealId:string):Deal {
+  if(deal.id!==sourceDealId)throw new Error("The active deal changed, so this source note cannot be restored here.");
   if(deal.values[k]!==entry.value||deal.period!==entry.period)throw new Error("The figure or reporting period changed, so this source note cannot be restored.");
   return {...deal,evidence:{...deal.evidence,[k]:entry},assumptionsReviewed:false};
 }

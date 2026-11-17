@@ -183,3 +183,7 @@ Extension save, clear, corrupt-draft deletion and startup restore failures now u
 ## Saved-library action recovery
 
 Saved-record JSON export now reports preparation failures without changing the local snapshot. Deletion success removes the record from the visible library immediately; a later database refresh can no longer turn a completed deletion into a false failure message. A rejected deletion keeps the record visible and explicitly says it remains on this device.
+
+## Deal-scoped evidence undo
+
+Evidence removal undo now records the source deal identifier as well as the figure and source note. Restoration is rejected if the active deal has been replaced, even when the new deal happens to use the same value and reporting period. The existing value and period checks still prevent edited figures from silently regaining stale provenance.
