@@ -156,6 +156,10 @@ When extension review rejects an edited amount during save, export or handoff, f
 
 Each projected year in the PDF now reports scenario cash, flat cash, screening coverage and scheduled debt from one tested formatter. Coverage becomes “No scheduled debt” after note maturity instead of displaying an infinite ratio or implying lender approval. This brings the exported scenario table in line with the interactive workbench.
 
+## Current workspace tab navigation
+
+The live five-tab workbench now uses the tested keyboard-navigation helper instead of a separate inline implementation. Arrow Left/Right and Arrow Up/Down wrap across Deal inputs, Evidence, Scenarios, Memo and Comparison; Home and End move to the first and last tab. Regression coverage now targets the current five-tab interface rather than the retired three-view layout.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.
