@@ -152,6 +152,10 @@ Comparison, the on-screen memo and the PDF now share one formatter for each bank
 
 When extension review rejects an edited amount during save, export or handoff, focus now moves to that exact field and the input references the live error message. Correct fields clear the temporary relationship. Popup integration coverage confirms that invalid data is neither saved nor transferred while the rejected field is exposed to keyboard and assistive-technology users.
 
+## Coverage in exported scenarios
+
+Each projected year in the PDF now reports scenario cash, flat cash, screening coverage and scheduled debt from one tested formatter. Coverage becomes “No scheduled debt” after note maturity instead of displaying an infinite ratio or implying lender approval. This brings the exported scenario table in line with the interactive workbench.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.

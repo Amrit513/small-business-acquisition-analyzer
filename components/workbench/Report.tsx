@@ -3,6 +3,7 @@ import {metrics,metricText,modelVersion,usd,type Metric, type Result} from "@/li
 import {fields,type Deal} from "@/lib/workspace/deal";
 import {evidenceMetadata} from "@/lib/reporting/provenance";
 import {formatDebtTerms} from "@/lib/reporting/transaction";
+import {scenarioReportRow} from "@/lib/reporting/scenarios";
 let registered=false;
 export function registerReportFont(base="/fonts"){
  if(registered)return;
@@ -29,8 +30,8 @@ export function Report({deal:d,result:r,generated}:{deal:Deal;result:Result;gene
  </Page><Page size="A4" style={st.page} wrap><Text style={st.eyebrow}>ACQUISITION LENS / {d.name}</Text><Text style={st.title}>Scenarios & diligence</Text>
  <Text style={st.section}>First-year pretax cash-flow bridge</Text><Text style={st.paragraph}>Compensation for the buyer’s work is shown separately from return on invested cash. Taxes and sale proceeds are outside this screen.</Text>
  {row("Seller’s discretionary earnings",usd(d.values.sde))}{row("Less: buyer labor compensation",usd(d.values.buyerPay))}{row("Less: additional replacement labor",usd(d.values.managerCost))}{row("Less: maintenance capital expenditure",usd(d.values.capex))}{row("Less: working-capital increase",usd(d.values.annualWorkingCapital))}{row("Less: scheduled debt payments",usd(r.debt))}{row("Pretax cash to equity",usd(r.distribution))}
- <Text style={st.section}>Scenario assumptions and results</Text><Text style={st.paragraph}>Annual revenue {d.settings.revenueChange}%, expenses {d.settings.expenseChange}%. Debt uses scheduled payments at each maturity; flat baseline retains current operating figures.</Text>
- {r.years.map(y=>row("Year "+y.year+": cash / flat / debt",usd(y.distribution)+" / "+usd(y.baseline)+" / "+usd(y.debt)))}
+ <Text style={st.section}>Scenario assumptions and results</Text><Text style={st.paragraph}>Annual revenue {d.settings.revenueChange}%, expenses {d.settings.expenseChange}%. Rows show scenario cash / flat cash / screening coverage / scheduled debt. Debt stops at each maturity; the flat baseline retains current operating figures.</Text>
+ {r.years.map(y=>{const report=scenarioReportRow(y);return row(report.label,report.value);})}
  <Text style={st.section}>Diligence questions</Text>{(r.issues.length?r.issues:["Obtain and independently reconcile source statements, earnings adjustments, labor, capital expenditure and funding terms."]).map((q,i)=><Text style={st.item} key={i}>• {q}</Text>)}
  <Text style={st.section}>Source appendix</Text>{r.linked.length?r.linked.map(k=>{const evidence=d.evidence[k]!,metadata=evidenceMetadata(evidence);return <View style={st.item} key={k} wrap={false}><Text style={st.metric}>{fields[k][0]}: {usd(d.values[k])} · {evidence.status}</Text><Text>{metadata.location} · {metadata.period} · {metadata.date}</Text><Text>“{evidence.excerpt}”</Text></View>; }):<Text style={st.item}>No linked source excerpts.</Text>}
  <Text style={st.footer} fixed>Acquisition Lens · Model {modelVersion} · Generated {generated}. On-device, educational screen. No recommendation, lender determination, tax or legal opinion.</Text>
