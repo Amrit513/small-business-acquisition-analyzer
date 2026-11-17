@@ -1,18 +1,15 @@
 import {calculate,metricText,usd} from "@/lib/calculations/workbench";
 import type {Deal,Field} from "@/lib/workspace/deal";
 import {formatDebtTerms} from "@/lib/reporting/transaction";
+import {modelScreenStatus,sourceNoteStatus} from "@/lib/reporting/status";
 
 export interface ComparisonRow { label:string; values:string[] }
-
-export function sourceNoteSummary(count:number):string {
-  return count===0?"None linked":`${count} current source-note link${count===1?"":"s"}`;
-}
 
 export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
   const results=deals.map(calculate);
   const value=(field:Field)=>deals.map(deal=>usd(deal.values[field]));
   return [
-    {label:"Screen",values:results.map(result=>result.ready?"Assumptions reviewed":`Incomplete · ${result.issues.length} issue${result.issues.length===1?"":"s"}`)},
+    {label:"Model status",values:results.map(modelScreenStatus)},
     {label:"Reporting period",values:deals.map(deal=>deal.period.trim()||"Not recorded")},
     {label:"Purchase price",values:value("purchasePrice")},
     {label:"Buyer cash invested",values:value("equity")},
@@ -28,6 +25,6 @@ export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
     {label:"Screening debt coverage",values:results.map(result=>metricText("coverage",result))},
     {label:"Pretax cash to equity",values:results.map(result=>metricText("distribution",result))},
     {label:"Cash-on-cash return",values:results.map(result=>metricText("roi",result))},
-    {label:"Current source-note links",values:results.map(result=>sourceNoteSummary(result.linked.length))},
+    {label:"Evidence status",values:results.map(sourceNoteStatus)},
   ];
 }

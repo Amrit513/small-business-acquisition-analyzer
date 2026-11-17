@@ -4,6 +4,7 @@ import {fields,type Deal} from "@/lib/workspace/deal";
 import {evidenceMetadata} from "@/lib/reporting/provenance";
 import {formatDebtTerms} from "@/lib/reporting/transaction";
 import {scenarioReportRow} from "@/lib/reporting/scenarios";
+import {modelScreenStatus,sourceNoteStatus} from "@/lib/reporting/status";
 let registered=false;
 export function registerReportFont(base="/fonts"){
  if(registered)return;
@@ -24,6 +25,7 @@ export function Report({deal:d,result:r,generated}:{deal:Deal;result:Result;gene
  return <Document title={"Acquisition Lens - "+d.name} author="Acquisition Lens" subject="Educational acquisition screen">
  <Page size="A4" style={st.page} wrap><View style={st.head}><Text style={[st.eyebrow,{color:"#ddea8a"}]}>ACQUISITION LENS / INVESTMENT MEMO</Text><Text style={st.title}>{d.name}</Text><Text style={st.sub}>{d.isSample?"Fictional sample · ":""}{recorded(d.period,"Period not recorded")} · Generated {generated}</Text></View>
  <Text style={st.section}>Executive screen</Text><Text style={st.paragraph}>This model illustrates a transaction under user-entered assumptions. It cannot verify claims or determine suitability. Pretax cash and screening debt coverage exclude taxes; coverage also excludes capex and working capital. The {d.settings.coverageTarget}× coverage comparison target is a user-selected screening assumption, not a lender standard.</Text>
+ <Text style={[st.paragraph,st.metric]}>Model status: {modelScreenStatus(r)} · Evidence status: {sourceNoteStatus(r)}</Text>
  {(Object.keys(metrics) as Metric[]).map(k=>row(metrics[k].name,metricText(k,r)))}
  <Text style={st.section}>Sources and uses</Text>{row("Purchase price",usd(d.values.purchasePrice))}{row("Closing costs",usd(d.values.closingCosts))}{row("Upfront working capital",usd(d.values.initialWorkingCapital))}{row("Total uses",usd(r.uses))}{row("Buyer cash",usd(d.values.equity))}{row("Bank note · rate · term",formatDebtTerms(d,"bank"))}{row("Seller note · rate · term",formatDebtTerms(d,"seller"))}{row("Total sources",usd(r.sources))}{row("Funding difference",usd(r.gap))}
  <Text style={st.section}>Earnings and valuation</Text><Text style={st.paragraph}>Revenue minus expenses: {usd(r.operating)}. Entered SDE: {usd(d.values.sde)}. Bridge: {usd(r.bridge)}. {d.earningsNote}</Text><Text style={st.paragraph}>Illustrative SDE range: {usd(r.valuationLow)} to {usd(r.valuationHigh)} at user-selected {d.settings.low}×–{d.settings.high}×. Not an appraisal or verified comparable.</Text>

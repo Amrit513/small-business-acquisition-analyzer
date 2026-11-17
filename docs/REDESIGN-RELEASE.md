@@ -202,4 +202,8 @@ Below 420 CSS pixels, memo metrics and sidebar metric buttons now stack their la
 
 ## Honest evidence status in comparison
 
-Deal comparison now labels evidence as current user-linked source notes instead of implying that a count represents verified evidence. A deal with no current links says “None linked,” while the comparison introduction explains that a source note records what a user reviewed and does not authenticate a seller or document. This keeps evidence support separate from economic readiness and model outputs.
+Deal comparison now labels evidence as current user-linked source notes instead of implying that a count represents verified evidence. A deal with no current links says “No current source-note links,” while the comparison introduction explains that a source note records what a user reviewed and does not authenticate a seller or document. This keeps evidence support separate from economic readiness and model outputs.
+
+## Shared memo readiness and evidence status
+
+Comparison, the on-screen memo and the exported PDF now use one tested reporting status for model completeness and a separate status for current source-note support. A complete model screen can still state “No current source-note links,” and incomplete work reports its unresolved issue count. The preparation message now calls the output a screening memo rather than implying that completing inputs alone makes an acquisition decision-ready. The fictional memo remained two A4 pages after the compact PDF status line was rendered, text-extracted and visually inspected.
