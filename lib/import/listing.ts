@@ -43,6 +43,21 @@ export function parseListingAmount(raw: string, field?: ListingField): number | 
   return Number.isFinite(value) && value >= 0 && value <= 1e12 ? (negative ? -1 : 1) * Math.round(value * 100) / 100 : undefined;
 }
 
+export function reviewListingAmounts(draft: ListingDraft, rawAmounts: Partial<Record<ListingField, string>>):
+  | { ok: true; draft: ListingDraft }
+  | { ok: false; field: ListingField; message: string } {
+  const values: ListingDraft["values"] = {};
+  const quotes = { ...draft.quotes };
+  for (const field of listingFields) {
+    const raw = rawAmounts[field]?.trim() ?? "";
+    const amount = raw ? parseListingAmount(raw, field) : undefined;
+    if (raw && amount === undefined) return { ok: false, field, message: `Review ${listingLabels[field].toLowerCase()}: use one USD amount or leave it blank.` };
+    if (amount !== undefined) values[field] = amount;
+    if (amount !== draft.values[field]) delete quotes[field];
+  }
+  return { ok: true, draft: { ...draft, values, quotes } };
+}
+
 export function safeListingUrl(raw: string): string {
   if (!raw) return "";
   try {

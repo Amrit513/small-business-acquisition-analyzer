@@ -128,6 +128,10 @@ Listing JSON and extension handoffs now reject unknown top-level, financial-valu
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.
 
+## Shared reviewed-amount validation
+
+The website and extension now use one pure validator for edited listing amounts and excerpt invalidation. The website associates a rejected amount with the exact input through `aria-invalid` and `aria-describedby`, while both surfaces keep unknown values blank and reject ranges or unsupported currency text.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.

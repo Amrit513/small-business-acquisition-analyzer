@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractListing, listingFragment, listingFromFragment, listingToInputs, parseListingAmount, parseListingDraft, safeListingUrl } from "../listing";
+import { extractListing, listingFragment, listingFromFragment, listingToInputs, parseListingAmount, parseListingDraft, reviewListingAmounts, safeListingUrl } from "../listing";
 
 describe("listing import boundary", () => {
   it("extracts labeled USD figures and keeps source snippets", () => {
@@ -60,6 +60,15 @@ describe("listing import boundary", () => {
   it("rejects executable and credential-bearing source links", () => {
     expect(safeListingUrl("javascript:alert(1)")).toBe("");
     expect(safeListingUrl("https://user:password@example.com")).toBe("");
+  });
+  it("reviews edited amounts consistently and unlinks changed excerpts", () => {
+    const draft=extractListing("Asking Price: $200K\nAnnual Revenue: $300K");
+    const invalid=reviewListingAmounts(draft,{purchasePrice:"$100K-$200K",annualRevenue:"300000"});
+    expect(invalid).toMatchObject({ok:false,field:"purchasePrice"});
+    const reviewed=reviewListingAmounts(draft,{purchasePrice:"250000",annualRevenue:"300000"});
+    expect(reviewed.ok&&reviewed.draft.values).toEqual({purchasePrice:250000,annualRevenue:300000});
+    expect(reviewed.ok&&reviewed.draft.quotes.purchasePrice).toBeUndefined();
+    expect(reviewed.ok&&reviewed.draft.quotes.annualRevenue).toContain("Annual Revenue");
   });
   it("keeps missing or malformed capture provenance unknown", () => {
     const base = { ...extractListing("Asking Price: $200K"), capturedAt: undefined };

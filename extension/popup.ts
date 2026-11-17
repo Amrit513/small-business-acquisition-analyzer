@@ -1,4 +1,4 @@
-import { extractListing, listingFields, listingFragment, listingLabels, parseListingAmount, parseListingDraft, type ListingDraft } from "../lib/import/listing";
+import { extractListing, listingFields, listingFragment, listingLabels, parseListingDraft, reviewListingAmounts, type ListingDraft } from "../lib/import/listing";
 import { screenListing } from "../lib/calculations/listingScreen";
 import { readListingPage } from "./pageCapture";
 
@@ -11,18 +11,10 @@ function showRecovery(show: boolean) { unreadableSavedDraft = show; $("recovery"
 
 function readReviewed(): ListingDraft {
   if (!draft) throw new Error("Capture a listing first.");
-  const values: ListingDraft["values"] = {};
-  const quotes = { ...draft.quotes };
-  for (const field of listingFields) {
-    const input = inputs.get(field);
-    const raw = input?.value.trim() ?? "";
-    const amount = raw ? parseListingAmount(raw, field) : undefined;
-    input?.setAttribute("aria-invalid", String(Boolean(raw && amount === undefined)));
-    if (raw && amount === undefined) throw new Error(`Review ${listingLabels[field].toLowerCase()}: use one USD amount or leave it blank.`);
-    if (amount !== undefined) values[field] = amount;
-    if (amount !== draft.values[field]) delete quotes[field];
-  }
-  return { ...draft, title: ($("title") as HTMLInputElement).value.trim() || "Imported listing", values, quotes };
+  const reviewed=reviewListingAmounts(draft,Object.fromEntries(listingFields.map(field=>[field,inputs.get(field)?.value??""])));
+  for(const field of listingFields)inputs.get(field)?.setAttribute("aria-invalid",String(!reviewed.ok&&reviewed.field===field));
+  if(!reviewed.ok)throw new Error(reviewed.message);
+  return { ...reviewed.draft, title: ($("title") as HTMLInputElement).value.trim() || "Imported listing" };
 }
 function updateRatios() {
   try {
