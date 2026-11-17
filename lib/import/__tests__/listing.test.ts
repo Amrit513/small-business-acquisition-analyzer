@@ -40,6 +40,10 @@ describe("listing import boundary", () => {
     expect(() => parseListingDraft('{"kind":"acquisition-lens-listing","version":1,"values":{"sde":1e999}}')).toThrow();
     expect(() => listingFromFragment("#listing=%BAD")).toThrow();
   });
+  it("accepts a valid listing file saved with a UTF-8 byte-order mark", () => {
+    const raw = "\ufeff" + JSON.stringify(extractListing("Asking Price: $200K"));
+    expect(parseListingDraft(raw).values.purchasePrice).toBe(200000);
+  });
   it("rejects unsupported structure instead of silently discarding it", () => {
     const base = extractListing("Asking Price: $200K");
     for (const change of [

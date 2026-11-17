@@ -1,6 +1,7 @@
 import { openDB } from "idb";
 import { MAX_DEAL_IMPORT_BYTES, parseDealExport, type SavedDeal } from "./analyses";
 import { parseListingDraft } from "@/lib/import/listing";
+import { parseJsonDocument } from "@/lib/import/json";
 import { blankDeal, fieldKeys, newId, statuses, validAmount, type Deal, type Field, type Evidence, type Settings } from "@/lib/workspace/deal";
 
 const obj=(x:unknown):x is Record<string,unknown>=>!!x&&typeof x==="object"&&!Array.isArray(x);
@@ -48,7 +49,7 @@ function migrate(old:SavedDeal):Deal {
 export function serialize(d:Deal):string {return JSON.stringify({schemaVersion:3,deal:validateDeal(d)},null,2);}
 export function parseSnapshot(raw:string):Deal {
   if(raw.length>MAX_DEAL_IMPORT_BYTES||new TextEncoder().encode(raw).length>MAX_DEAL_IMPORT_BYTES)throw new Error("Files must be 256 KiB or smaller.");
-  const x:unknown=JSON.parse(raw);
+  const x=parseJsonDocument(raw);
   return obj(x)&&x.schemaVersion===3?(only(x,["schemaVersion","deal"])?validateDeal(x.deal):invalid()):migrate(parseDealExport(raw));
 }
 async function db(){return openDB("acquisition-lens",1,{upgrade(data){const store=data.createObjectStore("deals",{keyPath:"id"});store.createIndex("by-updated","updatedAt");}});}

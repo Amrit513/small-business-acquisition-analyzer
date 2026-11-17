@@ -1,5 +1,6 @@
 import type { BusinessInputs, FinancingInputs } from "@/types/business";
 import type { EvidenceMap } from "@/lib/evidence/provenance";
+import { parseJsonDocument } from "./json";
 
 export const listingFields = ["purchasePrice", "annualRevenue", "sde", "ebitda"] as const;
 export type ListingField = typeof listingFields[number];
@@ -111,7 +112,7 @@ export function extractListing(text: string, title = "", url = ""): ListingDraft
 /** Whitelist external input; never accept evidence levels, HTML or extra financial fields. */
 export function parseListingDraft(raw: string): ListingDraft {
   if (raw.length > 12000 || new TextEncoder().encode(raw).length > 12000) throw new Error("This listing is too large to import.");
-  const data: unknown = JSON.parse(raw);
+  const data = parseJsonDocument(raw);
   if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid listing file.");
   const value = data as Record<string, unknown>;
   const topKeys = new Set(["kind", "version", "title", "url", "capturedAt", "values", "quotes", "warnings"]);

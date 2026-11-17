@@ -3,6 +3,7 @@ import type { BusinessInputs, FinancingInputs } from "@/types/business";
 import { normalizeEvidence, type EvidenceMap } from "@/lib/evidence/provenance";
 
 import { parseListingDraft, type ListingDraft } from "@/lib/import/listing";
+import { parseJsonDocument } from "@/lib/import/json";
 
 export interface SavedDeal {
   id: string;
@@ -59,7 +60,7 @@ export function parseDealExport(raw: string): SavedDeal {
   if (raw.length > MAX_DEAL_IMPORT_BYTES || new TextEncoder().encode(raw).length > MAX_DEAL_IMPORT_BYTES) {
     throw new Error("Deal exports must be 256 KiB or smaller.");
   }
-  const parsed: unknown = JSON.parse(raw);
+  const parsed = parseJsonDocument(raw);
   if (!isExportEnvelope(parsed)) throw new Error("This is not a valid Acquisition Lens export.");
   return { ...parsed.deal, evidence: normalizeEvidence(parsed.deal.evidence), listingSource: parsed.deal.listingSource !== undefined ? parseListingDraft(JSON.stringify(parsed.deal.listingSource)) : undefined, needsListingReview: parsed.deal.needsListingReview ?? false };
 }

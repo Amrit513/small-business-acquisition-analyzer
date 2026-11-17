@@ -5,6 +5,10 @@ import { extractListing } from "@/lib/import/listing";
 const deal: SavedDeal = { id: "deal-1", name: "Atlas", updatedAt: "2026-08-17T00:00:00.000Z", business: { purchasePrice: 425000, annualRevenue: 520000, sde: 170000, ebitda: 125000, growthRate: .07, industry: "service", numberOfEmployees: 6, currentExpenses: 350000, ownerSalary: 80000 }, financing: { downPayment: 85000, loanAmount: 340000, interestRate: .095, loanTermYears: 10 } };
 
 describe("deal export evidence migration", () => {
+  it("accepts a valid legacy deal file saved with a UTF-8 byte-order mark", () => {
+    expect(parseDealExport("\ufeff" + serializeDeal(deal))).toEqual(parseDealExport(serializeDeal(deal)));
+  });
+
   it("exports version two with normalized evidence", () => {
     const parsed = JSON.parse(serializeDeal(deal)) as { schemaVersion: number; deal: SavedDeal };
     expect(parsed.schemaVersion).toBe(2);

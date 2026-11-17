@@ -140,6 +140,10 @@ Deal comparison now exposes the reporting period, replacement labor, maintenance
 
 Each repeated source-note removal control now includes the figure in its accessible name and offers an immediate undo. Restore is guarded by the linked value and reporting period, so a changed figure cannot silently regain stale provenance.
 
+## UTF-8 import compatibility
+
+Current deal exports, legacy deal exports and extension listing JSON now accept the single leading byte-order mark that some Windows editors add to otherwise valid UTF-8 files. File-size limits and strict schema validation still run on the original input, and markers anywhere else remain invalid JSON. This improves file recovery without coercing values or silently discarding unsupported fields.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.
