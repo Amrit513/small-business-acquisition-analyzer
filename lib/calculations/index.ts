@@ -54,3 +54,6 @@ export * from "@/lib/calculations/financing";
 export * from "@/lib/calculations/returns";
 export * from "@/lib/calculations/scenarios";
 export * from "@/lib/calculations/scoring";
+export * from "@/lib/calculations/insights";
+export * from "@/lib/calculations/sensitivity";
+export * from "@/lib/calculations/validation";

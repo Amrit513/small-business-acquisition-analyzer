@@ -1,0 +1,254 @@
+{
+  "@react-pdf/fns@3.1.2": {
+    "source": "https://github.com/diegomura/react-pdf/blob/c807b955821297184d705addb0bf12bd0109ec28/LICENSE",
+    "files": [
+      "react-pdf-2017-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/fns@3.1.3": {
+    "source": "https://github.com/diegomura/react-pdf/blob/a8301b239f750ee2a74e851522daadc3718b30e3/LICENSE",
+    "files": [
+      "react-pdf-2017-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/font@4.1.2": {
+    "source": "https://github.com/diegomura/react-pdf/blob/2c0b6d4a5d9db397d8cf5de4215e43b08ad5a7ca/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/hyphenate@0.1.0": {
+    "source": "https://github.com/diegomura/react-pdf/blob/2c0b6d4a5d9db397d8cf5de4215e43b08ad5a7ca/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/image@3.1.2": {
+    "source": "https://github.com/diegomura/react-pdf/blob/d5adf3db48fff165c433aaf5ba54600542700cff/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/layout@4.7.1": {
+    "source": "https://github.com/diegomura/react-pdf/blob/63d57610d9c18722fe1a3c429e1f862cc793e809/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/pdfkit@4.1.0": {
+    "source": "https://github.com/diegomura/react-pdf/tree/52e97fd0052f4e634d8b39143154e0a09ff98cba/packages/pdfkit",
+    "files": [
+      "Adobe-Core14-readme.txt",
+      "Adobe-metric-credits.txt",
+      "SVGO-MIT.txt",
+      "Node-Joyent-MIT.txt",
+      "browser-buffer-MIT.txt",
+      "node-process-MIT.txt",
+      "ieee754-BSD.txt"
+    ],
+    "attribution": "Fork of PDFKit by Devon Govett and contributors. Packed browser build contains Node polyfills and converted Adobe font metrics; SVG path logic credits SVGO."
+  },
+  "@react-pdf/png-js@3.0.0": {
+    "source": "https://github.com/diegomura/react-pdf/tree/3729489e1df485897f53c1537529b71b912a51e5/packages/png-js",
+    "files": [
+      "Node-Joyent-MIT.txt",
+      "browser-buffer-MIT.txt",
+      "node-process-MIT.txt",
+      "ieee754-BSD.txt"
+    ],
+    "attribution": "Fork of png.js by Devon Govett and contributors. Browser version includes Node polyfills."
+  },
+  "@react-pdf/primitives@4.4.0": {
+    "source": "https://github.com/diegomura/react-pdf/blob/d5adf3db48fff165c433aaf5ba54600542700cff/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/reconciler@1.1.4": {
+    "source": "https://github.com/diegomura/react-pdf/blob/80f72b91cd005075bb277233edbc1583ba94056d/LICENSE",
+    "files": [
+      "react-pdf-2017-MIT.txt",
+      "react-legacy-MIT.txt",
+      "react-current-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/render@4.7.0": {
+    "source": "https://github.com/diegomura/react-pdf/blob/2c0b6d4a5d9db397d8cf5de4215e43b08ad5a7ca/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/renderer@4.3.1": {
+    "source": "https://github.com/diegomura/react-pdf/blob/4aad0f971a484b75c3ff8de6729de15bc6ffe587/LICENSE",
+    "files": [
+      "react-pdf-2017-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/stylesheet@6.3.2": {
+    "source": "https://github.com/diegomura/react-pdf/blob/2c0b6d4a5d9db397d8cf5de4215e43b08ad5a7ca/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/svg@1.1.1": {
+    "source": "https://github.com/diegomura/react-pdf/blob/d5adf3db48fff165c433aaf5ba54600542700cff/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "@react-pdf/textkit@6.4.2": {
+    "source": "https://github.com/diegomura/react-pdf/blob/d5adf3db48fff165c433aaf5ba54600542700cff/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true,
+    "attribution": "The distributed README credits the foliojs/textkit project by @devongovett and its original contributors. Package specifies MIT. Upstream: https://github.com/foliojs/textkit/tree/2f8963734a1e04d078cfea390192e130999387b6"
+  },
+  "@react-pdf/textkit@7.0.1": {
+    "source": "https://github.com/diegomura/react-pdf/blob/8c047bd26d3d0a46eee0238659100f68a7a7b881/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true,
+    "attribution": "The distributed README credits the foliojs/textkit project by @devongovett and its original contributors. Package specifies MIT. Upstream: https://github.com/foliojs/textkit/tree/2f8963734a1e04d078cfea390192e130999387b6"
+  },
+  "@react-pdf/types@2.14.0": {
+    "source": "https://github.com/diegomura/react-pdf/blob/2c0b6d4a5d9db397d8cf5de4215e43b08ad5a7ca/LICENSE",
+    "files": [
+      "react-pdf-2017-present-MIT.txt"
+    ],
+    "primary": true
+  },
+  "abs-svg-path@0.1.1": {
+    "source": "https://github.com/jkroso/abs-svg-path/blob/f0f57c97b12cdc4fc1d94798256fba357394e40a/License",
+    "files": [
+      "abs-svg-path-MIT.txt"
+    ],
+    "primary": true
+  },
+  "bidi-js@1.1.0": {
+    "source": "https://www.npmjs.com/package/bidi-js/v/1.1.0",
+    "files": [
+      "ICU-Unicode-data.txt"
+    ],
+    "attribution": "Character data or algorithms derived from Unicode. "
+  },
+  "brotli@1.3.3": {
+    "source": "https://github.com/foliojs/brotli.js/tree/e36051345f6d27a56e5f39ea70d2f789b8574046",
+    "files": [
+      "MIT-grant.txt",
+      "Brotli-Apache-header.txt",
+      "Apache-2.0.txt",
+      "Brotli-Authors-MIT.txt"
+    ],
+    "attribution": "JavaScript port: credited author Devon Govett. The package metadata and README specify MIT. Google decoder files have their own Apache-2.0 headers. The vendor/brotli gitlink at this commit points to 5ce9bf11b3fe0924d87b2a2d47eb7a53a76a4421, which carries the Brotli Authors’ MIT notice.",
+    "primary": true
+  },
+  "client-only@0.0.1": {
+    "source": "https://registry.npmjs.org/client-only/-/client-only-0.0.1.tgz",
+    "files": [
+      "MIT-grant.txt"
+    ],
+    "attribution": "Its package.json identifies reactjs.org and facebook/react, declares MIT, and gives no copyright byline. Its default browser entry is empty.",
+    "primary": true
+  },
+  "dfa@1.2.0": {
+    "source": "https://github.com/foliojs/dfa/tree/3f5e603e5082caedabefefdf53e8a6ca3111e966",
+    "files": [
+      "MIT-grant.txt"
+    ],
+    "attribution": "Credited package author: Devon Govett. The package metadata and README specify MIT; the release has no standalone license file.",
+    "primary": true
+  },
+  "fontkit@2.0.4": {
+    "source": "https://github.com/foliojs/fontkit/tree/fbf3b9ef21eebd219eb73e666faed573af0fba09",
+    "files": [
+      "MIT-grant.txt",
+      "base64-arraybuffer-MIT.txt",
+      "HarfBuzz-COPYING.txt"
+    ],
+    "attribution": "Credited package author: Devon Govett. The package metadata and README specify MIT. src/utils.js credits base64-arraybuffer; shapers and layout sources credit HarfBuzz. Test fonts are not included in this package.",
+    "primary": true
+  },
+  "hsl-to-hex@1.0.0": {
+    "source": "https://registry.npmjs.org/hsl-to-hex/-/hsl-to-hex-1.0.0.tgz",
+    "files": [
+      "MIT-grant.txt",
+      "ISC-grant.txt"
+    ],
+    "attribution": "Credited author: David Mark Clements. The published package.json specifies MIT while the published readme.md specifies ISC. Both grant texts are preserved; the inconsistency is not resolved by this inventory.",
+    "primary": true
+  },
+  "hsl-to-rgb-for-reals@1.1.1": {
+    "source": "https://github.com/davidmarkclements/hsl_rgb_converter/tree/f5c494e4c8ddb31262326304690964379f1ed697",
+    "files": [
+      "ISC-grant.txt"
+    ],
+    "attribution": "The package specifies ISC. Based on hsl-to-rgb by kayellpeee; the fork is maintained under davidmarkclements and its README acknowledges kayellpeee and nearForm (sponsor). No copyright byline in package.json.",
+    "primary": true
+  },
+  "hyphen@1.6.6": {
+    "source": "https://registry.npmjs.org/hyphen/-/hyphen-1.6.6.tgz",
+    "files": [
+      "hyphen-English-pattern.txt"
+    ],
+    "attribution": "The app’s textkit imports @react-pdf/hyphenate/en-us, which uses hyphen/patterns/en-us.js. Other language pattern files are not part of this workflow and have separate terms."
+  },
+  "linebreak@1.1.0": {
+    "source": "https://www.npmjs.com/package/linebreak/v/1.1.0",
+    "files": [
+      "ICU-Unicode-data.txt"
+    ],
+    "attribution": "Character data or algorithms derived from Unicode. "
+  },
+  "media-engine@2.0.0": {
+    "source": "https://raw.githubusercontent.com/diegomura/media-engine/491a0a6b8be9af2166a515af0bbc427a81f00930/README.md",
+    "files": [
+      "MIT-grant.txt"
+    ],
+    "attribution": "MIT © Diego Muracciole — license section of the distributed README.",
+    "primary": true
+  },
+  "png-js@2.0.0": {
+    "source": "https://raw.githubusercontent.com/foliojs/png.js/ce0b0138a95b1dd6557f518c7a8dea2ff4fa3694/LICENSE",
+    "files": [
+      "png-js-MIT.txt"
+    ],
+    "attribution": "Original PNG decoder by Devon Govett.",
+    "primary": true
+  },
+  "unicode-properties@1.4.1": {
+    "source": "https://www.npmjs.com/package/unicode-properties/v/1.4.1",
+    "files": [
+      "ICU-Unicode-data.txt"
+    ],
+    "attribution": "Character data or algorithms derived from Unicode. "
+  },
+  "unicode-trie@2.0.0": {
+    "source": "https://www.npmjs.com/package/unicode-trie/v/2.0.0",
+    "files": [
+      "ICU-Unicode-data.txt",
+      "ICU-legacy.txt"
+    ],
+    "attribution": "Character data or algorithms derived from Unicode. The README credits ICU for the packed trie algorithm."
+  },
+  "yoga-layout@3.2.1": {
+    "source": "https://raw.githubusercontent.com/react/yoga/v3.2.1/LICENSE",
+    "files": [
+      "yoga-MIT.txt"
+    ],
+    "primary": true
+  }
+}

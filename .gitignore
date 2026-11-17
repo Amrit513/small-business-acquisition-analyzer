@@ -2,6 +2,7 @@ node_modules/
 .next/
 out/
 dist/
+tmp/
 coverage/
 .env
 .env.local
@@ -9,3 +10,8 @@ coverage/
 *.log
 npm-debug.log*
 .vercel
+
+# Generated packages and build metadata
+public/downloads/
+public/icons/
+*.tsbuildinfo

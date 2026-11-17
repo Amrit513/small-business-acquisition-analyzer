@@ -3,7 +3,52 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%;
+  --background: 150 14% 96%;
   --foreground: 222 47% 11%;
   --border: 214 32% 91%;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid #0f766e;
+  outline-offset: 3px;
+}
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: .75rem;
+  background: #ffffff;
+  padding: .75rem 1rem;
+  color: #092f2a;
+  font-weight: 700;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, .18);
+}
+.skip-link:focus { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+
+@layer components {
+  .field { @apply h-12 w-full rounded-xl border border-slate-200 bg-white px-3 text-base text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10; }
+  .field-affix { @apply pointer-events-none absolute top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400; }
+  .tab-button { @apply rounded-lg px-3 py-2.5 text-xs font-semibold text-slate-500 transition sm:px-4 sm:text-sm; }
+  .tab-active { @apply bg-slate-950 text-white shadow-sm; }
+  .scenario-button { @apply rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold capitalize text-slate-600 transition hover:border-emerald-600; }
+  .scenario-active { @apply border-[#0a7664] bg-[#0a7664] text-white; }
+  .score-pill { @apply rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wider; }
+  .score-excellent, .score-good { @apply bg-emerald-300 text-emerald-950; }
+  .score-fair { @apply bg-amber-300 text-amber-950; }
+  .score-risky, .score-poor { @apply bg-rose-300 text-rose-950; }
+  .tone-positive { @apply bg-emerald-500; }
+  .tone-warning { @apply bg-amber-400; }
+  .tone-danger { @apply bg-rose-500; }
 }

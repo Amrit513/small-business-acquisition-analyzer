@@ -1,0 +1,6 @@
+Acquisition Lens · Desktop developer preview
+Capture runs when you click. It reads selected text or a listing's main content and extracts explicitly labeled USD amounts. Do not capture confidential, private or restricted content without permission. Browser settings, form fields and some pages cannot be captured.
+
+Save draft stores one reviewed listing and short excerpts in this browser. Clear deletes it. Local downloads remain on disk until you remove them. There is no background capture, account, synchronization, advertising, or AI call. The extension's activeTab and scripting permissions allow user-triggered capture; storage is for Save draft.
+
+Review in full analyzer shares reviewed values, short excerpts and the source URL path with acquisition-lens.vercel.app in a URL fragment. Fragments are visible to the receiving page and may be visible in browser history. Export listing is the manual alternative. Figures are listing claims, not authenticated records. Ratios are educational screens, not an offer, appraisal or recommendation.
