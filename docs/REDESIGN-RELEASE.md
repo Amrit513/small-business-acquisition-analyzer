@@ -195,3 +195,7 @@ Deal and listing JSON file imports now decode bytes with a fatal UTF-8 boundary 
 ## Extension capture replacement guard
 
 Starting another page capture while a listing is already under review now asks before replacing it. Cancelling retains the current edited values and stops before querying the active tab or injecting the capture function. This protects unsaved extension work in source and simulated browser-API integration tests; installed Chrome/Edge acceptance remains pending because Chromium cannot create its process socket in this workspace.
+
+## Narrow memo and summary reflow
+
+Below 420 CSS pixels, memo metrics and sidebar metric buttons now stack their labels and values instead of forcing long text into competing columns. Values such as “No scheduled debt” can wrap within their own region, and a stylesheet regression protects the breakpoint. This reduces a source-level phone and zoom overflow risk; manual 200% zoom and physical-device acceptance remain pending.

@@ -31,4 +31,11 @@ describe("focus indicator contrast", () => {
     expect(css).toMatch(/\.tablescroll:focus-visible[^{}]*\{[^}]*outline:/);
     expect(css).toMatch(/\[role=tabpanel\]:focus-visible[^{}]*\{[^}]*outline:/);
   });
+
+  it("stacks long memo and summary values at the narrow reflow breakpoint",()=>{
+    const css=readFileSync("app/workbench.css","utf8");
+    expect(css).toMatch(/@media\(max-width:420px\)[\s\S]*\.inspectorrows>div,\.memorow\{grid-template-columns:1fr\}/);
+    expect(css).toMatch(/\.summarymetrics button\{align-items:flex-start;flex-direction:column\}/);
+    expect(css).toMatch(/\.summarymetrics b\{white-space:normal;overflow-wrap:anywhere\}/);
+  });
 });
