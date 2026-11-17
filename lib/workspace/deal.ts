@@ -49,6 +49,15 @@ export function editValue(deal:Deal,k:Field,value:number|null):Deal {
 export function editPeriod(deal:Deal,period:string):Deal {
   return deal.period===period?deal:{...deal,period,evidence:{},assumptionsReviewed:false};
 }
+export function removeEvidence(deal:Deal,k:Field):Deal {
+  if(!deal.evidence[k])return deal;
+  const evidence={...deal.evidence};delete evidence[k];
+  return {...deal,evidence,assumptionsReviewed:false};
+}
+export function restoreEvidence(deal:Deal,k:Field,entry:Evidence):Deal {
+  if(deal.values[k]!==entry.value||deal.period!==entry.period)throw new Error("The figure or reporting period changed, so this source note cannot be restored.");
+  return {...deal,evidence:{...deal.evidence,[k]:entry},assumptionsReviewed:false};
+}
 export function validAmount(k:Field,v:unknown):v is number {
   return amountValidationMessage(k,v)===null;
 }

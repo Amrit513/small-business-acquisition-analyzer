@@ -136,6 +136,10 @@ The website and extension now use one pure validator for edited listing amounts 
 
 Deal comparison now exposes the reporting period, replacement labor, maintenance capex, working-capital increase, note rate and term, funding difference and each deal's coverage comparison target. Incomplete deals remain visibly incomplete and unranked; the table explains differences without calling the highest number the best acquisition.
 
+## Recoverable evidence removal
+
+Each repeated source-note removal control now includes the figure in its accessible name and offers an immediate undo. Restore is guarded by the linked value and reporting period, so a changed figure cannot silently regain stale provenance.
+
 ## Focusable result regions
 
 The active tab panel and each keyboard-scrollable scenario, sensitivity and comparison table now use the same high-contrast visible focus indicator as the workbench controls. A stylesheet regression check protects both selectors. This closes an invisible keyboard-focus position in source; full manual keyboard, screen-reader and 200% zoom acceptance remains pending.

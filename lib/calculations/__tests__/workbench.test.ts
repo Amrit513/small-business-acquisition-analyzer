@@ -1,6 +1,6 @@
 import {describe,it,expect} from "vitest";
 import {calculate,scheduledPayments,sensitivity,metricText} from "../workbench";
-import {amountValidationMessage,blankDeal,sampleDeal,editValue,editPeriod,fromListing} from "@/lib/workspace/deal";
+import {amountValidationMessage,blankDeal,sampleDeal,editValue,editPeriod,fromListing,removeEvidence,restoreEvidence} from "@/lib/workspace/deal";
 import {serialize,parseSnapshot,readStored,journalEntry} from "@/lib/storage/workspace";
 import {extractListing,parseListingDraft} from "@/lib/import/listing";
 
@@ -12,6 +12,7 @@ describe("v3 workbench against independent examples",()=>{
  it("retains losses and flags unexplained earnings, without inventing a valuation",()=>{const d=editValue(sampleDeal(),"sde",-3000);const r=calculate(d);expect(r.valuationLow).toBeNull();expect(r.distribution).toBeLessThan(0);expect(r.coverage).toBeLessThan(0);expect(r.payback).toBeNull();expect(r.issues.some(s=>s.includes("bridge"))).toBe(true);expect(r.linked).toEqual([]);});
  it("matches a sensitivity cell to a separately rebuilt deal",()=>{const d=sampleDeal(),cell=sensitivity(d).find(s=>s.earningsPct===80&&s.rateChange===2);d.values.sde=136000;d.values.bankRate=11.5;expect(cell?.distribution).toBe(calculate(d).distribution);});
  it("preserves unknowns and explicit zero across JSON; clears source linkage on edits",()=>{const d=fromListing(extractListing("Asking price: $0"),"test","2026-06-01");const copy=parseSnapshot(serialize(d));expect(copy.values.purchasePrice).toBe(0);expect(copy.values.sde).toBeNull();expect(calculate(copy).ready).toBe(false);expect(editValue(copy,"purchasePrice",9).evidence.purchasePrice).toBeUndefined();expect(editPeriod(sampleDeal(),"FY 2026").evidence).toEqual({});});
+ it("removes and restores current evidence without relinking a changed figure",()=>{const original=sampleDeal(),entry=original.evidence.sde!;const removed=removeEvidence(original,"sde");expect(removed.evidence.sde).toBeUndefined();expect(removed.assumptionsReviewed).toBe(false);expect(restoreEvidence(removed,"sde",entry).evidence.sde).toEqual(entry);expect(()=>restoreEvidence(editValue(removed,"sde",180000),"sde",entry)).toThrow(/changed/);});
  it("round-trips an unknown imported evidence date without inventing one",()=>{const listing=parseListingDraft(JSON.stringify({...extractListing("Asking price: $200K"),capturedAt:undefined}));const d=fromListing(listing,"test","2026-06-01");const copy=parseSnapshot(serialize(d));expect(copy.listing?.capturedAt).toBe("");expect(copy.evidence.purchasePrice?.date).toBe("");});
  it("rejects unknown version-three properties instead of silently discarding them",()=>{for(const mutate of [
   (x:Record<string,unknown>)=>{x.unexpected=true;},
