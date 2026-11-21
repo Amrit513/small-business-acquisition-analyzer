@@ -108,6 +108,7 @@ describe("extension popup local workflow", () => {
 
   it("keeps the reviewed draft visible when browser storage writes or deletion fail", async () => {
     const popup = popupDocument(); vi.stubGlobal("document", popup.document);
+    vi.stubGlobal("confirm", vi.fn(() => true));
     const set = vi.fn(async () => { throw new Error("browser-internal save error"); });
     const remove = vi.fn(async () => { throw new Error("browser-internal remove error"); });
     vi.stubGlobal("chrome", {
@@ -127,6 +128,24 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(() => expect(popup.elements.status!.textContent).toContain("remains visible"));
     expect(popup.elements.status!.textContent).not.toContain("browser-internal");
     expect(popup.elements.review!.hidden).toBe(false);
+  });
+
+  it("keeps the reviewed listing when clear is cancelled",async()=>{
+    const popup=popupDocument();vi.stubGlobal("document",popup.document);
+    const remove=vi.fn();const confirm=vi.fn(()=>false);vi.stubGlobal("confirm",confirm);
+    vi.stubGlobal("chrome",{
+      storage:{local:{get:vi.fn(async()=>({listingDraft:extractListing("SDE: $170,000","Keep this review")})),set:vi.fn(),remove}},
+      tabs:{query:vi.fn(),create:vi.fn()},scripting:{executeScript:vi.fn()},
+    });
+
+    await import("../popup");
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+    popup.elements.clear!.click();
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Reviewed listing kept."));
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(remove).not.toHaveBeenCalled();
+    expect(popup.elements.review!.hidden).toBe(false);
+    expect(popup.elements.title!.value).toBe("Keep this review");
   });
 
   it("keeps the current review when replacement capture is cancelled",async()=>{

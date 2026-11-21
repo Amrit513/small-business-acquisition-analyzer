@@ -211,3 +211,7 @@ Comparison, the on-screen memo and the exported PDF now use one tested reporting
 ## Correct next-action routing
 
 The prominent next-action button now opens Deal inputs for missing figures, funding differences, financing terms and other model-input blockers. Earnings-bridge explanations and the review acknowledgement continue to open Evidence; a complete model opens Scenarios. A pure resolver and regression cases protect the touch and keyboard path from returning to the previous hard-coded Evidence destination.
+
+## Extension clear confirmation
+
+Clearing a reviewed extension listing now asks for confirmation and recommends exporting JSON first when a backup is needed. Cancelling leaves the edited review visible and does not call browser storage removal. Simulated popup coverage protects the cancellation path; this does not replace installed Chrome or Edge acceptance.
