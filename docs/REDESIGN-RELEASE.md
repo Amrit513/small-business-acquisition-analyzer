@@ -223,3 +223,7 @@ If the browser refuses the extension's JSON download click after a temporary Blo
 ## Round-trip-safe listing warnings
 
 The strict listing boundary now validates the final deduplicated warning set after adding the required independent-review notice. A payload whose warning count would exceed the supported limit after normalization is rejected immediately instead of being accepted once and then failing its own JSON export or fragment handoff. Boundary tests exercise the largest accepted set and the first rejected set through parse, export and restore.
+
+## Restricted-page and handoff recovery
+
+When the browser denies page-script access, the extension now retains the current reviewed listing, re-enables capture and gives stable copy-to-website guidance instead of exposing the browser's internal error. If a reviewed fragment cannot be opened in a new tab, the review likewise remains available with an explicit JSON-export fallback. Simulated browser-API integration tests cover both failures; installed Chrome or Edge acceptance remains pending.

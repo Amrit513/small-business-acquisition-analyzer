@@ -7,6 +7,8 @@ let unreadableSavedDraft = false;
 const $ = (id: string) => { const element = document.getElementById(id); if (!element) throw new Error(`Missing control ${id}`); return element; };
 const status = (message: string) => { $("status").textContent = message; };
 const inputs = new Map<string, HTMLInputElement>();
+type BrowserTab = { id?: number; url?: string };
+type PageCapture = ReturnType<typeof readListingPage>;
 function showRecovery(show: boolean) { unreadableSavedDraft = show; $("recovery").hidden = !show; }
 
 function readReviewed(): ListingDraft {
@@ -45,10 +47,19 @@ async function capture() {
   }
   const button = $("capture") as HTMLButtonElement; button.disabled = true; status("Reading the selected page…");
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    let tabs: BrowserTab[];
+    try { tabs = await chrome.tabs.query({ active: true, currentWindow: true }); }
+    catch { throw new Error("The active page could not be inspected. Open a regular business listing webpage and try again."); }
+    const [tab] = tabs;
     if (!tab?.id || !tab.url || !/^https?:\/\//.test(tab.url)) throw new Error("Open a regular business listing webpage first. Browser settings and PDF viewers cannot be captured.");
-    const [capture] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: readListingPage });
-    const [current] = await chrome.tabs.query({ active:true, currentWindow:true });
+    let captures: Array<{ result?: PageCapture }>;
+    try { captures = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: readListingPage }); }
+    catch { throw new Error("This page blocks listing capture. Copy the listing figures into the website or try another listing page."); }
+    const [capture] = captures;
+    let currentTabs: BrowserTab[];
+    try { currentTabs = await chrome.tabs.query({ active:true, currentWindow:true }); }
+    catch { throw new Error("The active page could not be confirmed. Capture the listing again."); }
+    const [current] = currentTabs;
     if (tab.id !== current?.id || capture?.result?.url !== tab.url || current?.url !== tab.url) throw new Error("The active page changed. Capture the listing again.");
     if (!capture?.result?.text.trim()) throw new Error(capture?.result?.ambiguousArticles
       ? "This page has several listing cards. Select the text for one listing and capture again."
@@ -63,7 +74,9 @@ async function action(work: () => void | Promise<unknown>) { try { await work();
 $("capture").addEventListener("click", () => void capture());
 $("open").addEventListener("click", () => void action(async () => {
   const reviewed = readReviewed(); if (!Object.keys(reviewed.values).length) throw new Error("Enter at least one amount first.");
-  await chrome.tabs.create({ url: `https://acquisition-lens.vercel.app/${listingFragment(reviewed)}` }); status("Opened a review in Acquisition Lens.");
+  try { await chrome.tabs.create({ url: `https://acquisition-lens.vercel.app/${listingFragment(reviewed)}` }); }
+  catch { throw new Error("Acquisition Lens could not be opened. Keep this review and try again, or export JSON as a backup."); }
+  status("Opened a review in Acquisition Lens.");
 }));
 $("save").addEventListener("click", () => void action(async () => { const reviewed=readReviewed();try { await chrome.storage.local.set({ listingDraft: reviewed }); } catch { throw new Error("Draft could not be saved in this browser. Export JSON to keep a backup."); } showRecovery(false); status("Draft saved in this browser."); }));
 $("export").addEventListener("click", () => void action(() => {

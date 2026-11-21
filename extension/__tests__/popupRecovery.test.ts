@@ -186,4 +186,40 @@ describe("extension popup local workflow", () => {
     expect(popup.elements.review!.hidden).toBe(false);
     expect(popup.elements.title!.value).toBe("Current review");
   });
+
+  it("keeps the current review when a page blocks extension capture",async()=>{
+    const popup=popupDocument();vi.stubGlobal("document",popup.document);vi.stubGlobal("confirm",vi.fn(()=>true));
+    vi.stubGlobal("chrome",{
+      storage:{local:{get:vi.fn(async()=>({listingDraft:extractListing("SDE: $170,000","Restricted-page review")})),set:vi.fn(),remove:vi.fn()}},
+      tabs:{query:vi.fn(async()=>[{id:7,url:"https://example.com/restricted"}]),create:vi.fn()},
+      scripting:{executeScript:vi.fn(async()=>{throw new Error("Cannot access contents of the page");})},
+    });
+
+    await import("../popup");
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+    popup.elements.capture!.click();
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("This page blocks listing capture. Copy the listing figures into the website or try another listing page."));
+    expect(popup.elements.status!.textContent).not.toContain("Cannot access contents");
+    expect(popup.elements.capture!.disabled).toBe(false);
+    expect(popup.elements.review!.hidden).toBe(false);
+    expect(popup.elements.title!.value).toBe("Restricted-page review");
+  });
+
+  it("keeps the review and offers an export fallback when handoff cannot open",async()=>{
+    const popup=popupDocument();vi.stubGlobal("document",popup.document);
+    const create=vi.fn(async()=>{throw new Error("browser-internal tab error");});
+    vi.stubGlobal("chrome",{
+      storage:{local:{get:vi.fn(async()=>({listingDraft:extractListing("Annual Revenue: $600,000","Handoff recovery")})),set:vi.fn(),remove:vi.fn()}},
+      tabs:{query:vi.fn(),create},scripting:{executeScript:vi.fn()},
+    });
+
+    await import("../popup");
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+    popup.elements.open!.click();
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Acquisition Lens could not be opened. Keep this review and try again, or export JSON as a backup."));
+    expect(popup.elements.status!.textContent).not.toContain("browser-internal");
+    expect(create).toHaveBeenCalledOnce();
+    expect(popup.elements.review!.hidden).toBe(false);
+    expect(popup.elements.title!.value).toBe("Handoff recovery");
+  });
 });
