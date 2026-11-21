@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractListing, listingFragment, listingFromFragment, listingToInputs, parseListingAmount, parseListingDraft, reviewListingAmounts, safeListingUrl } from "../listing";
+import { extractListing, LISTING_REVIEW_WARNING, listingFragment, listingFromFragment, listingToInputs, parseListingAmount, parseListingDraft, reviewListingAmounts, safeListingUrl } from "../listing";
 
 describe("listing import boundary", () => {
   it("extracts labeled USD figures and keeps source snippets", () => {
@@ -34,6 +34,18 @@ describe("listing import boundary", () => {
     const fragment = listingFragment(draft);
     expect(listingFromFragment(fragment)?.title).toBe("Café & co.");
     expect(new URL(`https://example.com/${fragment}`).search).toBe("");
+  });
+  it("keeps the largest accepted warning set safe for export and handoff", () => {
+    const raw = { ...extractListing("Asking Price: $20K"), warnings: Array.from({ length: 19 }, (_, index) => `Review note ${index + 1}`) };
+    const parsed = parseListingDraft(JSON.stringify(raw));
+    const restored = listingFromFragment(listingFragment(parsed));
+    expect(parsed.warnings).toHaveLength(20);
+    expect(parsed.warnings).toContain(LISTING_REVIEW_WARNING);
+    expect(restored?.warnings).toEqual(parsed.warnings);
+  });
+  it("rejects warning sets that normalization would make unsafe to reimport", () => {
+    const raw = { ...extractListing("Asking Price: $20K"), warnings: Array.from({ length: 20 }, (_, index) => `Review note ${index + 1}`) };
+    expect(() => parseListingDraft(JSON.stringify(raw))).toThrow("This listing has too many warnings.");
   });
   it("rejects oversized, nonfinite and invalid values", () => {
     expect(() => parseListingDraft(" ".repeat(12001))).toThrow();

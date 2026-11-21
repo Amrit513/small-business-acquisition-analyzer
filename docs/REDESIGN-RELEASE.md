@@ -219,3 +219,7 @@ Clearing a reviewed extension listing now asks for confirmation and recommends e
 ## Extension export failure recovery
 
 If the browser refuses the extension's JSON download click after a temporary Blob URL is created, the popup now revokes that URL immediately, preserves the reviewed listing and shows an actionable message without exposing the raw browser error. Simulated popup coverage verifies cleanup and retained review state; an installed-browser download remains a separate acceptance gate.
+
+## Round-trip-safe listing warnings
+
+The strict listing boundary now validates the final deduplicated warning set after adding the required independent-review notice. A payload whose warning count would exceed the supported limit after normalization is rejected immediately instead of being accepted once and then failing its own JSON export or fragment handoff. Boundary tests exercise the largest accepted set and the first rejected set through parse, export and restore.

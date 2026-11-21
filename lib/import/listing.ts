@@ -4,6 +4,7 @@ import { parseJsonDocument } from "./json";
 
 export const listingFields = ["purchasePrice", "annualRevenue", "sde", "ebitda"] as const;
 export const MAX_LISTING_IMPORT_BYTES = 12000;
+export const LISTING_REVIEW_WARNING = "Review every amount. Imported listing claims have not been independently verified.";
 export type ListingField = typeof listingFields[number];
 export const listingLabels: Record<ListingField, string> = {
   purchasePrice: "Asking price", annualRevenue: "Annual revenue", sde: "SDE", ebitda: "EBITDA",
@@ -128,6 +129,8 @@ export function parseListingDraft(raw: string): ListingDraft {
   if (value.url !== undefined && (typeof value.url !== "string" || value.url.length > 800)) throw new Error("Invalid listing source URL.");
   if (value.capturedAt !== undefined && typeof value.capturedAt !== "string") throw new Error("Invalid listing capture time.");
   if (value.warnings !== undefined && (!Array.isArray(value.warnings) || value.warnings.length > 20 || value.warnings.some(warning => typeof warning !== "string" || warning.length > 220))) throw new Error("Invalid listing warnings.");
+  const warnings = [...new Set([...(value.warnings as string[] | undefined ?? []), LISTING_REVIEW_WARNING])];
+  if (warnings.length > 20) throw new Error("This listing has too many warnings.");
   const values: ListingDraft["values"] = {};
   const quotes: ListingDraft["quotes"] = {};
   for (const field of listingFields) {
@@ -146,7 +149,7 @@ export function parseListingDraft(raw: string): ListingDraft {
     url: typeof value.url === "string" ? safeListingUrl(value.url) : "",
     capturedAt: captureTimestamp(value.capturedAt),
     values, quotes,
-    warnings: [...new Set([...(value.warnings as string[] | undefined ?? []), "Review every amount. Imported listing claims have not been independently verified."])],
+    warnings,
   };
 }
 
