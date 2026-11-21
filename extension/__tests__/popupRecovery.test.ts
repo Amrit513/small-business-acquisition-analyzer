@@ -222,4 +222,32 @@ describe("extension popup local workflow", () => {
     expect(popup.elements.review!.hidden).toBe(false);
     expect(popup.elements.title!.value).toBe("Handoff recovery");
   });
+
+  it("does not save an edited title that the extension cannot restore",async()=>{
+    const popup=popupDocument();vi.stubGlobal("document",popup.document);
+    let stored:unknown=extractListing("SDE: $170,000","Restorable title");
+    const set=vi.fn(async(value:{listingDraft:unknown})=>{stored=value.listingDraft;});
+    vi.stubGlobal("chrome",{
+      storage:{local:{get:vi.fn(async()=>({listingDraft:stored})),set,remove:vi.fn()}},
+      tabs:{query:vi.fn(),create:vi.fn()},scripting:{executeScript:vi.fn()},
+    });
+
+    await import("../popup");
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+    popup.elements.title!.value="x".repeat(161);
+    popup.elements.save!.click();
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Business name must be 160 characters or fewer."));
+    expect(popup.elements.title!.attributes.get("aria-invalid")).toBe("true");
+    expect(popup.elements.title!.attributes.get("aria-describedby")).toBe("status");
+    expect(popup.elements.title!.focusCount).toBe(1);
+    expect(set).not.toHaveBeenCalled();
+    expect(stored).toMatchObject({title:"Restorable title"});
+
+    popup.elements.title!.value="Restorable edited title";
+    popup.elements.save!.click();
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Draft saved in this browser."));
+    expect(popup.elements.title!.attributes.get("aria-invalid")).toBe("false");
+    expect(popup.elements.title!.attributes.has("aria-describedby")).toBe(false);
+    expect(stored).toMatchObject({title:"Restorable edited title"});
+  });
 });

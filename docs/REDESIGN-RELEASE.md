@@ -227,3 +227,7 @@ The strict listing boundary now validates the final deduplicated warning set aft
 ## Restricted-page and handoff recovery
 
 When the browser denies page-script access, the extension now retains the current reviewed listing, re-enables capture and gives stable copy-to-website guidance instead of exposing the browser's internal error. If a reviewed fragment cannot be opened in a new tab, the review likewise remains available with an explicit JSON-export fallback. Simulated browser-API integration tests cover both failures; installed Chrome or Edge acceptance remains pending.
+
+## Restorable extension titles
+
+Before save, export or handoff, the extension now validates the edited business name and canonicalizes the complete reviewed draft through the same strict parser used during startup restore. An overlong title focuses the title input, exposes its invalid state and leaves the prior saved draft untouched. This closes a path where browser autofill or scripted input could persist a draft that the extension could not reopen.

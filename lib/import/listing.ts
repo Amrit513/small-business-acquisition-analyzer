@@ -4,6 +4,7 @@ import { parseJsonDocument } from "./json";
 
 export const listingFields = ["purchasePrice", "annualRevenue", "sde", "ebitda"] as const;
 export const MAX_LISTING_IMPORT_BYTES = 12000;
+export const MAX_LISTING_TITLE_LENGTH = 160;
 export const LISTING_REVIEW_WARNING = "Review every amount. Imported listing claims have not been independently verified.";
 export type ListingField = typeof listingFields[number];
 export const listingLabels: Record<ListingField, string> = {
@@ -125,7 +126,7 @@ export function parseListingDraft(raw: string): ListingDraft {
   if (value.quotes !== undefined && (!value.quotes || typeof value.quotes !== "object" || Array.isArray(value.quotes))) throw new Error("Invalid listing excerpts.");
   const rawQuotes = (value.quotes ?? {}) as Record<string, unknown>;
   if (Object.keys(rawQuotes).some(key => !listingFields.includes(key as ListingField))) throw new Error("This listing contains unsupported excerpt fields.");
-  if (value.title !== undefined && (typeof value.title !== "string" || value.title.length > 160)) throw new Error("Invalid listing title.");
+  if (value.title !== undefined && (typeof value.title !== "string" || value.title.length > MAX_LISTING_TITLE_LENGTH)) throw new Error("Invalid listing title.");
   if (value.url !== undefined && (typeof value.url !== "string" || value.url.length > 800)) throw new Error("Invalid listing source URL.");
   if (value.capturedAt !== undefined && typeof value.capturedAt !== "string") throw new Error("Invalid listing capture time.");
   if (value.warnings !== undefined && (!Array.isArray(value.warnings) || value.warnings.length > 20 || value.warnings.some(warning => typeof warning !== "string" || warning.length > 220))) throw new Error("Invalid listing warnings.");

@@ -1,4 +1,4 @@
-import { extractListing, listingFields, listingFragment, listingLabels, parseListingDraft, reviewListingAmounts, type ListingDraft } from "../lib/import/listing";
+import { extractListing, listingFields, listingFragment, listingLabels, MAX_LISTING_TITLE_LENGTH, parseListingDraft, reviewListingAmounts, type ListingDraft } from "../lib/import/listing";
 import { screenListing } from "../lib/calculations/listingScreen";
 import { readListingPage } from "./pageCapture";
 
@@ -16,7 +16,12 @@ function readReviewed(): ListingDraft {
   const reviewed=reviewListingAmounts(draft,Object.fromEntries(listingFields.map(field=>[field,inputs.get(field)?.value??""])));
   for(const field of listingFields){const input=inputs.get(field),invalid=!reviewed.ok&&reviewed.field===field;input?.setAttribute("aria-invalid",String(invalid));if(invalid)input?.setAttribute("aria-describedby","status");else input?.removeAttribute("aria-describedby");}
   if(!reviewed.ok){inputs.get(reviewed.field)?.focus();throw new Error(reviewed.message);}
-  return { ...reviewed.draft, title: ($("title") as HTMLInputElement).value.trim() || "Imported listing" };
+  const titleInput=$("title") as HTMLInputElement,title=titleInput.value.trim()||"Imported listing";
+  const invalidTitle=title.length>MAX_LISTING_TITLE_LENGTH;titleInput.setAttribute("aria-invalid",String(invalidTitle));
+  if(invalidTitle){titleInput.setAttribute("aria-describedby","status");titleInput.focus();throw new Error(`Business name must be ${MAX_LISTING_TITLE_LENGTH} characters or fewer.`);}
+  titleInput.removeAttribute("aria-describedby");
+  // Canonicalize every edited draft through the same strict boundary used by restore and handoff.
+  return parseListingDraft(JSON.stringify({ ...reviewed.draft, title }));
 }
 function updateRatios() {
   try {
