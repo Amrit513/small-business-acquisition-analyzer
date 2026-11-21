@@ -215,3 +215,7 @@ The prominent next-action button now opens Deal inputs for missing figures, fund
 ## Extension clear confirmation
 
 Clearing a reviewed extension listing now asks for confirmation and recommends exporting JSON first when a backup is needed. Cancelling leaves the edited review visible and does not call browser storage removal. Simulated popup coverage protects the cancellation path; this does not replace installed Chrome or Edge acceptance.
+
+## Extension export failure recovery
+
+If the browser refuses the extension's JSON download click after a temporary Blob URL is created, the popup now revokes that URL immediately, preserves the reviewed listing and shows an actionable message without exposing the raw browser error. Simulated popup coverage verifies cleanup and retained review state; an installed-browser download remains a separate acceptance gate.

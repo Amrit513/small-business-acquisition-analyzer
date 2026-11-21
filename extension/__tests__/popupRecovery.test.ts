@@ -14,6 +14,7 @@ class ElementStub {
   id = "";
   clickCount = 0;
   focusCount = 0;
+  clickError?: Error;
   attributes = new Map<string, string>();
   private listeners = new Map<string, Array<() => void>>();
   addEventListener(type: string, listener: () => void) { this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]); }
@@ -22,17 +23,17 @@ class ElementStub {
   focus() { this.focusCount++; }
   append() {}
   replaceChildren() {}
-  click() { this.clickCount++; for (const listener of this.listeners.get("click") ?? []) listener(); }
+  click() { this.clickCount++; if(this.clickError)throw this.clickError;for (const listener of this.listeners.get("click") ?? []) listener(); }
 }
 
 const ids = ["status", "recovery", "review", "title", "source", "captured", "fields", "warnings", "multiple", "margin", "capture", "open", "save", "export", "clear", "discard-corrupt"];
-function popupDocument() {
+function popupDocument(options:{failExportClick?:boolean}={}) {
   const elements = Object.fromEntries(ids.map(id => [id, new ElementStub()])) as Record<string, ElementStub>;
   const created: ElementStub[] = [];
   elements.recovery!.hidden = true; elements.review!.hidden = true; elements.source!.hidden = true;
   return { elements, created, document: {
     getElementById: (id: string) => elements[id] ?? null,
-    createElement: () => { const element = new ElementStub(); created.push(element); return element; },
+    createElement: (tag:string) => { const element = new ElementStub();if(tag==="a"&&options.failExportClick)element.clickError=new Error("browser-internal download error");created.push(element); return element; },
   } };
 }
 
@@ -146,6 +147,25 @@ describe("extension popup local workflow", () => {
     expect(remove).not.toHaveBeenCalled();
     expect(popup.elements.review!.hidden).toBe(false);
     expect(popup.elements.title!.value).toBe("Keep this review");
+  });
+
+  it("keeps the review and revokes its Blob URL when export cannot start",async()=>{
+    const popup=popupDocument({failExportClick:true});vi.stubGlobal("document",popup.document);
+    vi.stubGlobal("chrome",{
+      storage:{local:{get:vi.fn(async()=>({listingDraft:extractListing("Annual Revenue: $600,000","Export recovery")})),set:vi.fn(),remove:vi.fn()}},
+      tabs:{query:vi.fn(),create:vi.fn()},scripting:{executeScript:vi.fn()},
+    });
+    vi.spyOn(URL,"createObjectURL").mockReturnValue("blob:failed-export");
+    const revoke=vi.spyOn(URL,"revokeObjectURL").mockImplementation(()=>undefined);
+
+    await import("../popup");
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+    popup.elements.export!.click();
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Listing export could not start. Keep this popup open and try again."));
+    expect(popup.elements.status!.textContent).not.toContain("browser-internal");
+    expect(revoke).toHaveBeenCalledWith("blob:failed-export");
+    expect(popup.elements.review!.hidden).toBe(false);
+    expect(popup.elements.title!.value).toBe("Export recovery");
   });
 
   it("keeps the current review when replacement capture is cancelled",async()=>{
