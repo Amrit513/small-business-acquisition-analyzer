@@ -279,3 +279,7 @@ When a bank or seller-note principal is unknown, comparison, on-screen memo and 
 ## Extension export preparation recovery
 
 If the browser cannot create the temporary Blob URL needed for an extension JSON export, the popup now keeps the reviewed listing visible and gives a stable retry message instead of exposing a raw browser error. Existing cleanup still revokes a URL when a later download click fails. Simulated browser-API coverage protects both stages; an installed-browser download remains a separate acceptance gate.
+
+## Workbench JSON download recovery
+
+Current-deal and saved-deal JSON backups now share one tested browser-download boundary. Preparation and download-click failures return stable recovery guidance instead of exposing browser internals, and a failed click immediately revokes its temporary Blob URL. The active deal and local saved snapshot remain unchanged. Browser APIs are simulated in the regression cases; real mobile and desktop downloads remain separate acceptance checks.
