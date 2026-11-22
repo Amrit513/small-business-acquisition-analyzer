@@ -315,3 +315,7 @@ The annual reporting-period input now exposes the same invalid state that alread
 ## Explicitly unauthenticated source-note support
 
 Comparison, the on-screen memo and the PDF now label their shared count as user-linked source-note support rather than evidence status. Any nonzero count explicitly says that the notes are not authenticated, while an empty count remains visible. This prevents model completeness or a user-selected source label from being mistaken for document verification.
+
+## Actionable deal-import recovery
+
+Deal JSON imports now distinguish an oversized file from malformed UTF-8 and unsupported content while always confirming that the active deal remains unchanged. Only allowlisted local failure categories reach the status region; raw browser, filesystem and parser messages stay hidden. Pure regression cases protect both actionable copy and the generic privacy-preserving fallback.
