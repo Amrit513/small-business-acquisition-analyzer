@@ -299,3 +299,7 @@ While a memo is rendering locally, the memo region now exposes its busy state an
 ## Named-deal memo readiness
 
 A blank or whitespace-only deal name now creates an explicit model issue, prevents the optional screening score and blocks PDF preparation until corrected. The name input exposes its invalid state and associated alert at the same boundary. This aligns live model readiness with the existing saved-file validator, so an unnamed deal cannot appear report-ready while remaining impossible to save or export validly.
+
+## Serialized extension actions
+
+The extension popup now permits only one capture, save, export, clear or handoff operation at a time. Its workspace exposes the busy state and disables every conflicting action until the active browser or storage request settles, including failure cleanup. Simulated browser-API coverage confirms that a delayed save cannot race a clear and leave the stored draft in an ambiguous state; installed Chrome or Edge acceptance remains pending.

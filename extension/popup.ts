@@ -4,12 +4,19 @@ import { readListingPage } from "./pageCapture";
 
 let draft: ListingDraft | undefined;
 let unreadableSavedDraft = false;
+let operationInProgress = false;
 const $ = (id: string) => { const element = document.getElementById(id); if (!element) throw new Error(`Missing control ${id}`); return element; };
 const status = (message: string) => { $("status").textContent = message; };
 const inputs = new Map<string, HTMLInputElement>();
+const operationControlIds = ["capture", "open", "save", "export", "clear", "discard-corrupt"] as const;
 type BrowserTab = { id?: number; url?: string };
 type PageCapture = ReturnType<typeof readListingPage>;
 function showRecovery(show: boolean) { unreadableSavedDraft = show; $("recovery").hidden = !show; }
+function setOperationBusy(busy: boolean) {
+  operationInProgress = busy;
+  $("workspace").setAttribute("aria-busy", String(busy));
+  for (const id of operationControlIds) ($(id) as HTMLButtonElement).disabled = busy;
+}
 
 function readReviewed(): ListingDraft {
   if (!draft) throw new Error("Capture a listing first.");
@@ -50,7 +57,7 @@ async function capture() {
     status("Current reviewed listing kept.");
     return;
   }
-  const button = $("capture") as HTMLButtonElement; button.disabled = true; status("Reading the selected page…");
+  status("Reading the selected page…");
   try {
     let tabs: BrowserTab[];
     try { tabs = await chrome.tabs.query({ active: true, currentWindow: true }); }
@@ -73,10 +80,15 @@ async function capture() {
     render(extractListing(capture.result.text, capture.result.title, capture.result.url));
     status(replacingUnreadable ? "Review the extracted amounts, then save to replace the unreadable draft." : "Review the extracted amounts before using them.");
   } catch (error) { status(error instanceof Error ? error.message : "Capture failed. The website may restrict extension access."); }
-  finally { button.disabled = false; }
 }
-async function action(work: () => void | Promise<unknown>) { try { await work(); } catch (error) { status(error instanceof Error ? error.message : "The action could not be completed."); } }
-$("capture").addEventListener("click", () => void capture());
+async function action(work: () => void | Promise<unknown>) {
+  if (operationInProgress) return;
+  setOperationBusy(true);
+  try { await work(); }
+  catch (error) { status(error instanceof Error ? error.message : "The action could not be completed."); }
+  finally { setOperationBusy(false); }
+}
+$("capture").addEventListener("click", () => void action(capture));
 $("open").addEventListener("click", () => void action(async () => {
   const reviewed = readReviewed(); if (!Object.keys(reviewed.values).length) throw new Error("Enter at least one amount first.");
   try { await chrome.tabs.create({ url: `https://acquisition-lens.vercel.app/${listingFragment(reviewed)}` }); }

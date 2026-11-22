@@ -26,7 +26,7 @@ class ElementStub {
   click() { this.clickCount++; if(this.clickError)throw this.clickError;for (const listener of this.listeners.get("click") ?? []) listener(); }
 }
 
-const ids = ["status", "recovery", "review", "title", "source", "captured", "fields", "warnings", "multiple", "margin", "capture", "open", "save", "export", "clear", "discard-corrupt"];
+const ids = ["workspace", "status", "recovery", "review", "title", "source", "captured", "fields", "warnings", "multiple", "margin", "capture", "open", "save", "export", "clear", "discard-corrupt"];
 function popupDocument(options:{failExportClick?:boolean}={}) {
   const elements = Object.fromEntries(ids.map(id => [id, new ElementStub()])) as Record<string, ElementStub>;
   const created: ElementStub[] = [];
@@ -129,6 +129,33 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(() => expect(popup.elements.status!.textContent).toContain("remains visible"));
     expect(popup.elements.status!.textContent).not.toContain("browser-internal");
     expect(popup.elements.review!.hidden).toBe(false);
+  });
+
+  it("prevents clear from racing an in-progress save", async () => {
+    const popup = popupDocument(); vi.stubGlobal("document", popup.document);
+    let finishSave: (() => void) | undefined;
+    const set = vi.fn(() => new Promise<void>(resolve => { finishSave = resolve; }));
+    const remove = vi.fn(); const confirm = vi.fn(() => true); vi.stubGlobal("confirm", confirm);
+    vi.stubGlobal("chrome", {
+      storage: { local: { get: vi.fn(async () => ({ listingDraft: extractListing("SDE: $170,000", "Save race") })), set, remove } },
+      tabs: { query: vi.fn(), create: vi.fn() }, scripting: { executeScript: vi.fn() },
+    });
+
+    await import("../popup");
+    await vi.waitFor(() => expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+    popup.elements.save!.click();
+    await vi.waitFor(() => expect(set).toHaveBeenCalledOnce());
+    expect(popup.elements.workspace!.attributes.get("aria-busy")).toBe("true");
+    for (const id of ["capture", "open", "save", "export", "clear", "discard-corrupt"]) expect(popup.elements[id]!.disabled).toBe(true);
+
+    popup.elements.clear!.click();
+    expect(confirm).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
+    finishSave?.();
+
+    await vi.waitFor(() => expect(popup.elements.status!.textContent).toBe("Draft saved in this browser."));
+    expect(popup.elements.workspace!.attributes.get("aria-busy")).toBe("false");
+    for (const id of ["capture", "open", "save", "export", "clear", "discard-corrupt"]) expect(popup.elements[id]!.disabled).toBe(false);
   });
 
   it("keeps the reviewed listing when clear is cancelled",async()=>{
