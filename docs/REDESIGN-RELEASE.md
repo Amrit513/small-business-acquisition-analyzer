@@ -275,3 +275,7 @@ Text-style workbench actions, footer navigation, the install-page return link, l
 ## Partial debt assumptions in reports
 
 When a bank or seller-note principal is unknown, comparison, on-screen memo and PDF now retain any entered annual rate and term instead of collapsing the entire financing line to “Unknown amount.” Each missing term remains explicitly unknown, and an explicit zero principal still reports “No note.” This preserves partial assumptions without inventing scheduled debt.
+
+## Extension export preparation recovery
+
+If the browser cannot create the temporary Blob URL needed for an extension JSON export, the popup now keeps the reviewed listing visible and gives a stable retry message instead of exposing a raw browser error. Existing cleanup still revokes a URL when a later download click fails. Simulated browser-API coverage protects both stages; an installed-browser download remains a separate acceptance gate.

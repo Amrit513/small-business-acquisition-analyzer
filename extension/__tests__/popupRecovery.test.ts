@@ -168,6 +168,25 @@ describe("extension popup local workflow", () => {
     expect(popup.elements.title!.value).toBe("Export recovery");
   });
 
+  it("keeps the review when the browser cannot prepare an export URL",async()=>{
+    const popup=popupDocument();vi.stubGlobal("document",popup.document);
+    vi.stubGlobal("chrome",{
+      storage:{local:{get:vi.fn(async()=>({listingDraft:extractListing("SDE: $170,000","Export preparation recovery")})),set:vi.fn(),remove:vi.fn()}},
+      tabs:{query:vi.fn(),create:vi.fn()},scripting:{executeScript:vi.fn()},
+    });
+    vi.spyOn(URL,"createObjectURL").mockImplementation(()=>{throw new Error("browser-internal blob error");});
+    const revoke=vi.spyOn(URL,"revokeObjectURL").mockImplementation(()=>undefined);
+
+    await import("../popup");
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+    popup.elements.export!.click();
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Listing export could not be prepared. Keep this review and try again."));
+    expect(popup.elements.status!.textContent).not.toContain("browser-internal");
+    expect(revoke).not.toHaveBeenCalled();
+    expect(popup.elements.review!.hidden).toBe(false);
+    expect(popup.elements.title!.value).toBe("Export preparation recovery");
+  });
+
   it("keeps the current review when replacement capture is cancelled",async()=>{
     const popup=popupDocument();vi.stubGlobal("document",popup.document);
     const executeScript=vi.fn();

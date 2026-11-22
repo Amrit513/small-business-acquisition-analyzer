@@ -85,7 +85,10 @@ $("open").addEventListener("click", () => void action(async () => {
 }));
 $("save").addEventListener("click", () => void action(async () => { const reviewed=readReviewed();try { await chrome.storage.local.set({ listingDraft: reviewed }); } catch { throw new Error("Draft could not be saved in this browser. Export JSON to keep a backup."); } showRecovery(false); status("Draft saved in this browser."); }));
 $("export").addEventListener("click", () => void action(() => {
-  const url = URL.createObjectURL(new Blob([JSON.stringify(readReviewed(), null, 2)], { type: "application/json" }));
+  const reviewed=readReviewed();
+  let url:string;
+  try { url=URL.createObjectURL(new Blob([JSON.stringify(reviewed, null, 2)], { type: "application/json" })); }
+  catch { throw new Error("Listing export could not be prepared. Keep this review and try again."); }
   const anchor = document.createElement("a"); anchor.href = url; anchor.download = "acquisition-lens-listing.json";
   try { anchor.click(); }
   catch { URL.revokeObjectURL(url); throw new Error("Listing export could not start. Keep this popup open and try again."); }
