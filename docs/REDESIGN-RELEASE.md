@@ -128,6 +128,10 @@ Listing JSON and extension handoffs now reject unknown top-level, financial-valu
 
 Listing JSON imports now use allowlisted recovery copy instead of exposing raw browser, filesystem or JSON-parser errors. Oversized and invalid UTF-8 files receive specific guidance; every other failure is described as an unsupported Acquisition Lens listing export. Each rejection confirms that the current listing review is unchanged. Pure regression cases protect the categories and fallback; installed-browser acceptance remains pending.
 
+## Extension error announcements
+
+Extension action and capture failures now switch the popup message region to an assertive alert, while progress and successful outcomes remain polite status updates. The atomic live region prevents partial recovery messages from being announced. Simulated popup coverage verifies both the urgent error state and its reset after a successful retry; installed Chrome/Edge assistive-technology acceptance remains pending.
+
 ## Consistent memo provenance
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.

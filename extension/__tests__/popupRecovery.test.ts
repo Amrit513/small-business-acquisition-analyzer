@@ -75,6 +75,8 @@ describe("extension popup local workflow", () => {
     purchasePrice.value = "$400K-$500K";
     first.elements.save!.click();
     await vi.waitFor(() => expect(first.elements.status!.textContent).toContain("one USD amount"));
+    expect(first.elements.status!.attributes.get("role")).toBe("alert");
+    expect(first.elements.status!.attributes.get("aria-live")).toBe("assertive");
     expect(purchasePrice.attributes.get("aria-invalid")).toBe("true");
     expect(purchasePrice.attributes.get("aria-describedby")).toBe("status");
     expect(purchasePrice.focusCount).toBe(1);
@@ -83,6 +85,8 @@ describe("extension popup local workflow", () => {
 
     first.elements.save!.click();
     await vi.waitFor(() => expect(first.elements.status!.textContent).toBe("Draft saved in this browser."));
+    expect(first.elements.status!.attributes.get("role")).toBe("status");
+    expect(first.elements.status!.attributes.get("aria-live")).toBe("polite");
     expect(first.elements.recovery!.hidden).toBe(true);
     expect(stored).toMatchObject({ kind: "acquisition-lens-listing", title: "Fixture listing", values: { purchasePrice: 425000, sde: 170000 } });
 
@@ -245,6 +249,8 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
     popup.elements.capture!.click();
     await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("This page blocks listing capture. Copy the listing figures into the website or try another listing page."));
+    expect(popup.elements.status!.attributes.get("role")).toBe("alert");
+    expect(popup.elements.status!.attributes.get("aria-live")).toBe("assertive");
     expect(popup.elements.status!.textContent).not.toContain("Cannot access contents");
     expect(popup.elements.capture!.disabled).toBe(false);
     expect(popup.elements.review!.hidden).toBe(false);

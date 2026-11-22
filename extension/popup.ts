@@ -6,7 +6,18 @@ let draft: ListingDraft | undefined;
 let unreadableSavedDraft = false;
 let operationInProgress = false;
 const $ = (id: string) => { const element = document.getElementById(id); if (!element) throw new Error(`Missing control ${id}`); return element; };
-const status = (message: string) => { $("status").textContent = message; };
+const status = (message: string) => {
+  const region = $("status");
+  region.setAttribute("role", "status");
+  region.setAttribute("aria-live", "polite");
+  region.textContent = message;
+};
+const reportError = (message: string) => {
+  const region = $("status");
+  region.setAttribute("role", "alert");
+  region.setAttribute("aria-live", "assertive");
+  region.textContent = message;
+};
 const inputs = new Map<string, HTMLInputElement>();
 const operationControlIds = ["capture", "open", "save", "export", "clear", "discard-corrupt"] as const;
 type BrowserTab = { id?: number; url?: string };
@@ -79,13 +90,13 @@ async function capture() {
     const replacingUnreadable = unreadableSavedDraft;
     render(extractListing(capture.result.text, capture.result.title, capture.result.url));
     status(replacingUnreadable ? "Review the extracted amounts, then save to replace the unreadable draft." : "Review the extracted amounts before using them.");
-  } catch (error) { status(error instanceof Error ? error.message : "Capture failed. The website may restrict extension access."); }
+  } catch (error) { reportError(error instanceof Error ? error.message : "Capture failed. The website may restrict extension access."); }
 }
 async function action(work: () => void | Promise<unknown>) {
   if (operationInProgress) return;
   setOperationBusy(true);
   try { await work(); }
-  catch (error) { status(error instanceof Error ? error.message : "The action could not be completed."); }
+  catch (error) { reportError(error instanceof Error ? error.message : "The action could not be completed."); }
   finally { setOperationBusy(false); }
 }
 $("capture").addEventListener("click", () => void action(capture));
