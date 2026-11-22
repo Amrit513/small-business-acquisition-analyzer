@@ -1,6 +1,7 @@
 import type { BusinessInputs, FinancingInputs } from "@/types/business";
 import type { EvidenceMap } from "@/lib/evidence/provenance";
 import { parseJsonDocument } from "./json";
+import { plausiblePastInstant } from "./time";
 
 export const listingFields = ["purchasePrice", "annualRevenue", "sde", "ebitda"] as const;
 export const MAX_LISTING_IMPORT_BYTES = 12000;
@@ -75,9 +76,8 @@ export function safeListingUrl(raw: string): string {
 /** Preserve an actual capture instant; never replace missing provenance with import time. */
 function captureTimestamp(value: unknown): string {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(value)) return "";
-  const time = Date.parse(value);
   // Allow small device-clock drift, but never present a clearly future claim as capture provenance.
-  return Number.isFinite(time) && time <= Date.now() + 5 * 60 * 1000 ? new Date(time).toISOString() : "";
+  return plausiblePastInstant(value) ? new Date(value).toISOString() : "";
 }
 
 /** Convert a normalized capture instant to the importing device's calendar date. */

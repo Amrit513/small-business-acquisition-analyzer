@@ -1,6 +1,7 @@
 import { openDB, type DBSchema } from "idb";
 import type { BusinessInputs, FinancingInputs } from "@/types/business";
 import { normalizeEvidence, type EvidenceMap } from "@/lib/evidence/provenance";
+import { plausiblePastInstant } from "@/lib/import/time";
 
 import { parseListingDraft, type ListingDraft } from "@/lib/import/listing";
 import { parseJsonDocument } from "@/lib/import/json";
@@ -111,7 +112,7 @@ function isExportEnvelope(value: unknown): value is { schemaVersion: 1 | 2; deal
   const deal = envelope.deal as Record<string, unknown>;
   return record(deal) && typeof deal.id === "string" && deal.id.trim().length > 0 && deal.id.length <= 256
     && typeof deal.name === "string" && deal.name.length <= 1000
-    && typeof deal.updatedAt === "string" && Number.isFinite(Date.parse(deal.updatedAt))
+    && plausiblePastInstant(deal.updatedAt)
     && (deal.needsListingReview === undefined || typeof deal.needsListingReview === "boolean")
     && validBusiness(deal.business) && validFinancing(deal.financing);
 }

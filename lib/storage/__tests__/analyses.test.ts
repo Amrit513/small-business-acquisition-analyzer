@@ -34,7 +34,7 @@ describe("untrusted saved-deal imports", () => {
     { financing: { ...deal.financing, sellerFinancing: {} } },
     { financing: { ...deal.financing, sellerFinancing: { amount: 10, interestRate: 0, termYears: 1e10 } } },
     { financing: { ...deal.financing, closingCosts: "0" } },
-    { id: " " }, { updatedAt: "invalid" }, { needsListingReview: "false" },
+    { id: " " }, { updatedAt: "invalid" }, { updatedAt: "9999-01-01T00:00:00.000Z" }, { needsListingReview: "false" },
     { listingSource: null },
   ])("rejects invalid nested inputs or metadata: %j", (patch) => {
     expect(() => parseDealExport(JSON.stringify({ schemaVersion: 2, deal: { ...deal, ...patch } }))).toThrow();

@@ -247,3 +247,7 @@ Listing evidence now derives its review date from the capture instant in the imp
 ## Local PDF generation date
 
 Prepared PDF memos now label their generation date with the user's local calendar day instead of slicing the UTC instant. This prevents an evening memo in a western timezone from being dated one day ahead. Exact saved-record timestamps remain ISO instants; only the human-facing report date uses the local day.
+
+## Plausible saved-record timestamps
+
+Current and legacy deal imports now reject save timestamps more than five minutes ahead of the importing device, using the same bounded clock-drift rule as listing capture provenance. A malformed future record remains recoverable as its original JSON but cannot sort above genuine work or present false recency in the local library.
