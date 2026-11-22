@@ -80,13 +80,19 @@ describe("untrusted saved-deal imports", () => {
   });
 
   it("does not read an oversized file", async () => {
-    const text = vi.fn().mockResolvedValue(serializeDeal(deal));
-    await expect(readDealExport({ size: MAX_DEAL_IMPORT_BYTES + 1, text })).rejects.toThrow("256 KiB");
-    expect(text).not.toHaveBeenCalled();
+    const arrayBuffer = vi.fn().mockResolvedValue(new ArrayBuffer(0));
+    await expect(readDealExport({ size: MAX_DEAL_IMPORT_BYTES + 1, arrayBuffer })).rejects.toThrow("256 KiB");
+    expect(arrayBuffer).not.toHaveBeenCalled();
   });
 
   it("reads a valid file without modifying financial values", async () => {
     const raw = serializeDeal(deal);
-    await expect(readDealExport({ size: raw.length, text: async () => raw })).resolves.toMatchObject(deal);
+    const bytes = new TextEncoder().encode(raw);
+    await expect(readDealExport({ size: bytes.byteLength, arrayBuffer: async () => bytes.buffer })).resolves.toMatchObject(deal);
+  });
+
+  it("rejects malformed UTF-8 bytes instead of replacing them", async () => {
+    const bytes = new Uint8Array([0x7b, 0x22, 0xc3, 0x28, 0x22, 0x7d]);
+    await expect(readDealExport({ size: bytes.byteLength, arrayBuffer: async () => bytes.buffer })).rejects.toThrow("not valid UTF-8");
   });
 });

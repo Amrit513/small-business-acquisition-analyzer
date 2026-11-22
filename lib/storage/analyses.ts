@@ -5,6 +5,7 @@ import { plausiblePastInstant } from "@/lib/import/time";
 
 import { parseListingDraft, type ListingDraft } from "@/lib/import/listing";
 import { parseJsonDocument } from "@/lib/import/json";
+import { readUtf8File, type BinaryFile } from "@/lib/import/utf8";
 
 export interface SavedDeal {
   id: string;
@@ -69,9 +70,8 @@ export function parseDealExport(raw: string): SavedDeal {
 export const MAX_DEAL_IMPORT_BYTES = 256 * 1024;
 
 /** Check size before reading the file, then validate before any local database write. */
-export async function readDealExport(file: Pick<File, "size" | "text">): Promise<SavedDeal> {
-  if (file.size > MAX_DEAL_IMPORT_BYTES) throw new Error("Deal exports must be 256 KiB or smaller.");
-  return parseDealExport(await file.text());
+export async function readDealExport(file: BinaryFile): Promise<SavedDeal> {
+  return parseDealExport(await readUtf8File(file, MAX_DEAL_IMPORT_BYTES, "Deal exports must be 256 KiB or smaller."));
 }
 
 function record(value: unknown): value is Record<string, unknown> {

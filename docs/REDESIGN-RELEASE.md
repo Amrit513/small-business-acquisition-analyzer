@@ -263,3 +263,7 @@ Legacy version-one and current version-two deal imports now reject unsupported e
 ## Conservative missing-evidence migration
 
 A legacy or manual deal without a saved evidence map now labels every financial field, including purchase price, as an unverified assumption. It no longer assigns a marketplace-listing label when no listing source exists. Actual reviewed listing imports still assign the listing label only to values present in the captured listing, so this migration does not erase supported provenance.
+
+## Consistent deal-file decoding
+
+The supported legacy deal-file reader now uses the same byte-level, fatal UTF-8 decoder as the current workbench and listing importer. It checks both the declared file size and the bytes actually returned, and malformed byte sequences are rejected instead of being silently replaced before schema validation. This aligns every local JSON file entry point with the documented import boundary.
