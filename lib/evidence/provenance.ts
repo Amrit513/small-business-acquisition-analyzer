@@ -3,7 +3,7 @@ export type EvidenceField = "purchasePrice" | "annualRevenue" | "sde" | "ebitda"
 export type EvidenceMap = Record<EvidenceField, EvidenceLevel>;
 
 export const defaultEvidence: EvidenceMap = {
-  purchasePrice: "listing", annualRevenue: "unverified", sde: "unverified",
+  purchasePrice: "unverified", annualRevenue: "unverified", sde: "unverified",
   ebitda: "unverified", currentExpenses: "unverified", ownerSalary: "unverified",
 };
 

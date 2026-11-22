@@ -12,12 +12,13 @@ describe("deal export evidence migration", () => {
   it("exports version two with normalized evidence", () => {
     const parsed = JSON.parse(serializeDeal(deal)) as { schemaVersion: number; deal: SavedDeal };
     expect(parsed.schemaVersion).toBe(2);
-    expect(parsed.deal.evidence?.purchasePrice).toBe("listing");
+    expect(parsed.deal.evidence?.purchasePrice).toBe("unverified");
   });
 
   it("imports legacy version-one deals with conservative defaults", () => {
     const imported = parseDealExport(JSON.stringify({ schemaVersion: 1, deal }));
     expect(imported.evidence?.sde).toBe("unverified");
+    expect(imported.evidence?.purchasePrice).toBe("unverified");
   });
 });
 

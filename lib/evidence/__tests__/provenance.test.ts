@@ -6,7 +6,7 @@ describe("financial evidence provenance", () => {
     const evidence = normalizeEvidence({ annualRevenue: "document-supported" });
     expect(evidence.annualRevenue).toBe("document-supported");
     expect(evidence.sde).toBe("unverified");
-    expect(evidence.purchasePrice).toBe("listing");
+    expect(evidence.purchasePrice).toBe("unverified");
   });
 
   it("summarizes document support without claiming verification", () => {

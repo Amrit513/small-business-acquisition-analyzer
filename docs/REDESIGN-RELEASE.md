@@ -259,3 +259,7 @@ The installation panel now recognizes iOS's standalone web-app signal in additio
 ## Strict saved-deal object shape
 
 Legacy version-one and current version-two deal imports now reject unsupported envelope, deal, business, financing, seller-note and evidence fields. Unknown assumptions and evidence labels can no longer be silently discarded while an import appears successful. Supported optional fields, partial legacy evidence, losses and zero values remain valid; version-three workspace imports continue through their separate strict boundary.
+
+## Conservative missing-evidence migration
+
+A legacy or manual deal without a saved evidence map now labels every financial field, including purchase price, as an unverified assumption. It no longer assigns a marketplace-listing label when no listing source exists. Actual reviewed listing imports still assign the listing label only to values present in the captured listing, so this migration does not erase supported provenance.
