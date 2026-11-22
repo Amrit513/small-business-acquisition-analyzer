@@ -303,3 +303,7 @@ A blank or whitespace-only deal name now creates an explicit model issue, preven
 ## Serialized extension actions
 
 The extension popup now permits only one capture, save, export, clear or handoff operation at a time. Its workspace exposes the busy state and disables every conflicting action until the active browser or storage request settles, including failure cleanup. Simulated browser-API coverage confirms that a delayed save cannot race a clear and leave the stored draft in an ambiguous state; installed Chrome or Edge acceptance remains pending.
+
+## Serialized saved-library mutations
+
+The website now permits only one local deal save or deletion at a time. Conflicting mutation controls remain disabled while IndexedDB work settles, the library exposes its busy state, and a second same-tick request is rejected by the operation boundary rather than relying only on React rendering. This prevents a delayed save from recreating a snapshot that the user just deleted. The lock is unit tested; real mobile and desktop IndexedDB acceptance remains pending.
