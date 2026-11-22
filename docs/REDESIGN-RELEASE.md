@@ -295,3 +295,7 @@ Changing or replacing the active deal now invalidates an in-progress PDF render,
 ## Announced PDF preparation state
 
 While a memo is rendering locally, the memo region now exposes its busy state and its polite live status announces that preparation is in progress. The message replaces the previous idle instruction until the render succeeds or fails, while the preparation control remains disabled against duplicate activation. Source regression coverage protects the semantics; screen-reader and browser acceptance remain pending.
+
+## Named-deal memo readiness
+
+A blank or whitespace-only deal name now creates an explicit model issue, prevents the optional screening score and blocks PDF preparation until corrected. The name input exposes its invalid state and associated alert at the same boundary. This aligns live model readiness with the existing saved-file validator, so an unnamed deal cannot appear report-ready while remaining impossible to save or export validly.

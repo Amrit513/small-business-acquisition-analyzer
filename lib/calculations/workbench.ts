@@ -36,6 +36,7 @@ export function calculate(d:Deal) {
   const roi=ratio(distribution,v.equity),payback=v.equity!==null&&v.equity>0?ratio(v.equity,distribution):null;
   const operating=subtract(v.annualRevenue,v.expenses),bridge=subtract(v.sde,operating);
   const issues:string[]=[];
+  if(!d.name.trim())issues.push("Enter a deal name.");
   for(const k of fieldKeys) if(v[k]!==null&&!validAmount(k,v[k]))issues.push("Review "+fields[k][0].toLowerCase()+": outside the supported range.");
   const missing=required.filter(k=>v[k]===null);if(missing.length)issues.push("Enter: "+missing.map(k=>fields[k][0].toLowerCase()).join(", ")+".");
   if(!d.period.trim())issues.push("Identify the annual reporting period.");
