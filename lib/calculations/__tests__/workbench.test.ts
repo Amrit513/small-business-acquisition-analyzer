@@ -38,4 +38,5 @@ describe("v3 workbench against independent examples",()=>{
  it("makes corrupted local records recoverable without silently overwriting them",()=>{const item=readStored({id:"bad",version:3,name:"broken",saved:"untouched"});expect(item?.deal).toBeNull();expect(item?.original).toContain("untouched");});
  it("does not score unknown data or silently substitute sample values",()=>{const r=calculate(blankDeal("test","2026-01-01"));expect(r.distribution).toBeNull();expect(r.coverage).toBeNull();expect(r.sources).toBeNull();expect(r.ready).toBe(false);});
  it("keeps an unnamed deal out of memo-ready status",()=>{const d=sampleDeal();d.name="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues[0]).toBe("Enter a deal name.");expect(r.score).toBeNull();});
+ it("keeps a deal with no reporting period out of memo-ready status",()=>{const d=sampleDeal();d.period="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues).toContain("Identify the annual reporting period.");expect(r.score).toBeNull();});
 });

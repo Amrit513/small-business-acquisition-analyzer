@@ -54,4 +54,11 @@ describe("focus indicator contrast", () => {
     expect(memo).toMatch(/role="status" aria-live="polite"/);
     expect(memo).toContain("Preparing the PDF memo on this device…");
   });
+
+  it("associates the memo-required reporting period with its guidance",()=>{
+    const inputs=readFileSync("components/workbench/Inputs.tsx","utf8");
+    expect(inputs).toContain('aria-invalid={missingPeriod}');
+    expect(inputs).toContain('aria-describedby={missingPeriod?"deal-period-error":undefined}');
+    expect(inputs).toContain('id="deal-period-error" role="alert"');
+  });
 });

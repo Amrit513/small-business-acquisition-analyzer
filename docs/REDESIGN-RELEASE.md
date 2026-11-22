@@ -307,3 +307,7 @@ The extension popup now permits only one capture, save, export, clear or handoff
 ## Serialized saved-library mutations
 
 The website now permits only one local deal save or deletion at a time. Conflicting mutation controls remain disabled while IndexedDB work settles, the library exposes its busy state, and a second same-tick request is rejected by the operation boundary rather than relying only on React rendering. This prevents a delayed save from recreating a snapshot that the user just deleted. The lock is unit tested; real mobile and desktop IndexedDB acceptance remains pending.
+
+## Reporting-period validation guidance
+
+The annual reporting-period input now exposes the same invalid state that already prevents memo readiness and screening-index calculation. Its field-specific alert is programmatically associated with the input, so keyboard and assistive-technology users receive the resolution at the control instead of only seeing the issue in the sidebar. Calculation and source-semantics regressions protect the boundary; screen-reader acceptance remains pending.
