@@ -47,4 +47,11 @@ describe("focus indicator contrast", () => {
       expect(readFileSync(path,"utf8")).toContain("min-h-11");
     }
   });
+
+  it("announces local PDF preparation as a busy status",()=>{
+    const memo=readFileSync("components/workbench/Memo.tsx","utf8");
+    expect(memo).toContain('aria-busy={loading}');
+    expect(memo).toMatch(/role="status" aria-live="polite"/);
+    expect(memo).toContain("Preparing the PDF memo on this device…");
+  });
 });

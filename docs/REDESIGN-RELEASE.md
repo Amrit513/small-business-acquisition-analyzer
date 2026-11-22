@@ -291,3 +291,7 @@ Deal and listing JSON readers now apply results only while their file selection 
 ## Deal-scoped PDF preparation
 
 Changing or replacing the active deal now invalidates an in-progress PDF render, clears its loading state and removes any prior report error. A late success or failure from the previous deal cannot publish a download link or error into the new workspace, and a new report can start immediately. The latest-operation boundary is regression tested; local rendered-fixture checks do not replace mobile and desktop download acceptance.
+
+## Announced PDF preparation state
+
+While a memo is rendering locally, the memo region now exposes its busy state and its polite live status announces that preparation is in progress. The message replaces the previous idle instruction until the render succeeds or fails, while the preparation control remains disabled against duplicate activation. Source regression coverage protects the semantics; screen-reader and browser acceptance remain pending.
