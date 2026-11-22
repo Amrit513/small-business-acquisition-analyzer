@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { extractListing, listingFields, listingFromFragment, listingLabels, MAX_LISTING_IMPORT_BYTES, parseListingDraft, reviewListingAmounts, type ListingDraft, type ListingField } from "@/lib/import/listing";
 import { readUtf8File } from "@/lib/import/utf8";
+import { LatestOperation } from "@/lib/import/latest";
 
 export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => boolean }) {
   const [open, setOpen] = useState(false);
@@ -12,8 +13,10 @@ export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => b
   const [error, setError] = useState<string>();
   const [invalidField, setInvalidField] = useState<ListingField>();
   const fileRef = useRef<HTMLInputElement>(null);
+  const fileImport = useRef(new LatestOperation());
 
   function review(next: ListingDraft) {
+    fileImport.current.invalidate();
     setDraft(next); setAmounts(Object.fromEntries(listingFields.map(field => [field, next.values[field]?.toString() ?? ""]))); setError(undefined); setInvalidField(undefined); setOpen(true);
   }
   useEffect(() => {
@@ -26,10 +29,12 @@ export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => b
   }, []);
 
   async function readFile(file: File) {
+    const current=fileImport.current.begin();
     try {
       const raw=await readUtf8File(file,MAX_LISTING_IMPORT_BYTES,"Listing files must be 12 KB or smaller.");
+      if(!current())return;
       review(parseListingDraft(raw));
-    } catch (err) { setError(err instanceof Error ? err.message : "Could not read listing."); }
+    } catch (err) { if(current())setError(err instanceof Error ? err.message : "Could not read listing."); }
   }
   function apply() {
     if (!draft) return;
@@ -44,7 +49,7 @@ export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => b
     setDraft(undefined); setText(""); setError(undefined); setOpen(false);
   }
   return <section className="mb-6 rounded-2xl border border-emerald-200 bg-white p-5 sm:p-6">
-    <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">Start from a business listing</h2><p className="mt-1 text-sm text-slate-600">Paste listing text or bring in a capture from the browser extension.</p></div><button type="button" aria-expanded={open} aria-controls="listing-import" onClick={() => setOpen(!open)} className="rounded-xl bg-[#0a5c4f] px-4 py-3 text-sm font-semibold text-white">{open ? "Close import" : "Import listing"}</button></div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold">Start from a business listing</h2><p className="mt-1 text-sm text-slate-600">Paste listing text or bring in a capture from the browser extension.</p></div><button type="button" aria-expanded={open} aria-controls="listing-import" onClick={() => {if(open)fileImport.current.invalidate();setOpen(!open);}} className="rounded-xl bg-[#0a5c4f] px-4 py-3 text-sm font-semibold text-white">{open ? "Close import" : "Import listing"}</button></div>
     {open && <div id="listing-import" className="mt-5 space-y-5">
       {!draft ? <><label className="block text-sm font-semibold" htmlFor="listing-text">Listing text</label><textarea id="listing-text" value={text} onChange={e => setText(e.target.value)} rows={6} maxLength={60000} placeholder={"Asking Price: $425,000\nAnnual Revenue: $520,000\nSDE: $170,000"} className="w-full rounded-xl border border-slate-300 p-3 text-base" /><div className="flex flex-wrap gap-3"><button disabled={!text.trim()} onClick={() => review(extractListing(text))} className="rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">Extract numbers</button><button onClick={() => fileRef.current?.click()} className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold">Import listing JSON</button><a href="/install" className="px-2 py-3 text-sm font-semibold text-emerald-800 underline">Get the extension</a></div><input ref={fileRef} aria-label="Import listing JSON" className="hidden" type="file" accept=".json,application/json" onChange={e => { const file = e.target.files?.[0]; if (file) void readFile(file); e.target.value = ""; }} /></> : <>
         <label className="block text-sm font-semibold">Business name<input className="field mt-2" maxLength={160} value={draft.title} onChange={e => setDraft({ ...draft, title: e.target.value })} /></label>

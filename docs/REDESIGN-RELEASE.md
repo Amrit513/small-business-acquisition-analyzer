@@ -283,3 +283,7 @@ If the browser cannot create the temporary Blob URL needed for an extension JSON
 ## Workbench JSON download recovery
 
 Current-deal and saved-deal JSON backups now share one tested browser-download boundary. Preparation and download-click failures return stable recovery guidance instead of exposing browser internals. A URL is immediately revoked when the later download-element setup or click fails, including partial preparation after URL creation. The active deal and local saved snapshot remain unchanged. Browser APIs are simulated in the regression cases; real mobile and desktop downloads remain separate acceptance checks.
+
+## Latest-only local file imports
+
+Deal and listing JSON readers now apply results only while their file selection is still current. Choosing a newer file, editing or replacing the active deal, manually extracting listing text, or closing the listing importer invalidates an earlier pending read. A slow prior file therefore cannot replace newer work or surface a stale error after the user has moved on. This safeguard is covered at the operation boundary; browser import acceptance remains pending.

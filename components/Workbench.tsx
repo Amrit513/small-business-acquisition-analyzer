@@ -9,17 +9,18 @@ import {readUtf8File} from "@/lib/import/utf8";
 import {MAX_DEAL_IMPORT_BYTES} from "@/lib/storage/analyses";
 import {nextWorkspaceAction} from "@/lib/workspace/nextAction";
 import {downloadJson} from "@/lib/export/download";
+import {LatestOperation} from "@/lib/import/latest";
 import {Inputs} from "./workbench/Inputs";import {Evidence} from "./workbench/Evidence";import {Scenarios} from "./workbench/Scenarios";import {Memo} from "./workbench/Memo";import {Comparison} from "./workbench/Comparison";
 const tabs=["Deal inputs","Evidence","Scenarios","Memo","Comparison"] as const;
 type Tab=typeof tabs[number];
 export function Workbench(){
  const [d,setDeal]=useState<Deal>(sampleDeal),[tab,setTab]=useState<Tab>("Deal inputs"),[items,setItems]=useState<Stored[]>([]),[notice,setNotice]=useState(""),[loading,setLoading]=useState(false),[pdf,setPdf]=useState<string|null>(null),[err,setErr]=useState(""),[inspector,inspect]=useState<Metric|null>(null);
- const file=useRef<HTMLInputElement>(null),pdfRef=useRef<string|null>(null),revision=useRef(0),saving=useRef(0),dirty=useRef(false),tabsRef=useRef<(HTMLButtonElement|null)[]>([]);
+ const file=useRef<HTMLInputElement>(null),pdfRef=useRef<string|null>(null),revision=useRef(0),saving=useRef(0),dirty=useRef(false),imports=useRef(new LatestOperation()),tabsRef=useRef<(HTMLButtonElement|null)[]>([]);
  const dialogRef=useRef<HTMLDialogElement>(null),returnFocus=useRef<HTMLElement|null>(null);
  function openInspector(metric:Metric){returnFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;inspect(metric);}
  useEffect(()=>{if(!inspector)return;const dialog=dialogRef.current;if(!dialog)return;dialog.showModal();return()=>{if(dialog.open)dialog.close();returnFocus.current?.focus();};},[inspector]);
  const result=useMemo(()=>calculate(d),[d]),saved=items.flatMap(x=>x.deal?[x.deal]:[]),nextAction=nextWorkspaceAction(result.issues[0]);
- function set(next:Deal,unsaved=true){revision.current++;dirty.current=unsaved;if(pdfRef.current){URL.revokeObjectURL(pdfRef.current);pdfRef.current=null;setPdf(null);}setDeal(next);setNotice(unsaved?"Unsaved changes":"");}
+ function set(next:Deal,unsaved=true){imports.current.invalidate();revision.current++;dirty.current=unsaved;if(pdfRef.current){URL.revokeObjectURL(pdfRef.current);pdfRef.current=null;setPdf(null);}setDeal(next);setNotice(unsaved?"Unsaved changes":"");}
  async function refresh(){try{setItems(await library());}catch{setNotice("Saved deals are unavailable on this device. Export your deal JSON for backup.");}}
  useEffect(()=>{void refresh();return ()=>{if(pdfRef.current)URL.revokeObjectURL(pdfRef.current);};},[]);
  function maybeReplace(){return !dirty.current||window.confirm("Discard unsaved changes in this deal? Export JSON if you need a backup.");}
@@ -27,7 +28,7 @@ export function Workbench(){
  function exportCurrent(){try{downloadJson(serialize(d),d.id+".json");setNotice("Deal JSON prepared. Check your downloads for the backup.");}catch(e){setNotice(e instanceof Error?e.message:"Review invalid entries before exporting this deal.");}}
  function exportStored(item:Stored){try{downloadJson(item.original,item.id+".json");setNotice("Saved deal JSON prepared. Check your downloads for the backup.");}catch(e){setNotice(e instanceof Error?e.message:"Could not prepare this saved deal export. The local snapshot has not been changed.");}}
  async function deleteStored(item:Stored){try{await erase(item.id);}catch{setNotice("Deletion failed. The saved deal remains on this device.");return;}setItems(current=>current.filter(saved=>saved.id!==item.id));setNotice("Saved deal deleted from this device.");}
- async function importFile(f:File){try{const raw=await readUtf8File(f,MAX_DEAL_IMPORT_BYTES,"A deal file must be 256 KiB or smaller.");const data=asCopy(parseSnapshot(raw));if(!maybeReplace())return;set(data);setTab("Deal inputs");setNotice("Imported as a new unsaved deal. Review its assumptions.");}catch{setNotice("Could not import this deal JSON. Check its format, UTF-8 encoding and 256 KiB limit; your current deal is unchanged.");}}
+ async function importFile(f:File){const current=imports.current.begin();try{const raw=await readUtf8File(f,MAX_DEAL_IMPORT_BYTES,"A deal file must be 256 KiB or smaller.");if(!current())return;const data=asCopy(parseSnapshot(raw));if(!current()||!maybeReplace())return;set(data);setTab("Deal inputs");setNotice("Imported as a new unsaved deal. Review its assumptions.");}catch{if(current())setNotice("Could not import this deal JSON. Check its format, UTF-8 encoding and 256 KiB limit; your current deal is unchanged.");}}
  async function prepare(){if(!result.ready||loading)return;const version=revision.current;setErr("");setLoading(true);try{const {pdf:engine}=await import("@react-pdf/renderer");const {Report,registerReportFont}=await import("./workbench/Report");registerReportFont();const blob=await engine(<Report deal={d} result={result} generated={todayLocalDate()}/>).toBlob();if(revision.current!==version){setErr("Deal changed while preparing the report. Prepare it again.");return;}const u=URL.createObjectURL(blob);if(pdfRef.current)URL.revokeObjectURL(pdfRef.current);pdfRef.current=u;setPdf(u);}catch(e){setErr("Could not prepare the PDF on this device. Export JSON instead.");}finally{setLoading(false);}}
  function keyNav(event:KeyboardEvent<HTMLButtonElement>,i:number){const next=nextWorkspaceTabIndex(i,event.key,tabs.length);if(next===undefined)return;event.preventDefault();setTab(tabs[next]!);tabsRef.current[next]?.focus();}
  return <><a className="skip-link" href="#workspace">Skip to workspace</a><header className="mast"><a className="brand" href="/" aria-label="Acquisition Lens home"><span className="brandmark">A<span></span></span><span>ACQUISITION<br/>LENS</span></a><nav aria-label="Site"><a href="/install">Install app + extension</a><a href="/case-study">The project</a></nav></header>
