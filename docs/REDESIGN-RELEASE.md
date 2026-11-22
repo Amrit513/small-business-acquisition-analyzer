@@ -251,3 +251,7 @@ Prepared PDF memos now label their generation date with the user's local calenda
 ## Plausible saved-record timestamps
 
 Current and legacy deal imports now reject save timestamps more than five minutes ahead of the importing device, using the same bounded clock-drift rule as listing capture provenance. A malformed future record remains recoverable as its original JSON but cannot sort above genuine work or present false recency in the local library.
+
+## Installed web-app state on iPhone and iPad
+
+The installation panel now recognizes iOS's standalone web-app signal in addition to the standard display-mode media query, and it responds when the browser display mode changes. This prevents an already installed iPhone or iPad launch from continuing to show installation instructions. Pure regression cases cover standard standalone, iOS standalone and ordinary browser-tab states; physical phone installation and touch acceptance remain pending.

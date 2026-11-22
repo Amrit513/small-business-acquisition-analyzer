@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { isInstalledDisplay } from "@/lib/install/displayMode";
 
 type InstallPrompt = Event & { prompt(): Promise<void>; userChoice: Promise<{ outcome: "accepted" | "dismissed" }> };
 export function InstallApp() {
@@ -7,11 +8,18 @@ export function InstallApp() {
   const [installed, setInstalled] = useState(false);
   const [notice, setNotice] = useState("");
   useEffect(() => {
-    setInstalled(window.matchMedia("(display-mode: standalone)").matches);
+    const displayMode = window.matchMedia("(display-mode: standalone)");
+    const detectInstalled = () => setInstalled(isInstalledDisplay(window));
+    detectInstalled();
     const ready = (event: Event) => { event.preventDefault(); setPrompt(event as InstallPrompt); };
     const done = () => { setInstalled(true); setPrompt(undefined); };
+    displayMode.addEventListener("change", detectInstalled);
     window.addEventListener("beforeinstallprompt", ready); window.addEventListener("appinstalled", done);
-    return () => { window.removeEventListener("beforeinstallprompt", ready); window.removeEventListener("appinstalled", done); };
+    return () => {
+      displayMode.removeEventListener("change", detectInstalled);
+      window.removeEventListener("beforeinstallprompt", ready);
+      window.removeEventListener("appinstalled", done);
+    };
   }, []);
   async function install() {
     if (!prompt) return;
