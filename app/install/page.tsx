@@ -4,7 +4,7 @@ import { InstallApp } from "@/components/InstallApp";
 export const metadata: Metadata = { title: "Install Acquisition Lens" };
 export default function InstallPage() {
   return <main className="mx-auto max-w-3xl px-5 py-10 sm:py-16">
-    <a href="/" className="text-sm font-semibold text-emerald-800 underline">Back to analyzer</a>
+    <a href="/" className="inline-flex min-h-11 items-center text-sm font-semibold text-emerald-800 underline">Back to analyzer</a>
     <h1 className="mt-8 text-4xl font-semibold tracking-tight">Your deal workspace, within reach.</h1>
     <p className="mt-4 text-lg leading-8 text-slate-600">Use Acquisition Lens on your phone or capture listing figures as you browse on your computer.</p>
     <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8"><h2 className="mb-5 text-2xl font-semibold">Add the app to your home screen</h2><InstallApp /></section>

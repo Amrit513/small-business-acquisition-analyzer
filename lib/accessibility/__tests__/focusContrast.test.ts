@@ -38,4 +38,13 @@ describe("focus indicator contrast", () => {
     expect(css).toMatch(/\.summarymetrics button\{align-items:flex-start;flex-direction:column\}/);
     expect(css).toMatch(/\.summarymetrics b\{white-space:normal;overflow-wrap:anywhere\}/);
   });
+
+  it("keeps text-style actions and auxiliary links large enough to tap",()=>{
+    const css=readFileSync("app/workbench.css","utf8");
+    expect(css).toMatch(/\.textaction,\.smalllink\{[^}]*display:inline-flex;[^}]*min-height:44px/);
+    expect(css).toMatch(/\.sitefooter a\{[^}]*display:inline-flex;[^}]*min-height:44px/);
+    for(const path of ["app/install/page.tsx","app/case-study/page.tsx","components/ListingImport.tsx"]){
+      expect(readFileSync(path,"utf8")).toContain("min-h-11");
+    }
+  });
 });

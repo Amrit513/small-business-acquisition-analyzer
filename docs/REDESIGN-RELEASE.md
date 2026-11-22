@@ -267,3 +267,7 @@ A legacy or manual deal without a saved evidence map now labels every financial 
 ## Consistent deal-file decoding
 
 The supported legacy deal-file reader now uses the same byte-level, fatal UTF-8 decoder as the current workbench and listing importer. It checks both the declared file size and the bytes actually returned, and malformed byte sequences are rejected instead of being silently replaced before schema validation. This aligns every local JSON file entry point with the documented import boundary.
+
+## Auxiliary phone touch targets
+
+Text-style workbench actions, footer navigation, the install-page return link, listing-source link and case-study formula link now expose at least 44 CSS pixels of interactive height. Their compact visual treatment is retained while the actual hit area is usable at narrow widths and browser zoom. A source regression protects these target sizes; physical touch and 200% zoom acceptance remain pending.
