@@ -1,4 +1,4 @@
-import type { ListingDraft } from "@/lib/import/listing";
+import { listingCaptureDate, type ListingDraft } from "@/lib/import/listing";
 
 export const fields = {
   purchasePrice: ["Purchase price", "USD"], annualRevenue: ["Annual revenue", "USD/year"],
@@ -73,7 +73,7 @@ export function fromListing(listing:ListingDraft,id:string,now:string):Deal {
   const d=blankDeal(id,now);d.name=listing.title||"Imported listing";d.listing=listing;
   for(const k of ["purchasePrice","annualRevenue","sde","ebitda"] as const) {
     const val=listing.values[k];if(val===undefined) continue;d.values[k]=val;
-    const quote=listing.quotes[k];if(quote)d.evidence[k]={value:val,period:"",location:listing.url||"Pasted listing",date:listing.capturedAt.slice(0,10),excerpt:quote,status:"Listing claim"};
+    const quote=listing.quotes[k];if(quote)d.evidence[k]={value:val,period:"",location:listing.url||"Pasted listing",date:listingCaptureDate(listing.capturedAt),excerpt:quote,status:"Listing claim"};
   }
   return d;
 }

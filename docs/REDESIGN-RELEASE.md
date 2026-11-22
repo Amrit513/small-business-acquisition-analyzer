@@ -237,3 +237,9 @@ Before save, export or handoff, the extension now validates the edited business 
 The listing boundary now treats a capture timestamp more than five minutes ahead of the importing device as unknown instead of presenting it as source provenance. The small tolerance permits ordinary clock drift; malformed, impossible and clearly future timestamps remain empty through save, export and evidence linkage.
 
 An unpacked Chromium acceptance attempt on November 21 rebuilt the 10-file extension and prepared a local fictional listing, but Chromium aborted before opening a page or extension because this workspace denied its process-singleton socket (`Operation not permitted`). No capture action ran, so installed Chrome/Edge acceptance remains pending rather than being inferred from integration tests.
+
+## Future source-note dates
+
+Manual source notes and version-three snapshot imports now reject review dates after the importing device's current local date. The date control exposes the same maximum before submission, while an empty date remains allowed only for imported listing evidence whose capture time is honestly unknown. Future dates therefore cannot survive into comparison or memo provenance.
+
+Listing evidence now derives its review date from the capture instant in the importing device's local calendar rather than slicing the UTC timestamp. This prevents an evening capture in a western timezone from appearing to have been reviewed “tomorrow,” while retaining the exact ISO capture instant in the original listing record.

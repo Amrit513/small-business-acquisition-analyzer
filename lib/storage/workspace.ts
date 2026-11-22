@@ -7,7 +7,11 @@ import { blankDeal, fieldKeys, newId, statuses, validAmount, type Deal, type Fie
 const obj=(x:unknown):x is Record<string,unknown>=>!!x&&typeof x==="object"&&!Array.isArray(x);
 const str=(x:unknown,len:number):x is string=>typeof x==="string"&&x.length<=len;
 const only=(x:Record<string,unknown>,keys:readonly string[])=>Object.keys(x).every(k=>keys.includes(k));
-const evidenceDate=(x:unknown):x is string=>str(x,10)&&(x===""||(/^\d{4}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x))&&new Date(x).toISOString().slice(0,10)===x));
+export function todayLocalDate(now=new Date()):string {
+  const year=now.getFullYear(),month=String(now.getMonth()+1).padStart(2,"0"),day=String(now.getDate()).padStart(2,"0");
+  return `${year}-${month}-${day}`;
+}
+const evidenceDate=(x:unknown):x is string=>str(x,10)&&(x===""||(/^\d{4}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x))&&new Date(x).toISOString().slice(0,10)===x&&x<=todayLocalDate()));
 const invalid=():never=>{throw new Error("Unsupported or invalid deal file. Your current deal has not been changed.");};
 export function validSettings(s:unknown):s is Settings {
   if(!obj(s)||!only(s,["coverageTarget","low","high","revenueChange","expenseChange","years"]))return false;
@@ -66,5 +70,6 @@ export async function erase(id:string){const dbi=await db();try{await dbi.delete
 export function asCopy(d:Deal):Deal{return {...d,id:newId(),updatedAt:new Date().toISOString()};}
 export function journalEntry(d:Deal,k:Field,status:Evidence["status"],location:string,excerpt:string,date:string):Deal {
   const value=d.values[k];if(value===null||!location.trim()||!excerpt.trim()||!date.trim())throw new Error("Enter the figure, source location, excerpt and review date first.");
+  if(!evidenceDate(date))throw new Error("Enter a valid review date that is not in the future.");
   return validateDeal({...d,evidence:{...d.evidence,[k]:{value,period:d.period,status,location:location.trim(),excerpt:excerpt.trim(),date}},assumptionsReviewed:false});
 }

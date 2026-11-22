@@ -80,6 +80,15 @@ function captureTimestamp(value: unknown): string {
   return Number.isFinite(time) && time <= Date.now() + 5 * 60 * 1000 ? new Date(time).toISOString() : "";
 }
 
+/** Convert a normalized capture instant to the importing device's calendar date. */
+export function listingCaptureDate(value: string): string {
+  if (!value) return "";
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "";
+  const year = date.getFullYear(), month = String(date.getMonth() + 1).padStart(2, "0"), day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function extractListing(text: string, title = "", url = ""): ListingDraft {
   const draft: ListingDraft = { kind: "acquisition-lens-listing", version: 1, title: title.trim().slice(0, 160) || "Imported listing", url: safeListingUrl(url), capturedAt: new Date().toISOString(), values: {}, quotes: {}, warnings: [] };
   const lines = text.slice(0, 60000).replace(/\u00a0/g, " ").split(/\r?\n/).map(line => line.trim()).filter(Boolean);
