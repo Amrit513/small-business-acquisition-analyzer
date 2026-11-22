@@ -44,6 +44,18 @@ describe("untrusted saved-deal imports", () => {
     expect(() => parseDealExport(serializeDeal(deal).replace('"sde": 170000', '"sde": 1e400'))).toThrow();
   });
 
+  it.each([
+    { schemaVersion: 2, deal, unsupportedEnvelopeField: true },
+    { schemaVersion: 2, deal: { ...deal, unsupportedDealField: true } },
+    { schemaVersion: 2, deal: { ...deal, business: { ...deal.business, normalizedEarnings: 170000 } } },
+    { schemaVersion: 2, deal: { ...deal, financing: { ...deal.financing, balloonPayment: 50000 } } },
+    { schemaVersion: 2, deal: { ...deal, financing: { ...deal.financing, sellerFinancing: { amount: 100, interestRate: 0, termYears: 1, defermentMonths: 6 } } } },
+    { schemaVersion: 2, deal: { ...deal, evidence: { purchasePrice: "listing", authenticated: true } } },
+    { schemaVersion: 2, deal: { ...deal, evidence: { purchasePrice: "verified" } } },
+  ])("rejects unsupported fields or evidence labels instead of silently discarding them: %j", (payload) => {
+    expect(() => parseDealExport(JSON.stringify(payload))).toThrow("valid Acquisition Lens export");
+  });
+
   it("preserves losses, zeros, fractional terms, seller financing and evidence", () => {
     const original: SavedDeal = { ...deal, needsListingReview: true,
       business: { ...deal.business, sde: -100, ebitda: 0, growthRate: -.2 },

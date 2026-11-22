@@ -82,11 +82,17 @@ function boundedNumber(value: unknown, min: number, max: number): value is numbe
   return typeof value === "number" && Number.isFinite(value) && value >= min && value <= max;
 }
 
+function onlyKeys(value: Record<string, unknown>, allowed: readonly string[]): boolean {
+  const keys = new Set(allowed);
+  return Object.keys(value).every(key => keys.has(key));
+}
+
 // Technical import limits, not investment assumptions. Cap amortization work and
 // numeric magnitude; never coerce strings or replace missing figures with zeros.
 function validBusiness(value: unknown): boolean {
   if (!record(value)) return false;
-  return ["purchasePrice", "annualRevenue", "currentExpenses", "ownerSalary"].every(key => boundedNumber(value[key], 0, 1e12))
+  return onlyKeys(value, ["purchasePrice", "annualRevenue", "sde", "ebitda", "growthRate", "industry", "numberOfEmployees", "currentExpenses", "ownerSalary"])
+    && ["purchasePrice", "annualRevenue", "currentExpenses", "ownerSalary"].every(key => boundedNumber(value[key], 0, 1e12))
     && ["sde", "ebitda"].every(key => boundedNumber(value[key], -1e12, 1e12))
     && boundedNumber(value.growthRate, -1, 10)
     && boundedNumber(value.numberOfEmployees, 0, 1e7) && Number.isInteger(value.numberOfEmployees)
@@ -96,23 +102,34 @@ function validBusiness(value: unknown): boolean {
 
 function validFinancing(value: unknown): boolean {
   if (!record(value)) return false;
-  if (!["downPayment", "loanAmount"].every(key => boundedNumber(value[key], 0, 1e12))
+  if (!onlyKeys(value, ["downPayment", "loanAmount", "interestRate", "loanTermYears", "closingCosts", "sellerFinancing"])
+    || !["downPayment", "loanAmount"].every(key => boundedNumber(value[key], 0, 1e12))
     || !boundedNumber(value.interestRate, 0, 1) || !boundedNumber(value.loanTermYears, 0, 100)
     || (value.closingCosts !== undefined && !boundedNumber(value.closingCosts, 0, 1e12))) return false;
   if (value.sellerFinancing === undefined) return true;
   const seller = value.sellerFinancing;
-  return record(seller) && boundedNumber(seller.amount, 0, 1e12)
+  return record(seller) && onlyKeys(seller, ["amount", "interestRate", "termYears"])
+    && boundedNumber(seller.amount, 0, 1e12)
     && boundedNumber(seller.interestRate, 0, 1) && boundedNumber(seller.termYears, 0, 100);
+}
+
+function validEvidence(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!record(value)) return false;
+  const fields = ["purchasePrice", "annualRevenue", "sde", "ebitda", "currentExpenses", "ownerSalary"] as const;
+  const levels = new Set(["unverified", "listing", "seller-provided", "document-supported"]);
+  return onlyKeys(value, fields) && Object.values(value).every(level => typeof level === "string" && levels.has(level));
 }
 
 function isExportEnvelope(value: unknown): value is { schemaVersion: 1 | 2; deal: SavedDeal } {
   if (!record(value)) return false;
   const envelope = value as Record<string, unknown>;
-  if ((envelope.schemaVersion !== 1 && envelope.schemaVersion !== 2) || !envelope.deal || typeof envelope.deal !== "object") return false;
+  if (!onlyKeys(envelope, ["schemaVersion", "deal"]) || (envelope.schemaVersion !== 1 && envelope.schemaVersion !== 2) || !envelope.deal || typeof envelope.deal !== "object") return false;
   const deal = envelope.deal as Record<string, unknown>;
-  return record(deal) && typeof deal.id === "string" && deal.id.trim().length > 0 && deal.id.length <= 256
+  return record(deal) && onlyKeys(deal, ["id", "name", "business", "financing", "evidence", "listingSource", "needsListingReview", "updatedAt"])
+    && typeof deal.id === "string" && deal.id.trim().length > 0 && deal.id.length <= 256
     && typeof deal.name === "string" && deal.name.length <= 1000
     && plausiblePastInstant(deal.updatedAt)
     && (deal.needsListingReview === undefined || typeof deal.needsListingReview === "boolean")
-    && validBusiness(deal.business) && validFinancing(deal.financing);
+    && validEvidence(deal.evidence) && validBusiness(deal.business) && validFinancing(deal.financing);
 }

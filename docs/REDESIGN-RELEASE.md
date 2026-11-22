@@ -255,3 +255,7 @@ Current and legacy deal imports now reject save timestamps more than five minute
 ## Installed web-app state on iPhone and iPad
 
 The installation panel now recognizes iOS's standalone web-app signal in addition to the standard display-mode media query, and it responds when the browser display mode changes. This prevents an already installed iPhone or iPad launch from continuing to show installation instructions. Pure regression cases cover standard standalone, iOS standalone and ordinary browser-tab states; physical phone installation and touch acceptance remain pending.
+
+## Strict saved-deal object shape
+
+Legacy version-one and current version-two deal imports now reject unsupported envelope, deal, business, financing, seller-note and evidence fields. Unknown assumptions and evidence labels can no longer be silently discarded while an import appears successful. Supported optional fields, partial legacy evidence, losses and zero values remain valid; version-three workspace imports continue through their separate strict boundary.
