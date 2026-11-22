@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { extractListing, listingFields, listingFromFragment, listingLabels, MAX_LISTING_IMPORT_BYTES, parseListingDraft, reviewListingAmounts, type ListingDraft, type ListingField } from "@/lib/import/listing";
 import { readUtf8File } from "@/lib/import/utf8";
 import { LatestOperation } from "@/lib/import/latest";
+import { listingImportFailureMessage } from "@/lib/import/listingFailure";
 
 export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => boolean }) {
   const [open, setOpen] = useState(false);
@@ -34,7 +35,7 @@ export function ListingImport({ onApply }: { onApply: (draft: ListingDraft) => b
       const raw=await readUtf8File(file,MAX_LISTING_IMPORT_BYTES,"Listing files must be 12 KB or smaller.");
       if(!current())return;
       review(parseListingDraft(raw));
-    } catch (err) { if(current())setError(err instanceof Error ? err.message : "Could not read listing."); }
+    } catch (err) { if(current())setError(listingImportFailureMessage(err)); }
   }
   function apply() {
     if (!draft) return;

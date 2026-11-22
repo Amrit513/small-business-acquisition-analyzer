@@ -124,6 +124,10 @@ Invalid money, interest-rate and loan-term inputs now expose guidance for their 
 
 Listing JSON and extension handoffs now reject unknown top-level, financial-value and excerpt fields instead of silently dropping unsupported data. Optional metadata is type- and length-checked, while a missing or malformed string capture timestamp still remains explicitly unknown. This keeps the narrow listing schema separate from saved-deal and evidence schemas.
 
+## Safe listing-import recovery
+
+Listing JSON imports now use allowlisted recovery copy instead of exposing raw browser, filesystem or JSON-parser errors. Oversized and invalid UTF-8 files receive specific guidance; every other failure is described as an unsupported Acquisition Lens listing export. Each rejection confirms that the current listing review is unchanged. Pure regression cases protect the categories and fallback; installed-browser acceptance remains pending.
+
 ## Consistent memo provenance
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.
