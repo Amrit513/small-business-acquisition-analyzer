@@ -32,6 +32,13 @@ describe("local JSON downloads", () => {
     expect(environment.createAnchor).not.toHaveBeenCalled();
   });
 
+  it("revokes a prepared Blob URL when download-element creation fails", () => {
+    const { environment } = fixture({ createAnchor: vi.fn(() => { throw new Error("browser-internal document error"); }) });
+    expect(() => downloadJson("{}", "deal.json", environment)).toThrow("Could not prepare the JSON download on this device. Keep the deal open and try again.");
+    expect(environment.revokeObjectUrl).toHaveBeenCalledWith("blob:deal-export");
+    expect(environment.schedule).not.toHaveBeenCalled();
+  });
+
   it("revokes the Blob URL and hides raw browser errors when download cannot start", () => {
     const click = vi.fn(() => { throw new Error("browser-internal click error"); });
     const { environment } = fixture({ createAnchor: vi.fn(() => ({ href: "", download: "", click })) });

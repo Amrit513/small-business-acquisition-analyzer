@@ -19,7 +19,7 @@ function safelyRevoke(environment: JsonDownloadEnvironment, url: string) {
 }
 
 export function downloadJson(raw: string, name: string, environment = browserEnvironment()) {
-  let url: string;
+  let url: string | undefined;
   let anchor: Pick<HTMLAnchorElement, "href" | "download" | "click">;
   try {
     url = environment.createObjectUrl(new Blob([raw], { type: "application/json" }));
@@ -27,6 +27,7 @@ export function downloadJson(raw: string, name: string, environment = browserEnv
     anchor.href = url;
     anchor.download = name;
   } catch {
+    if (url) safelyRevoke(environment, url);
     throw new Error("Could not prepare the JSON download on this device. Keep the deal open and try again.");
   }
 
