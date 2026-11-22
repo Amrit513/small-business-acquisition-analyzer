@@ -231,3 +231,9 @@ When the browser denies page-script access, the extension now retains the curren
 ## Restorable extension titles
 
 Before save, export or handoff, the extension now validates the edited business name and canonicalizes the complete reviewed draft through the same strict parser used during startup restore. An overlong title focuses the title input, exposes its invalid state and leaves the prior saved draft untouched. This closes a path where browser autofill or scripted input could persist a draft that the extension could not reopen.
+
+## Future capture-date provenance
+
+The listing boundary now treats a capture timestamp more than five minutes ahead of the importing device as unknown instead of presenting it as source provenance. The small tolerance permits ordinary clock drift; malformed, impossible and clearly future timestamps remain empty through save, export and evidence linkage.
+
+An unpacked Chromium acceptance attempt on November 21 rebuilt the 10-file extension and prepared a local fictional listing, but Chromium aborted before opening a page or extension because this workspace denied its process-singleton socket (`Operation not permitted`). No capture action ran, so installed Chrome/Edge acceptance remains pending rather than being inferred from integration tests.

@@ -76,7 +76,8 @@ export function safeListingUrl(raw: string): string {
 function captureTimestamp(value: unknown): string {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(value)) return "";
   const time = Date.parse(value);
-  return Number.isFinite(time) ? new Date(time).toISOString() : "";
+  // Allow small device-clock drift, but never present a clearly future claim as capture provenance.
+  return Number.isFinite(time) && time <= Date.now() + 5 * 60 * 1000 ? new Date(time).toISOString() : "";
 }
 
 export function extractListing(text: string, title = "", url = ""): ListingDraft {

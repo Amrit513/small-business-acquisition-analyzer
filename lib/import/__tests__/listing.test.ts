@@ -92,4 +92,8 @@ describe("listing import boundary", () => {
     expect(parseListingDraft(JSON.stringify({ ...base, capturedAt: "January 1" })).capturedAt).toBe("");
     expect(parseListingDraft(JSON.stringify({ ...base, capturedAt: "2026-11-15T12:30:00-05:00" })).capturedAt).toBe("2026-11-15T17:30:00.000Z");
   });
+  it("does not present a far-future timestamp as capture provenance", () => {
+    const base = extractListing("Asking Price: $200K");
+    expect(parseListingDraft(JSON.stringify({ ...base, capturedAt: "9999-01-01T00:00:00Z" })).capturedAt).toBe("");
+  });
 });
