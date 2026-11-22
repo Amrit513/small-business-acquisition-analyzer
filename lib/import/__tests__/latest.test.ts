@@ -16,4 +16,13 @@ describe("latest local import operation", () => {
     operations.invalidate();
     expect(pending()).toBe(false);
   });
+
+  it("allows a new operation after invalidating prior work", () => {
+    const operations = new LatestOperation();
+    const stale = operations.begin();
+    operations.invalidate();
+    const current = operations.begin();
+    expect(stale()).toBe(false);
+    expect(current()).toBe(true);
+  });
 });

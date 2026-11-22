@@ -287,3 +287,7 @@ Current-deal and saved-deal JSON backups now share one tested browser-download b
 ## Latest-only local file imports
 
 Deal and listing JSON readers now apply results only while their file selection is still current. Choosing a newer file, editing or replacing the active deal, manually extracting listing text, or closing the listing importer invalidates an earlier pending read. A slow prior file therefore cannot replace newer work or surface a stale error after the user has moved on. This safeguard is covered at the operation boundary; browser import acceptance remains pending.
+
+## Deal-scoped PDF preparation
+
+Changing or replacing the active deal now invalidates an in-progress PDF render, clears its loading state and removes any prior report error. A late success or failure from the previous deal cannot publish a download link or error into the new workspace, and a new report can start immediately. The latest-operation boundary is regression tested; local rendered-fixture checks do not replace mobile and desktop download acceptance.
