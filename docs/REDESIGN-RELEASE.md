@@ -271,3 +271,7 @@ The supported legacy deal-file reader now uses the same byte-level, fatal UTF-8 
 ## Auxiliary phone touch targets
 
 Text-style workbench actions, footer navigation, the install-page return link, listing-source link and case-study formula link now expose at least 44 CSS pixels of interactive height. Their compact visual treatment is retained while the actual hit area is usable at narrow widths and browser zoom. A source regression protects these target sizes; physical touch and 200% zoom acceptance remain pending.
+
+## Partial debt assumptions in reports
+
+When a bank or seller-note principal is unknown, comparison, on-screen memo and PDF now retain any entered annual rate and term instead of collapsing the entire financing line to “Unknown amount.” Each missing term remains explicitly unknown, and an explicit zero principal still reports “No note.” This preserves partial assumptions without inventing scheduled debt.
