@@ -14,6 +14,6 @@ describe("comparison reporting",()=>{
   expect(row("Seller note · rate · term")?.[0]).toBe("No note");
   expect(row("Coverage comparison target")?.[0]).toBe("1.25× user assumption");
   expect(row("Reporting period")?.[1]).toBe("Not recorded");
-  expect(row("Evidence status")).toEqual(["1 current source-note link","No current source-note links"]);
+  expect(row("Source-note support")).toEqual(["1 current user-linked source note · not authenticated","No current user-linked source notes"]);
  });
 });

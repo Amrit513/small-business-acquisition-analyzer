@@ -17,7 +17,7 @@ const st=StyleSheet.create({page:{padding:42,fontFamily:"Liberation Sans",fontSi
  title:{fontSize:23,fontWeight:700,lineHeight:1.4,marginBottom:12},sub:{fontSize:10,marginTop:3},
  section:{marginTop:16,marginBottom:7,paddingBottom:5,borderBottom:"1px solid #dce4e0",fontWeight:700,fontSize:13},
  row:{flexDirection:"row",justifyContent:"space-between",borderBottom:"1px solid #dce4e0",paddingVertical:5},
- metric:{fontWeight:700,color:"#0b5142"},muted:{fontSize:8,color:"#486156"},
+ metric:{fontWeight:700,color:"#0b5142"},status:{fontSize:8,fontWeight:700,color:"#0b5142",marginBottom:3},muted:{fontSize:8,color:"#486156"},
  paragraph:{marginBottom:7},item:{marginBottom:7},footer:{position:"absolute",left:42,right:42,bottom:24,paddingTop:8,borderTop:"1px solid #dce4e0",fontSize:8,color:"#486156"}});
 export function Report({deal:d,result:r,generated}:{deal:Deal;result:Result;generated:string}){
  const row=(label:string,value:string)=><View style={st.row} key={label} wrap={false}><Text>{label}</Text><Text style={st.metric}>{value}</Text></View>;
@@ -25,7 +25,7 @@ export function Report({deal:d,result:r,generated}:{deal:Deal;result:Result;gene
  return <Document title={"Acquisition Lens - "+d.name} author="Acquisition Lens" subject="Educational acquisition screen">
  <Page size="A4" style={st.page} wrap><View style={st.head}><Text style={[st.eyebrow,{color:"#ddea8a"}]}>ACQUISITION LENS / INVESTMENT MEMO</Text><Text style={st.title}>{d.name}</Text><Text style={st.sub}>{d.isSample?"Fictional sample · ":""}{recorded(d.period,"Period not recorded")} · Generated {generated}</Text></View>
  <Text style={st.section}>Executive screen</Text><Text style={st.paragraph}>This model illustrates a transaction under user-entered assumptions. It cannot verify claims or determine suitability. Pretax cash and screening debt coverage exclude taxes; coverage also excludes capex and working capital. The {d.settings.coverageTarget}× coverage comparison target is a user-selected screening assumption, not a lender standard.</Text>
- <Text style={[st.paragraph,st.metric]}>Model status: {modelScreenStatus(r)} · Evidence status: {sourceNoteStatus(r)}</Text>
+ <Text style={st.status}>Model status: {modelScreenStatus(r)} · Source-note support: {sourceNoteStatus(r)}</Text>
  {(Object.keys(metrics) as Metric[]).map(k=>row(metrics[k].name,metricText(k,r)))}
  <Text style={st.section}>Sources and uses</Text>{row("Purchase price",usd(d.values.purchasePrice))}{row("Closing costs",usd(d.values.closingCosts))}{row("Upfront working capital",usd(d.values.initialWorkingCapital))}{row("Total uses",usd(r.uses))}{row("Buyer cash",usd(d.values.equity))}{row("Bank note · rate · term",formatDebtTerms(d,"bank"))}{row("Seller note · rate · term",formatDebtTerms(d,"seller"))}{row("Total sources",usd(r.sources))}{row("Funding difference",usd(r.gap))}
  <Text style={st.section}>Earnings and valuation</Text><Text style={st.paragraph}>Revenue minus expenses: {usd(r.operating)}. Entered SDE: {usd(d.values.sde)}. Bridge: {usd(r.bridge)}. {d.earningsNote}</Text><Text style={st.paragraph}>Illustrative SDE range: {usd(r.valuationLow)} to {usd(r.valuationHigh)} at user-selected {d.settings.low}×–{d.settings.high}×. Not an appraisal or verified comparable.</Text>

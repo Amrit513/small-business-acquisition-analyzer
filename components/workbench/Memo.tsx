@@ -6,7 +6,7 @@ import {formatDebtTerms} from "@/lib/reporting/transaction";
 import {modelScreenStatus,sourceNoteStatus} from "@/lib/reporting/status";
 export function Memo({d,r,onPrepare,pdf,loading,error}:Editor&{r:Result;onPrepare:()=>void;pdf:string|null;loading:boolean;error:string}){
  return <section className="sheet" aria-busy={loading}><div className="sectionhead"><span className="folio">04 / INVESTMENT MEMO</span><h2>What the screen can say</h2><p>Model {modelVersion} · {d.period||"Annual period missing"} · Educational analysis, not an appraisal or investment recommendation.</p></div>
- <p><b>Model status:</b> {modelScreenStatus(r)}. <b>Evidence status:</b> {sourceNoteStatus(r)}.</p>
+ <p><b>Model status:</b> {modelScreenStatus(r)}. <b>Source-note support:</b> {sourceNoteStatus(r)}.</p>
  <div className="memogrid">{(Object.keys(metrics) as Metric[]).map(k=><div className="memorow" key={k}><span>{metrics[k].name}</span><strong>{metricText(k,r)}</strong><small>{metrics[k].note}</small></div>)}</div><p>The {d.settings.coverageTarget}× debt-coverage comparison target is a user-selected screening assumption, not a lender standard.</p>
  <h3>Transaction and earnings</h3><p>Sources: {usd(r.sources)}. Uses: {usd(r.uses)}. Difference: {usd(r.gap)}. The difference between entered SDE and revenue less operating expenses is {usd(r.bridge)}.</p><p>Bank note: {formatDebtTerms(d,"bank")}. Seller note: {formatDebtTerms(d,"seller")}.</p><p>{d.earningsNote||"The earnings bridge has not been explained."}</p>
  <h3>Valuation illustration</h3><p>{usd(r.valuationLow)} to {usd(r.valuationHigh)} at {d.settings.low}×–{d.settings.high}× entered SDE. This is an editable assumption, not a market quote.</p>

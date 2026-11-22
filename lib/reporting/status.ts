@@ -10,5 +10,5 @@ export function modelScreenStatus(result:ReportingStatus):string {
 
 export function sourceNoteStatus(result:ReportingStatus):string {
   const count=result.linked.length;
-  return count===0?"No current source-note links":`${count} current source-note link${count===1?"":"s"}`;
+  return count===0?"No current user-linked source notes":`${count} current user-linked source note${count===1?"":"s"} · not authenticated`;
 }

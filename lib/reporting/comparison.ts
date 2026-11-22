@@ -25,6 +25,6 @@ export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
     {label:"Screening debt coverage",values:results.map(result=>metricText("coverage",result))},
     {label:"Pretax cash to equity",values:results.map(result=>metricText("distribution",result))},
     {label:"Cash-on-cash return",values:results.map(result=>metricText("roi",result))},
-    {label:"Evidence status",values:results.map(sourceNoteStatus)},
+    {label:"Source-note support",values:results.map(sourceNoteStatus)},
   ];
 }

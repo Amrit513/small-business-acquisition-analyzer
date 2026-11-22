@@ -311,3 +311,7 @@ The website now permits only one local deal save or deletion at a time. Conflict
 ## Reporting-period validation guidance
 
 The annual reporting-period input now exposes the same invalid state that already prevents memo readiness and screening-index calculation. Its field-specific alert is programmatically associated with the input, so keyboard and assistive-technology users receive the resolution at the control instead of only seeing the issue in the sidebar. Calculation and source-semantics regressions protect the boundary; screen-reader acceptance remains pending.
+
+## Explicitly unauthenticated source-note support
+
+Comparison, the on-screen memo and the PDF now label their shared count as user-linked source-note support rather than evidence status. Any nonzero count explicitly says that the notes are not authenticated, while an empty count remains visible. This prevents model completeness or a user-selected source label from being mistaken for document verification.

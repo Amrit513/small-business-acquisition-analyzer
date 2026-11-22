@@ -8,8 +8,8 @@ describe("memo reporting status",()=>{
   const complete=calculate(sampleDeal());
   const incomplete=calculate(blankDeal("draft","2026-11-17T00:00:00.000Z"));
   expect(modelScreenStatus(complete)).toBe("Complete model screen");
-  expect(sourceNoteStatus(complete)).toBe("1 current source-note link");
+  expect(sourceNoteStatus(complete)).toBe("1 current user-linked source note · not authenticated");
   expect(modelScreenStatus(incomplete)).toMatch(/^Incomplete model screen · \d+ unresolved issues$/);
-  expect(sourceNoteStatus(incomplete)).toBe("No current source-note links");
+  expect(sourceNoteStatus(incomplete)).toBe("No current user-linked source notes");
  });
 });
