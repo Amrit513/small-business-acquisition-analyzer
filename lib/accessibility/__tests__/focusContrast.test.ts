@@ -61,4 +61,13 @@ describe("focus indicator contrast", () => {
     expect(inputs).toContain('aria-describedby={missingPeriod?"deal-period-error":undefined}');
     expect(inputs).toContain('id="deal-period-error" role="alert"');
   });
+
+  it("associates scenario table values with explicit row and column headers",()=>{
+    const scenarios=readFileSync("components/workbench/Scenarios.tsx","utf8");
+    expect(scenarios).toContain('map(h=><th scope="col" key={h}>{h}</th>)');
+    expect(scenarios).toContain('<th scope="col">SDE / entered SDE</th>');
+    expect(scenarios).toContain('<th scope="col">Bank APR change</th>');
+    expect(scenarios).toContain('<th scope="col">Cash to equity</th>');
+    expect(scenarios).toContain('<th scope="row">{c.earningsPct}%</th>');
+  });
 });

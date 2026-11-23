@@ -355,3 +355,7 @@ Comparison, the on-screen memo and the PDF now label their shared count as user-
 ## Actionable deal-import recovery
 
 Deal JSON imports now distinguish an oversized file from malformed UTF-8 and unsupported content while always confirming that the active deal remains unchanged. Only allowlisted local failure categories reach the status region; raw browser, filesystem and parser messages stay hidden. Pure regression cases protect both actionable copy and the generic privacy-preserving fallback.
+
+## Scoped scenario-table headers
+
+The scenario projection and year-one sensitivity tables now identify every column header explicitly, and both tables identify their first-column values as row headers. This gives assistive technology a stable relationship between each financial value and its year or earnings assumption inside the existing keyboard-scrollable regions. Source regression coverage protects these semantics; manual screen-reader acceptance remains pending.
