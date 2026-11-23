@@ -180,6 +180,36 @@ describe("extension popup local workflow", () => {
     expect(popup.elements.title!.value).toBe("Keep this review");
   });
 
+  it("returns focus to capture after clearing visible extension state",async()=>{
+    const popup=popupDocument();vi.stubGlobal("document",popup.document);vi.stubGlobal("confirm",vi.fn(()=>true));
+    vi.stubGlobal("chrome",{
+      storage:{local:{get:vi.fn(async()=>({listingDraft:extractListing("SDE: $170,000","Clear focus")})),set:vi.fn(),remove:vi.fn(async()=>undefined)}},
+      tabs:{query:vi.fn(),create:vi.fn()},scripting:{executeScript:vi.fn()},
+    });
+
+    await import("../popup");
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Restored your saved draft."));
+    popup.elements.clear!.click();
+    await vi.waitFor(()=>expect(popup.elements.status!.textContent).toBe("Draft cleared from this browser."));
+    expect(popup.elements.review!.hidden).toBe(true);
+    expect(popup.elements.capture!.disabled).toBe(false);
+    expect(popup.elements.capture!.focusCount).toBe(1);
+
+    vi.resetModules();
+    const corrupt=popupDocument();vi.stubGlobal("document",corrupt.document);
+    vi.stubGlobal("chrome",{
+      storage:{local:{get:vi.fn(async()=>({listingDraft:{malformed:true}})),set:vi.fn(),remove:vi.fn(async()=>undefined)}},
+      tabs:{query:vi.fn(),create:vi.fn()},scripting:{executeScript:vi.fn()},
+    });
+    await import("../popup");
+    await vi.waitFor(()=>expect(corrupt.elements.recovery!.hidden).toBe(false));
+    corrupt.elements["discard-corrupt"]!.click();
+    await vi.waitFor(()=>expect(corrupt.elements.status!.textContent).toBe("Unreadable draft removed."));
+    expect(corrupt.elements.recovery!.hidden).toBe(true);
+    expect(corrupt.elements.capture!.disabled).toBe(false);
+    expect(corrupt.elements.capture!.focusCount).toBe(1);
+  });
+
   it("keeps the review and revokes its Blob URL when export cannot start",async()=>{
     const popup=popupDocument({failExportClick:true});vi.stubGlobal("document",popup.document);
     vi.stubGlobal("chrome",{

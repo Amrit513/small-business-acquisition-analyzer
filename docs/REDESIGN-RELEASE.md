@@ -363,3 +363,7 @@ The scenario projection and year-one sensitivity tables now identify every colum
 ## Unblocked PDF progress announcements
 
 PDF preparation now marks only the action group as busy. The polite live progress message remains outside that busy subtree, so assistive technology does not have to defer “Preparing…” until the local render is already complete. Source regression coverage protects this relationship; manual screen-reader and browser-download acceptance remain pending.
+
+## Extension focus after clearing
+
+After a reviewed listing or unreadable saved draft is removed, the extension now returns keyboard focus to Capture this listing. Focus moves only after the serialized storage operation finishes and the Capture control is re-enabled, avoiding focus on a button inside newly hidden content. Simulated browser-API coverage exercises both successful removal paths; installed Chrome and Edge keyboard acceptance remains pending.

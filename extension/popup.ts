@@ -92,12 +92,15 @@ async function capture() {
     status(replacingUnreadable ? "Review the extracted amounts, then save to replace the unreadable draft." : "Review the extracted amounts before using them.");
   } catch (error) { reportError(error instanceof Error ? error.message : "Capture failed. The website may restrict extension access."); }
 }
-async function action(work: () => void | Promise<unknown>) {
+type ActionResult = { focusId: string };
+async function action(work: () => void | ActionResult | Promise<void | ActionResult>) {
   if (operationInProgress) return;
+  let result: ActionResult | undefined;
   setOperationBusy(true);
-  try { await work(); }
+  try { const completed = await work(); if (completed) result = completed; }
   catch (error) { reportError(error instanceof Error ? error.message : "The action could not be completed."); }
   finally { setOperationBusy(false); }
+  if (result?.focusId) $(result.focusId).focus();
 }
 $("capture").addEventListener("click", () => void action(capture));
 $("open").addEventListener("click", () => void action(async () => {
@@ -121,7 +124,8 @@ $("clear").addEventListener("click", () => void action(async () => {
   if (!globalThis.confirm("Clear this reviewed listing? Export JSON first if you need a backup.")) { status("Reviewed listing kept."); return; }
   try { await chrome.storage.local.remove("listingDraft"); } catch { throw new Error("Draft could not be cleared. It remains visible and may still be stored in this browser."); }
   draft = undefined; showRecovery(false); $("review").hidden = true; inputs.clear(); status("Draft cleared from this browser.");
+  return { focusId: "capture" };
 }));
 void action(async () => { let saved: Record<string, unknown>; try { saved = await chrome.storage.local.get("listingDraft"); } catch { throw new Error("Local draft storage is unavailable. Capture and export still work, but saving may fail."); } if (saved.listingDraft) { try { render(parseListingDraft(JSON.stringify(saved.listingDraft))); status("Restored your saved draft."); } catch { showRecovery(true); status("The saved draft could not be read. You can clear it or capture a new listing."); } } });
 
-$("discard-corrupt").addEventListener("click", () => void action(async () => {try { await chrome.storage.local.remove("listingDraft"); } catch { throw new Error("Unreadable draft could not be removed from browser storage."); }showRecovery(false);status("Unreadable draft removed.");}));
+$("discard-corrupt").addEventListener("click", () => void action(async () => {try { await chrome.storage.local.remove("listingDraft"); } catch { throw new Error("Unreadable draft could not be removed from browser storage."); }showRecovery(false);status("Unreadable draft removed.");return { focusId:"capture" };}));
