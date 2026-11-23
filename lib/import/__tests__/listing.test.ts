@@ -56,6 +56,13 @@ describe("listing import boundary", () => {
     const raw = "\ufeff" + JSON.stringify(extractListing("Asking Price: $200K"));
     expect(parseListingDraft(raw).values.purchasePrice).toBe(200000);
   });
+  it("normalizes listing titles without allowing a whitespace-only deal name",()=>{
+    const base=extractListing("Asking Price: $200K","  Atlas Services  ");
+    expect(base.title).toBe("Atlas Services");
+    expect(parseListingDraft(JSON.stringify({...base,title:"   "})).title).toBe("Imported listing");
+    const reviewed=reviewListingAmounts({...base,title:" \t "},{purchasePrice:"200000"});
+    expect(reviewed.ok&&reviewed.draft.title).toBe("Imported listing");
+  });
   it("rejects unsupported structure instead of silently discarding it", () => {
     const base = extractListing("Asking Price: $200K");
     for (const change of [

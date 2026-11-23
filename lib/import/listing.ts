@@ -21,6 +21,7 @@ export interface ListingDraft {
   quotes: Partial<Record<ListingField, string>>;
   warnings: string[];
 }
+function listingTitle(value:string):string {return value.trim()||"Imported listing";}
 const labels: Record<ListingField, string> = {
   purchasePrice: "(?:asking\\s+price|purchase\\s+price|business\\s+price)",
   annualRevenue: "(?:(?:annual|gross|ttm)\\s+(?:revenue|sales)|revenue|gross\\s+income)",
@@ -60,7 +61,7 @@ export function reviewListingAmounts(draft: ListingDraft, rawAmounts: Partial<Re
     if (amount !== undefined) values[field] = amount;
     if (amount !== draft.values[field]) delete quotes[field];
   }
-  return { ok: true, draft: { ...draft, values, quotes } };
+  return { ok: true, draft: { ...draft, title:listingTitle(draft.title), values, quotes } };
 }
 
 export function safeListingUrl(raw: string): string {
@@ -90,7 +91,7 @@ export function listingCaptureDate(value: string): string {
 }
 
 export function extractListing(text: string, title = "", url = ""): ListingDraft {
-  const draft: ListingDraft = { kind: "acquisition-lens-listing", version: 1, title: title.trim().slice(0, 160) || "Imported listing", url: safeListingUrl(url), capturedAt: new Date().toISOString(), values: {}, quotes: {}, warnings: [] };
+  const draft: ListingDraft = { kind: "acquisition-lens-listing", version: 1, title: listingTitle(title).slice(0, 160), url: safeListingUrl(url), capturedAt: new Date().toISOString(), values: {}, quotes: {}, warnings: [] };
   const lines = text.slice(0, 60000).replace(/\u00a0/g, " ").split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   if (text.length > 60000) draft.warnings.push("Only the first 60,000 characters were inspected.");
   for (const field of listingFields) {
@@ -156,7 +157,7 @@ export function parseListingDraft(raw: string): ListingDraft {
   }
   return {
     kind: "acquisition-lens-listing", version: 1,
-    title: typeof value.title === "string" ? value.title : "Imported listing",
+    title: typeof value.title === "string" ? listingTitle(value.title) : "Imported listing",
     url: typeof value.url === "string" ? safeListingUrl(value.url) : "",
     capturedAt: captureTimestamp(value.capturedAt),
     values, quotes,

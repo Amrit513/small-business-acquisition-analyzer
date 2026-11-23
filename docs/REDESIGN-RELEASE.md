@@ -156,6 +156,10 @@ Memo and PDF reporting now distinguish an entered seller-compensation add-back f
 
 The workbench now calculates the portion of the SDE bridge left after entered seller compensation and shows it in Evidence, the on-screen memo, PDF and deal comparison. The remainder stays unknown when seller compensation is unknown instead of treating the missing amount as zero. This gives reviewers an exact amount to reconcile to other add-backs without changing projected SDE or cash flow.
 
+## Canonical listing titles
+
+Listing extraction, JSON parsing and final amount review now trim business names and replace a whitespace-only title with “Imported listing.” This prevents a syntactically valid listing handoff or local file from creating a blank-looking deal while preserving the existing maximum-length boundary and all financial values, excerpts and warnings.
+
 ## Consistent memo provenance
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.
