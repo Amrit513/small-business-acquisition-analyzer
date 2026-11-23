@@ -16,7 +16,7 @@ const st=StyleSheet.create({page:{padding:42,fontFamily:"Liberation Sans",fontSi
  eyebrow:{fontSize:9,letterSpacing:1.2,color:"#0b5142",marginBottom:6},
  title:{fontSize:23,fontWeight:700,lineHeight:1.4,marginBottom:12},sub:{fontSize:10,marginTop:3},
  section:{marginTop:16,marginBottom:7,paddingBottom:5,borderBottom:"1px solid #dce4e0",fontWeight:700,fontSize:13},
- row:{flexDirection:"row",justifyContent:"space-between",borderBottom:"1px solid #dce4e0",paddingVertical:5},
+ row:{flexDirection:"row",justifyContent:"space-between",borderBottom:"1px solid #dce4e0",paddingVertical:4},
  metric:{fontWeight:700,color:"#0b5142"},status:{fontSize:8,fontWeight:700,color:"#0b5142",marginBottom:3},muted:{fontSize:8,color:"#486156"},
  paragraph:{marginBottom:7},item:{marginBottom:7},footer:{position:"absolute",left:42,right:42,bottom:24,paddingTop:8,borderTop:"1px solid #dce4e0",fontSize:8,color:"#486156"}});
 export function Report({deal:d,result:r,generated}:{deal:Deal;result:Result;generated:string}){
@@ -28,7 +28,7 @@ export function Report({deal:d,result:r,generated}:{deal:Deal;result:Result;gene
  <Text style={st.status}>Model status: {modelScreenStatus(r)} · Source-note support: {sourceNoteStatus(r)}</Text>
  {(Object.keys(metrics) as Metric[]).map(k=>row(metrics[k].name,metricText(k,r)))}
  <Text style={st.section}>Sources and uses</Text>{row("Purchase price",usd(d.values.purchasePrice))}{row("Closing costs",usd(d.values.closingCosts))}{row("Upfront working capital",usd(d.values.initialWorkingCapital))}{row("Total uses",usd(r.uses))}{row("Buyer cash",usd(d.values.equity))}{row("Bank note · rate · term",formatDebtTerms(d,"bank"))}{row("Seller note · rate · term",formatDebtTerms(d,"seller"))}{row("Total sources",usd(r.sources))}{row("Funding difference",usd(r.gap))}
- <Text style={st.section}>Earnings and valuation</Text><Text style={st.paragraph}>Revenue minus expenses: {usd(r.operating)}. Entered SDE: {usd(d.values.sde)}. Bridge: {usd(r.bridge)}. {d.earningsNote}</Text><Text style={st.paragraph}>Illustrative SDE range: {usd(r.valuationLow)} to {usd(r.valuationHigh)} at user-selected {d.settings.low}×–{d.settings.high}×. Not an appraisal or verified comparable.</Text>
+ <Text style={st.section}>Earnings and valuation</Text><Text style={st.paragraph}>Revenue minus expenses: {usd(r.operating)}. Entered SDE: {usd(d.values.sde)}. Bridge: {usd(r.bridge)}. Seller compensation identified in SDE add-backs: {usd(d.values.sellerCompensation)}; already embedded in entered SDE and not added again. {d.earningsNote}</Text><Text style={st.paragraph}>Illustrative SDE range: {usd(r.valuationLow)} to {usd(r.valuationHigh)} at user-selected {d.settings.low}×–{d.settings.high}×. Not an appraisal or verified comparable.</Text>
  </Page><Page size="A4" style={st.page} wrap><Text style={st.eyebrow}>ACQUISITION LENS / {d.name}</Text><Text style={st.title}>Scenarios & diligence</Text>
  <Text style={st.section}>First-year pretax cash-flow bridge</Text><Text style={st.paragraph}>Compensation for the buyer’s work is shown separately from return on invested cash. Taxes and sale proceeds are outside this screen.</Text>
  {row("Seller’s discretionary earnings",usd(d.values.sde))}{row("Less: buyer labor compensation",usd(d.values.buyerPay))}{row("Less: additional replacement labor",usd(d.values.managerCost))}{row("Less: maintenance capital expenditure",usd(d.values.capex))}{row("Less: working-capital increase",usd(d.values.annualWorkingCapital))}{row("Less: scheduled debt payments",usd(r.debt))}{row("Pretax cash to equity",usd(r.distribution))}

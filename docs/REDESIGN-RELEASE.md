@@ -144,6 +144,10 @@ After a valid deal file is parsed, declining the unsaved-work replacement prompt
 
 The source-note form now offers only figures that have an entered value. Unknown values stay unavailable instead of failing after submission, while an explicit zero remains linkable. The selector explains this boundary, exposes its help programmatically and disables submission when no figure is available. A pure regression protects the unknown-versus-zero distinction; keyboard and assistive-technology acceptance remain pending.
 
+## Visible seller-compensation reconciliation
+
+The on-screen memo and exported PDF now show seller compensation identified in SDE add-backs beside operating earnings, entered SDE and the earnings bridge. Both state that the amount is already embedded in entered SDE and is not added again. Comparison exposes seller compensation and the calculated bridge as separate assumptions. Cash-flow formulas are unchanged; browser-downloaded PDF inspection remains pending.
+
 ## Consistent memo provenance
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.
