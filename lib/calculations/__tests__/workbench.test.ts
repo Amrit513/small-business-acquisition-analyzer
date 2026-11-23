@@ -1,6 +1,6 @@
 import {describe,it,expect} from "vitest";
 import {calculate,scheduledPayments,sensitivity,metricText} from "../workbench";
-import {amountValidationMessage,blankDeal,sampleDeal,editValue,editPeriod,fromListing,removeEvidence,restoreEvidence} from "@/lib/workspace/deal";
+import {amountValidationMessage,blankDeal,sampleDeal,editValue,editPeriod,fromListing,linkableEvidenceFields,removeEvidence,restoreEvidence} from "@/lib/workspace/deal";
 import {serialize,parseSnapshot,readStored,journalEntry,todayLocalDate} from "@/lib/storage/workspace";
 import {extractListing,parseListingDraft} from "@/lib/import/listing";
 
@@ -15,6 +15,7 @@ describe("v3 workbench against independent examples",()=>{
  it("accepts a valid current deal file saved with a UTF-8 byte-order mark",()=>{expect(parseSnapshot("\ufeff"+serialize(sampleDeal())).values.sde).toBe(170000);});
  it("restores evidence only to the unchanged deal it came from",()=>{const original=sampleDeal(),entry=original.evidence.sde!;const removed=removeEvidence(original,"sde");expect(removed.evidence.sde).toBeUndefined();expect(removed.assumptionsReviewed).toBe(false);expect(restoreEvidence(removed,"sde",entry,original.id).evidence.sde).toEqual(entry);expect(()=>restoreEvidence(editValue(removed,"sde",180000),"sde",entry,original.id)).toThrow(/changed/);expect(()=>restoreEvidence({...removed,id:"different-deal"},"sde",entry,original.id)).toThrow(/active deal changed/);});
  it("round-trips an unknown imported evidence date without inventing one",()=>{const listing=parseListingDraft(JSON.stringify({...extractListing("Asking price: $200K"),capturedAt:undefined}));const d=fromListing(listing,"test","2026-06-01");const copy=parseSnapshot(serialize(d));expect(copy.listing?.capturedAt).toBe("");expect(copy.evidence.purchasePrice?.date).toBe("");});
+ it("offers source-note linkage only for entered figures while preserving explicit zero",()=>{const d=blankDeal("test","2026-06-01T00:00:00.000Z");d.values.purchasePrice=0;expect(linkableEvidenceFields(d.values)).toEqual(["purchasePrice"]);});
  it("rejects unknown version-three properties instead of silently discarding them",()=>{for(const mutate of [
   (x:Record<string,unknown>)=>{x.unexpected=true;},
   (x:Record<string,unknown>)=>{(x.deal as Record<string,unknown>).unexpected=true;},

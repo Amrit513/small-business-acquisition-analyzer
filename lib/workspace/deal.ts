@@ -12,6 +12,7 @@ export const fields = {
 } as const;
 export type Field = keyof typeof fields;
 export const fieldKeys = Object.keys(fields) as Field[];
+export function linkableEvidenceFields(values:Values):Field[]{return fieldKeys.filter(k=>values[k]!==null);}
 export const statuses = ["User assumption", "Listing claim", "Document reviewed by user"] as const;
 export type Evidence = { value:number; period:string; location:string; excerpt:string; date:string; status:typeof statuses[number] };
 export type Values = Record<Field, number | null>;
