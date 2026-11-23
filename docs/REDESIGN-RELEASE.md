@@ -152,6 +152,10 @@ The on-screen memo and exported PDF now show seller compensation identified in S
 
 Memo and PDF reporting now distinguish an entered seller-compensation add-back from an explicit zero and an unknown amount. Only an entered positive amount is described as embedded in SDE; a missing value remains visibly unentered, while every state confirms that the model does not add a separate seller-compensation amount. A shared pure formatter and three regressions keep both report surfaces aligned. Financial calculations are unchanged.
 
+## Explicit remaining earnings adjustment
+
+The workbench now calculates the portion of the SDE bridge left after entered seller compensation and shows it in Evidence, the on-screen memo, PDF and deal comparison. The remainder stays unknown when seller compensation is unknown instead of treating the missing amount as zero. This gives reviewers an exact amount to reconcile to other add-backs without changing projected SDE or cash flow.
+
 ## Consistent memo provenance
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.

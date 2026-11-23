@@ -34,7 +34,7 @@ export function calculate(d:Deal) {
   const sources=sum(v.equity,v.bankDebt,v.sellerDebt),uses=sum(v.purchasePrice,v.closingCosts,v.initialWorkingCapital);
   const gap=subtract(uses,sources),coverage=ratio(laborAdjusted,debt);
   const roi=ratio(distribution,v.equity),payback=v.equity!==null&&v.equity>0?ratio(v.equity,distribution):null;
-  const operating=subtract(v.annualRevenue,v.expenses),bridge=subtract(v.sde,operating);
+  const operating=subtract(v.annualRevenue,v.expenses),bridge=subtract(v.sde,operating),remainingAdjustments=subtract(bridge,v.sellerCompensation);
   const issues:string[]=[];
   if(!d.name.trim())issues.push("Enter a deal name.");
   for(const k of fieldKeys) if(v[k]!==null&&!validAmount(k,v[k]))issues.push("Review "+fields[k][0].toLowerCase()+": outside the supported range.");
@@ -64,7 +64,7 @@ export function calculate(d:Deal) {
     price:valueToPrice===null?null:bound(70*valueToPrice)};
   const score=!issues.length&&Object.values(scoreParts).every(n=>n!==null)
     ?Math.round(.30*scoreParts.coverage!+.25*scoreParts.returns!+.20*scoreParts.payback!+.15*scoreParts.margin!+.10*scoreParts.price!):null;
-  return {debt,distribution,coverage,roi,payback,operating,bridge,sources,uses,gap,years,issues,valuationLow,valuationHigh,linked,score,scoreParts,ready:issues.length===0};
+  return {debt,distribution,coverage,roi,payback,operating,bridge,remainingAdjustments,sources,uses,gap,years,issues,valuationLow,valuationHigh,linked,score,scoreParts,ready:issues.length===0};
 }
 export type Result=ReturnType<typeof calculate>;
 export function sensitivity(d:Deal) {

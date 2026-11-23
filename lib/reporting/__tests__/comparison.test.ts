@@ -14,6 +14,7 @@ describe("comparison reporting",()=>{
   expect(row("Seller note · rate · term")?.[0]).toBe("No note");
   expect(row("Seller compensation in SDE add-backs")).toEqual(["$80,000","Unknown"]);
   expect(row("Earnings bridge")).toEqual(["$80,000","Unknown"]);
+  expect(row("Remaining adjustment after seller compensation")).toEqual(["$0","Unknown"]);
   expect(row("Coverage comparison target")?.[0]).toBe("1.25× user assumption");
   expect(row("Reporting period")?.[1]).toBe("Not recorded");
   expect(row("Source-note support")).toEqual(["1 current user-linked source note · not authenticated","No current user-linked source notes"]);

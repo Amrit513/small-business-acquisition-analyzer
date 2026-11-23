@@ -5,7 +5,7 @@ This educational asset-purchase screen models annual USD figures for one operati
 | Item | Calculation and scope |
 | --- | --- |
 | Funding | Sources = buyer cash + bank note + seller note. Uses = purchase price + closing costs + initial working capital. Any difference of at least a cent prevents a complete screen. |
-| Earnings bridge | Operating earnings = revenue minus expenses, including seller compensation in expenses if added back. Bridge = entered SDE minus operating earnings. Describe add-backs and differences. Seller pay already embedded in SDE is never added again. |
+| Earnings bridge | Operating earnings = revenue minus expenses, including seller compensation in expenses if added back. Bridge = entered SDE minus operating earnings. Remaining adjustment = bridge minus entered seller compensation; it stays unknown when seller compensation is unknown. Describe every other add-back or difference. Seller pay already embedded in SDE is never added again. |
 | Debt | Monthly fixed fully amortizing loans; annual nominal rate divided by 12. Round each payment, principal and interest to cents; reconcile the final balance. A zero-interest loan repays straight-line principal. Each year uses only payments scheduled in that year. |
 | Cash to equity | SDE minus buyer compensation, incremental replacement labor, maintenance capex, increase in annual working capital and scheduled debt service. A working capital release is negative. Upfront working capital belongs in uses, not in the annual increase. Taxes excluded. |
 | Screening coverage | (SDE minus buyer compensation and incremental replacement labor) / scheduled debt service. Before capex, working capital and taxes. Zero debt has no coverage ratio. Editable comparison target, not a lending rule. |

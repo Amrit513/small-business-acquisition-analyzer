@@ -20,6 +20,7 @@ export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
     {label:"SDE",values:value("sde")},
     {label:"Seller compensation in SDE add-backs",values:value("sellerCompensation")},
     {label:"Earnings bridge",values:results.map(result=>usd(result.bridge))},
+    {label:"Remaining adjustment after seller compensation",values:results.map(result=>usd(result.remainingAdjustments))},
     {label:"Bank note · rate · term",values:deals.map(deal=>formatDebtTerms(deal,"bank"))},
     {label:"Seller note · rate · term",values:deals.map(deal=>formatDebtTerms(deal,"seller"))},
     {label:"Funding difference (uses − sources)",values:results.map(result=>usd(result.gap))},
