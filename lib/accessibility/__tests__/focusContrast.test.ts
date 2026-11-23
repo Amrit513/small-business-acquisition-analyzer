@@ -39,6 +39,15 @@ describe("focus indicator contrast", () => {
     expect(workbench).toContain('finally{finish();if(deleted)libraryRef.current?.focus();}');
   });
 
+  it("moves listing-import focus when conditional controls disappear",()=>{
+    const importer=readFileSync("components/ListingImport.tsx","utf8");
+    expect(importer).toContain('focusNext.current="review";');
+    expect(importer).toContain('titleRef.current?.focus();');
+    expect(importer).toContain('focusNext.current="text";');
+    expect(importer).toContain('textRef.current?.focus();');
+    expect(importer).toContain('setOpen(false); toggleRef.current?.focus();');
+  });
+
   it("stacks long memo and summary values at the narrow reflow breakpoint",()=>{
     const css=readFileSync("app/workbench.css","utf8");
     expect(css).toMatch(/@media\(max-width:420px\)[\s\S]*\.inspectorrows>div,\.memorow\{grid-template-columns:1fr\}/);

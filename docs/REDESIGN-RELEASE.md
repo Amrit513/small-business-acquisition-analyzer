@@ -371,3 +371,7 @@ After a reviewed listing or unreadable saved draft is removed, the extension now
 ## Saved-library focus after deletion
 
 After a local deal snapshot is successfully deleted, keyboard focus now moves from the removed Delete button to the persistent, labeled deal-library region. The region has the same visible high-contrast focus treatment as other programmatically focused workbench regions. A cancelled or failed deletion keeps the row and does not move focus; source regression coverage protects the success-only relationship, while manual browser and screen-reader acceptance remains pending.
+
+## Listing-import focus transitions
+
+The website listing importer now moves keyboard focus to the business-name review field after pasted, file or extension-fragment extraction; Back returns focus to the listing-text field; and a successful deal handoff returns focus to the persistent Import listing toggle. These transitions prevent focus from remaining on controls removed by conditional rendering. Source regression coverage protects all three destinations; manual browser and screen-reader acceptance remains pending.
