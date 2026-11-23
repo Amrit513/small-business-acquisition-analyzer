@@ -379,3 +379,7 @@ The website listing importer now moves keyboard focus to the business-name revie
 ## Listing-review error focus
 
 When a reviewed website listing contains an ambiguous or invalid amount, Use reviewed numbers now moves keyboard focus to that exact field while preserving its relationship to the live alert. If every amount is blank, focus moves to the first amount field so the required correction is immediately actionable. The rejected review remains on-device and unapplied; source regression coverage protects both focus paths, while manual browser and screen-reader acceptance remains pending.
+
+## Defensive model-setting boundary
+
+The pure workbench engine now validates every active setting even when a caller bypasses the import and input boundaries. A zero or nonfinite coverage target cannot create a favorable screening component; invalid valuation settings cannot produce a valuation range; and invalid growth or projection length produces no scenario allocation. Nonfinite financial amounts propagate as unknown outputs while remaining explicit model issues. Independent regression cases cover each boundary, and the model documentation records the exact technical ranges.

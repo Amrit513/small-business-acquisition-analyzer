@@ -4,7 +4,7 @@ import { fieldKeys, fields, validAmount, type Deal, type Field, type Values } fr
 export const modelVersion="3.0";
 type N=number|null;
 const cents=(n:number)=>Math.round((n+Number.EPSILON)*100)/100;
-function sum(...ns:N[]):N {return ns.some(n=>n===null)?null:cents(ns.reduce<number>((s,n)=>s+(n??0),0));}
+function sum(...ns:N[]):N {return ns.some(n=>n===null||!Number.isFinite(n))?null:cents(ns.reduce<number>((s,n)=>s+(n??0),0));}
 function subtract(a:N,...bs:N[]):N {return sum(a,...bs.map(b=>b===null?null:-b));}
 function ratio(a:N,b:N):N{return a===null||b===null||b<=0?null:a/b;}
 export function scheduledPayments(v:Values,adjustBankRate=0):number[]|null {
@@ -28,6 +28,10 @@ export type Metric=keyof typeof metrics;
 export interface Year{year:number; revenue:N;expenses:N;sde:N;debt:N;distribution:N;coverage:N;baseline:N}
 export function calculate(d:Deal) {
   const v=d.values,s=d.settings;
+  const validCoverageTarget=Number.isFinite(s.coverageTarget)&&s.coverageTarget>=.01&&s.coverageTarget<=10;
+  const validValuation=Number.isFinite(s.low)&&Number.isFinite(s.high)&&s.low>=.01&&s.low<=s.high&&s.high<=50;
+  const validGrowth=Number.isFinite(s.revenueChange)&&s.revenueChange>=-100&&s.revenueChange<=100&&Number.isFinite(s.expenseChange)&&s.expenseChange>=-100&&s.expenseChange<=100;
+  const validYears=Number.isInteger(s.years)&&s.years>=1&&s.years<=10;
   const payments=scheduledPayments(v),debt=payments===null?null:payments[0]??0;
   const laborAdjusted=subtract(v.sde,v.buyerPay,v.managerCost);
   const distribution=subtract(laborAdjusted,v.capex,v.annualWorkingCapital,debt);
@@ -44,22 +48,25 @@ export function calculate(d:Deal) {
   if(gap!==null&&Math.abs(gap)>=0.01)issues.push(gap>0?"Funding is short. Reconcile sources and uses.":"Excess financing needs an identified use.");
   if(payments===null&&(v.bankDebt!==null||v.sellerDebt!==null))issues.push("Complete the amount, rate and term for each funded note.");
   if(bridge!==null&&(Math.abs(bridge)>=0.01||(v.sellerCompensation??0)>0)&&!d.earningsNote.trim())issues.push("Explain the earnings bridge and seller add-backs.");
-  if(s.low>s.high||s.low<=0||s.high>50)issues.push("Use ordered positive valuation multiples up to 50×.");
+  if(!validCoverageTarget)issues.push("Use a finite coverage target from 0.01× to 10×.");
+  if(!validValuation)issues.push("Use ordered finite valuation multiples from 0.01× to 50×.");
+  if(!validGrowth)issues.push("Use finite scenario changes from −100% to 100%.");
+  if(!validYears)issues.push("Use a whole projection length from 1 to 10 years.");
   if(!d.assumptionsReviewed)issues.push("Review the assumptions and mark them reviewed in Evidence.");
-  const valuationLow=v.sde!==null&&v.sde>0&&s.low>0&&s.low<=s.high?cents(v.sde*s.low):null;
+  const valuationLow=v.sde!==null&&v.sde>0&&validValuation?cents(v.sde*s.low):null;
   const valuationHigh=valuationLow!==null?cents(v.sde!*s.high):null;
-  const years:Year[]=Array.from({length:s.years},(_,i)=>{
+  const years:Year[]=validGrowth&&validYears?Array.from({length:s.years},(_,i)=>{
     const y=i+1; const rev=v.annualRevenue===null?null:cents(v.annualRevenue*Math.pow(1+s.revenueChange/100,y));
     const exp=v.expenses===null?null:cents(v.expenses*Math.pow(1+s.expenseChange/100,y));
     const earnings=sum(subtract(rev,exp),bridge),ds=payments===null?null:payments[i]??0;
     const labor=subtract(earnings,v.buyerPay,v.managerCost);
     return {year:y,revenue:rev,expenses:exp,sde:earnings,debt:ds,distribution:subtract(labor,v.capex,v.annualWorkingCapital,ds),coverage:ratio(labor,ds),baseline:subtract(laborAdjusted,v.capex,v.annualWorkingCapital,ds)};
-  });
+  }):[];
   const linked=fieldKeys.filter(k=>{const e=d.evidence[k];return e&&e.value===v[k]&&e.period===d.period&&e.location.trim()&&e.excerpt.trim();});
   const bound=(x:number)=>Math.min(100,Math.max(0,x));
   const margin=ratio(v.sde,v.annualRevenue);
   const valueToPrice=ratio(valuationLow!==null&&valuationHigh!==null?(valuationLow+valuationHigh)/2:null,v.purchasePrice);
-  const scoreParts={coverage:coverage===null?null:bound(70*coverage/s.coverageTarget),returns:roi===null?null:bound(100*roi/.35),
+  const scoreParts={coverage:coverage===null||!validCoverageTarget?null:bound(70*coverage/s.coverageTarget),returns:roi===null?null:bound(100*roi/.35),
     payback:payback===null?null:bound(100*(10-payback)/7),margin:margin===null?null:bound(100*margin/.20),
     price:valueToPrice===null?null:bound(70*valueToPrice)};
   const score=!issues.length&&Object.values(scoreParts).every(n=>n!==null)

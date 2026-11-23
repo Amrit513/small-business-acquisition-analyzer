@@ -40,6 +40,13 @@ describe("v3 workbench against independent examples",()=>{
  it("makes corrupted local records recoverable without silently overwriting them",()=>{const item=readStored({id:"bad",version:3,name:"broken",saved:"untouched"});expect(item?.deal).toBeNull();expect(item?.original).toContain("untouched");});
  it("isolates an unserializable local record without hiding its deletion control",()=>{const record:Record<string,unknown>={id:"cyclic",version:3,name:"Cyclic snapshot"};record.self=record;const item=readStored(record);expect(item).toMatchObject({id:"cyclic",name:"Cyclic snapshot",deal:null,original:null});});
  it("does not score unknown data or silently substitute sample values",()=>{const r=calculate(blankDeal("test","2026-01-01"));expect(r.distribution).toBeNull();expect(r.coverage).toBeNull();expect(r.sources).toBeNull();expect(r.ready).toBe(false);});
+ it("rejects malformed in-memory settings before scoring or allocating projections",()=>{
+  const coverage=sampleDeal();coverage.settings.coverageTarget=0;let r=calculate(coverage);expect(r.ready).toBe(false);expect(r.score).toBeNull();expect(r.scoreParts.coverage).toBeNull();expect(r.issues).toContain("Use a finite coverage target from 0.01× to 10×.");
+  const years=sampleDeal();years.settings.years=100000;r=calculate(years);expect(r.years).toEqual([]);expect(r.issues).toContain("Use a whole projection length from 1 to 10 years.");
+  const growth=sampleDeal();growth.settings.revenueChange=Number.NaN;r=calculate(growth);expect(r.years).toEqual([]);expect(r.issues).toContain("Use finite scenario changes from −100% to 100%.");
+  const valuation=sampleDeal();valuation.settings.high=Number.POSITIVE_INFINITY;r=calculate(valuation);expect(r.valuationLow).toBeNull();expect(r.valuationHigh).toBeNull();expect(r.issues).toContain("Use ordered finite valuation multiples from 0.01× to 50×.");
+ });
+ it("does not render nonfinite in-memory amounts as financial outputs",()=>{const d=sampleDeal();d.values.sde=Number.POSITIVE_INFINITY;const r=calculate(d);expect(r.distribution).toBeNull();expect(r.roi).toBeNull();expect(r.ready).toBe(false);expect(r.score).toBeNull();});
  it("keeps an unnamed deal out of memo-ready status",()=>{const d=sampleDeal();d.name="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues[0]).toBe("Enter a deal name.");expect(r.score).toBeNull();});
  it("keeps a deal with no reporting period out of memo-ready status",()=>{const d=sampleDeal();d.period="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues).toContain("Identify the annual reporting period.");expect(r.score).toBeNull();});
 });

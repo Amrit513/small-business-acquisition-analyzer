@@ -15,6 +15,8 @@ This educational asset-purchase screen models annual USD figures for one operati
 | Valuation | Positive SDE × user-editable low/high multiples. Default 2–4× is an educational illustration, not an industry benchmark. No appraisal, blended appraisal or enterprise-to-equity conversion. |
 | Optional screening index | Clamp each component to 0–100. Weights: 30% × (70 × coverage / user's target); 25% × (100 × cash-on-cash / .35); 20% × (100 × (10 − payback) / 7); 15% × (100 × SDE margin / .20); 10% × (70 × midpoint indication / price). Round the weighted sum. No index for an unresolved screen or an inapplicable component. These illustrative weights are not validated predictors. Evidence quality is displayed separately. |
 
+All active settings must be finite. The coverage target is limited to 0.01×–10×, valuation multiples to an ordered 0.01×–50× range, scenario changes to −100%–100%, and projection length to a whole 1–10 years. These are technical model boundaries, not recommended assumptions. An invalid setting makes the screen incomplete, suppresses the optional index, and suppresses scenario rows when their growth or horizon cannot be safely evaluated.
+
 ## Two hand checks
 
 Atlas: $425,000 + $18,000 + $20,000 = $463,000 of uses. $123,000 buyer cash + $340,000 bank debt = $463,000. A ten-year, 9.5% loan pays $4,399.52 monthly in year one. $170,000 SDE − $60,000 buyer pay − $10,000 capex − $5,000 annual working capital − $52,794.24 debt = **$42,205.76** pretax distribution. Coverage = $110,000 / $52,794.24 = **2.08×**. A 10% revenue decline and 3% expense rise produce $105,100 SDE and **−$22,694.24** distribution.
@@ -23,4 +25,4 @@ Maturities: a $12,000 two-year zero-interest note pays $500 monthly. A $3,000 si
 
 ## Screen completeness
 
-A memo-ready screen requires a nonblank deal name and annual reporting period, every required transaction and operating input, reconciled sources and uses, complete terms for each funded note, ordered valuation assumptions, an explained earnings bridge when applicable, and the user's review acknowledgement. These checks establish model completeness only; they do not authenticate evidence or make an acquisition decision-ready.
+A memo-ready screen requires a nonblank deal name and annual reporting period, every required transaction and operating input, reconciled sources and uses, complete terms for each funded note, valid bounded model settings, an explained earnings bridge when applicable, and the user's review acknowledgement. These checks establish model completeness only; they do not authenticate evidence or make an acquisition decision-ready.
