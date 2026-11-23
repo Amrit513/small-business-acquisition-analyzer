@@ -148,6 +148,10 @@ The source-note form now offers only figures that have an entered value. Unknown
 
 The on-screen memo and exported PDF now show seller compensation identified in SDE add-backs beside operating earnings, entered SDE and the earnings bridge. Both state that the amount is already embedded in entered SDE and is not added again. Comparison exposes seller compensation and the calculated bridge as separate assumptions. Cash-flow formulas are unchanged; browser-downloaded PDF inspection remains pending.
 
+## Honest seller-compensation disclosure states
+
+Memo and PDF reporting now distinguish an entered seller-compensation add-back from an explicit zero and an unknown amount. Only an entered positive amount is described as embedded in SDE; a missing value remains visibly unentered, while every state confirms that the model does not add a separate seller-compensation amount. A shared pure formatter and three regressions keep both report surfaces aligned. Financial calculations are unchanged.
+
 ## Consistent memo provenance
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.
