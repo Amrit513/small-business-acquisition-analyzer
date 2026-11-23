@@ -387,3 +387,7 @@ The pure workbench engine now validates every active setting even when a caller 
 ## Invalid financial-value isolation
 
 The calculation boundary now converts any financial amount outside its documented field range to unknown before deriving cash flow, coverage, valuation, scenario rows, score components or source-note support. The original invalid amount remains available only to produce its field-specific issue; it is never clamped or allowed to leak `Infinity` into a report. Regression cases cover nonfinite SDE and revenue across current outputs and projections. A real unpacked-Chromium acceptance attempt still failed before startup because this workspace denies Chromium's process-singleton socket, so installed Chrome/Edge remains a separate pending gate.
+
+## Sensitivity-value isolation
+
+Current results and the year-one sensitivity matrix now share one pure financial-value validation boundary. A finite but unsupported input can no longer make a sensitivity cell look favorable after the main screen has correctly rejected it; every affected distribution and coverage cell stays unknown. Regression coverage includes negative maintenance capex and SDE beyond the documented magnitude limit. This is local model validation; interactive browser and physical-device acceptance remain pending.

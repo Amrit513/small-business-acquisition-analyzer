@@ -7,6 +7,9 @@ const cents=(n:number)=>Math.round((n+Number.EPSILON)*100)/100;
 function sum(...ns:N[]):N {return ns.some(n=>n===null||!Number.isFinite(n))?null:cents(ns.reduce<number>((s,n)=>s+(n??0),0));}
 function subtract(a:N,...bs:N[]):N {return sum(a,...bs.map(b=>b===null?null:-b));}
 function ratio(a:N,b:N):N{return a===null||b===null||b<=0?null:a/b;}
+function validatedValues(values:Values):Values {
+  return Object.fromEntries(fieldKeys.map(k=>[k,values[k]!==null&&validAmount(k,values[k])?values[k]:null])) as Values;
+}
 export function scheduledPayments(v:Values,adjustBankRate=0):number[]|null {
   const result:number[]=[];
   for(const [p,r,y] of [["bankDebt","bankRate","bankYears"],["sellerDebt","sellerRate","sellerYears"]] as const){
@@ -28,7 +31,7 @@ export type Metric=keyof typeof metrics;
 export interface Year{year:number; revenue:N;expenses:N;sde:N;debt:N;distribution:N;coverage:N;baseline:N}
 export function calculate(d:Deal) {
   const entered=d.values,s=d.settings;
-  const v=Object.fromEntries(fieldKeys.map(k=>[k,entered[k]!==null&&validAmount(k,entered[k])?entered[k]:null])) as Values;
+  const v=validatedValues(entered);
   const validCoverageTarget=Number.isFinite(s.coverageTarget)&&s.coverageTarget>=.01&&s.coverageTarget<=10;
   const validValuation=Number.isFinite(s.low)&&Number.isFinite(s.high)&&s.low>=.01&&s.low<=s.high&&s.high<=50;
   const validGrowth=Number.isFinite(s.revenueChange)&&s.revenueChange>=-100&&s.revenueChange<=100&&Number.isFinite(s.expenseChange)&&s.expenseChange>=-100&&s.expenseChange<=100;
@@ -76,7 +79,7 @@ export function calculate(d:Deal) {
 }
 export type Result=ReturnType<typeof calculate>;
 export function sensitivity(d:Deal) {
-  const v=d.values;return [0.8,0.9,1,1.1].flatMap(f=>(v.bankDebt!==null&&v.bankDebt>0?[-2,0,2]:[0]).map(change=>{
+  const v=validatedValues(d.values);return [0.8,0.9,1,1.1].flatMap(f=>(v.bankDebt!==null&&v.bankDebt>0?[-2,0,2]:[0]).map(change=>{
     const payments=scheduledPayments(v,change);const ds=payments===null?null:payments[0]??0;
     const adjusted=subtract(v.sde===null?null:cents(v.sde*f),v.buyerPay,v.managerCost);
     return {earningsPct:Math.round(f*100),rateChange:change,distribution:subtract(adjusted,v.capex,v.annualWorkingCapital,ds),coverage:ratio(adjusted,ds)};
