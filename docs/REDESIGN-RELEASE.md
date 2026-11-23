@@ -132,6 +132,10 @@ Listing JSON imports now use allowlisted recovery copy instead of exposing raw b
 
 Extension action and capture failures now switch the popup message region to an assertive alert, while progress and successful outcomes remain polite status updates. The atomic live region prevents partial recovery messages from being announced. Simulated popup coverage verifies both the urgent error state and its reset after a successful retry; installed Chrome/Edge assistive-technology acceptance remains pending.
 
+## Isolated unreadable local snapshots
+
+A structured-clone record that JSON cannot serialize no longer aborts the entire saved-deal library. The unreadable record stays visible and deletable, is explicitly labeled as unavailable for export, and cannot be opened. Serializable malformed records retain their original recovery JSON and export path. Pure regression coverage uses a cyclic record; real IndexedDB corruption recovery remains pending browser acceptance.
+
 ## Consistent memo provenance
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.
