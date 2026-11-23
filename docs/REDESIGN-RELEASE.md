@@ -136,6 +136,10 @@ Extension action and capture failures now switch the popup message region to an 
 
 A structured-clone record that JSON cannot serialize no longer aborts the entire saved-deal library. The unreadable record stays visible and deletable, is explicitly labeled as unavailable for export, and cannot be opened. Serializable malformed records retain their original recovery JSON and export path. Pure regression coverage uses a cyclic record; real IndexedDB corruption recovery remains pending browser acceptance.
 
+## Explicit cancelled deal imports
+
+After a valid deal file is parsed, declining the unsaved-work replacement prompt now announces that the current deal was kept and the selected file was not applied. Invalid files remain rejected before the replacement prompt, and stale file reads remain unable to publish either a deal or a message. This aligns deal-file cancellation with the reviewed listing handoff; real file-picker acceptance remains pending.
+
 ## Consistent memo provenance
 
 The on-screen memo now shows each linked figure's source location, reporting period and review date alongside its excerpt, matching the exported PDF appendix. Both views use one tested formatter, including explicit labels when period or date provenance is unknown.
