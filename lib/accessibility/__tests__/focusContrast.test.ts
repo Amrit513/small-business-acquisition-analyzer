@@ -48,6 +48,13 @@ describe("focus indicator contrast", () => {
     expect(importer).toContain('setOpen(false); toggleRef.current?.focus();');
   });
 
+  it("focuses the listing amount that blocks reviewed import",()=>{
+    const importer=readFileSync("components/ListingImport.tsx","utf8");
+    expect(importer).toContain('amountRefs.current[reviewed.field]?.focus();');
+    expect(importer).toContain('amountRefs.current.purchasePrice?.focus();');
+    expect(importer).toContain('aria-describedby={invalidField===field?"listing-review-error":undefined}');
+  });
+
   it("stacks long memo and summary values at the narrow reflow breakpoint",()=>{
     const css=readFileSync("app/workbench.css","utf8");
     expect(css).toMatch(/@media\(max-width:420px\)[\s\S]*\.inspectorrows>div,\.memorow\{grid-template-columns:1fr\}/);

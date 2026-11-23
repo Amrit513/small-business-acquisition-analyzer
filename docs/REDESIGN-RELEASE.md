@@ -375,3 +375,7 @@ After a local deal snapshot is successfully deleted, keyboard focus now moves fr
 ## Listing-import focus transitions
 
 The website listing importer now moves keyboard focus to the business-name review field after pasted, file or extension-fragment extraction; Back returns focus to the listing-text field; and a successful deal handoff returns focus to the persistent Import listing toggle. These transitions prevent focus from remaining on controls removed by conditional rendering. Source regression coverage protects all three destinations; manual browser and screen-reader acceptance remains pending.
+
+## Listing-review error focus
+
+When a reviewed website listing contains an ambiguous or invalid amount, Use reviewed numbers now moves keyboard focus to that exact field while preserving its relationship to the live alert. If every amount is blank, focus moves to the first amount field so the required correction is immediately actionable. The rejected review remains on-device and unapplied; source regression coverage protects both focus paths, while manual browser and screen-reader acceptance remains pending.
