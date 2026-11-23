@@ -88,6 +88,13 @@ describe("focus indicator contrast", () => {
     expect(memo).toContain("Preparing the PDF memo on this device…");
   });
 
+  it("announces saved-deal import failures as assertive errors",()=>{
+    const workbench=readFileSync("components/Workbench.tsx","utf8");
+    expect(workbench).toContain('[importError,setImportError]=useState("")');
+    expect(workbench).toContain('setImportError(dealImportFailureMessage(error))');
+    expect(workbench).toContain('role="alert" aria-live="assertive" aria-atomic="true"');
+  });
+
   it("associates the memo-required reporting period with its guidance",()=>{
     const inputs=readFileSync("components/workbench/Inputs.tsx","utf8");
     expect(inputs).toContain('aria-invalid={missingPeriod}');

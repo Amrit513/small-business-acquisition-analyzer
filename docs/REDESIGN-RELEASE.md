@@ -399,3 +399,7 @@ The extension popup no longer forces its four post-capture actions into one crow
 ## Extension capture focus
 
 After a successful page capture, the extension now moves keyboard focus from Capture this listing to the newly revealed Business name review field. Focus moves only after the serialized capture operation has finished and controls are enabled; a restricted-page failure keeps the existing review and does not move focus into changed content. Simulated browser-API coverage protects both paths. Installed Chrome/Edge keyboard and screen-reader acceptance remain pending.
+
+## Assertive saved-deal import failures
+
+Malformed, unreadable and oversized saved-deal files now produce a dedicated assertive error announcement instead of sharing the workbench's polite status region. The active deal remains unchanged, messages use the existing stable recovery wording, and a new import attempt clears the previous error before validation begins. Source-level accessibility coverage protects the alert relationship; manual browser and screen-reader acceptance remains pending.
