@@ -27,7 +27,8 @@ export const metrics={
 export type Metric=keyof typeof metrics;
 export interface Year{year:number; revenue:N;expenses:N;sde:N;debt:N;distribution:N;coverage:N;baseline:N}
 export function calculate(d:Deal) {
-  const v=d.values,s=d.settings;
+  const entered=d.values,s=d.settings;
+  const v=Object.fromEntries(fieldKeys.map(k=>[k,entered[k]!==null&&validAmount(k,entered[k])?entered[k]:null])) as Values;
   const validCoverageTarget=Number.isFinite(s.coverageTarget)&&s.coverageTarget>=.01&&s.coverageTarget<=10;
   const validValuation=Number.isFinite(s.low)&&Number.isFinite(s.high)&&s.low>=.01&&s.low<=s.high&&s.high<=50;
   const validGrowth=Number.isFinite(s.revenueChange)&&s.revenueChange>=-100&&s.revenueChange<=100&&Number.isFinite(s.expenseChange)&&s.expenseChange>=-100&&s.expenseChange<=100;
@@ -41,8 +42,8 @@ export function calculate(d:Deal) {
   const operating=subtract(v.annualRevenue,v.expenses),bridge=subtract(v.sde,operating),remainingAdjustments=subtract(bridge,v.sellerCompensation);
   const issues:string[]=[];
   if(!d.name.trim())issues.push("Enter a deal name.");
-  for(const k of fieldKeys) if(v[k]!==null&&!validAmount(k,v[k]))issues.push("Review "+fields[k][0].toLowerCase()+": outside the supported range.");
-  const missing=required.filter(k=>v[k]===null);if(missing.length)issues.push("Enter: "+missing.map(k=>fields[k][0].toLowerCase()).join(", ")+".");
+  for(const k of fieldKeys) if(entered[k]!==null&&!validAmount(k,entered[k]))issues.push("Review "+fields[k][0].toLowerCase()+": outside the supported range.");
+  const missing=required.filter(k=>entered[k]===null);if(missing.length)issues.push("Enter: "+missing.map(k=>fields[k][0].toLowerCase()).join(", ")+".");
   if(!d.period.trim())issues.push("Identify the annual reporting period.");
   if(v.purchasePrice!==null&&v.purchasePrice<=0)issues.push("Enter a positive purchase price for this transaction.");
   if(gap!==null&&Math.abs(gap)>=0.01)issues.push(gap>0?"Funding is short. Reconcile sources and uses.":"Excess financing needs an identified use.");

@@ -383,3 +383,7 @@ When a reviewed website listing contains an ambiguous or invalid amount, Use rev
 ## Defensive model-setting boundary
 
 The pure workbench engine now validates every active setting even when a caller bypasses the import and input boundaries. A zero or nonfinite coverage target cannot create a favorable screening component; invalid valuation settings cannot produce a valuation range; and invalid growth or projection length produces no scenario allocation. Nonfinite financial amounts propagate as unknown outputs while remaining explicit model issues. Independent regression cases cover each boundary, and the model documentation records the exact technical ranges.
+
+## Invalid financial-value isolation
+
+The calculation boundary now converts any financial amount outside its documented field range to unknown before deriving cash flow, coverage, valuation, scenario rows, score components or source-note support. The original invalid amount remains available only to produce its field-specific issue; it is never clamped or allowed to leak `Infinity` into a report. Regression cases cover nonfinite SDE and revenue across current outputs and projections. A real unpacked-Chromium acceptance attempt still failed before startup because this workspace denies Chromium's process-singleton socket, so installed Chrome/Edge remains a separate pending gate.

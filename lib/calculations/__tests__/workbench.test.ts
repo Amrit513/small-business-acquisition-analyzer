@@ -46,7 +46,10 @@ describe("v3 workbench against independent examples",()=>{
   const growth=sampleDeal();growth.settings.revenueChange=Number.NaN;r=calculate(growth);expect(r.years).toEqual([]);expect(r.issues).toContain("Use finite scenario changes from −100% to 100%.");
   const valuation=sampleDeal();valuation.settings.high=Number.POSITIVE_INFINITY;r=calculate(valuation);expect(r.valuationLow).toBeNull();expect(r.valuationHigh).toBeNull();expect(r.issues).toContain("Use ordered finite valuation multiples from 0.01× to 50×.");
  });
- it("does not render nonfinite in-memory amounts as financial outputs",()=>{const d=sampleDeal();d.values.sde=Number.POSITIVE_INFINITY;const r=calculate(d);expect(r.distribution).toBeNull();expect(r.roi).toBeNull();expect(r.ready).toBe(false);expect(r.score).toBeNull();});
+ it("isolates invalid in-memory amounts from every financial output",()=>{
+  const earnings=sampleDeal();earnings.values.sde=Number.POSITIVE_INFINITY;let r=calculate(earnings);expect(r.distribution).toBeNull();expect(r.roi).toBeNull();expect(r.valuationLow).toBeNull();expect(r.valuationHigh).toBeNull();expect(r.scoreParts.margin).toBeNull();expect(r.years.every(y=>y.sde===null&&y.distribution===null)).toBe(true);expect(r.linked).toEqual([]);expect(r.ready).toBe(false);expect(r.score).toBeNull();
+  const revenue=sampleDeal();revenue.values.annualRevenue=Number.POSITIVE_INFINITY;r=calculate(revenue);expect(r.operating).toBeNull();expect(r.years.every(y=>y.revenue===null&&y.sde===null)).toBe(true);expect(r.scoreParts.margin).toBeNull();expect(r.ready).toBe(false);
+ });
  it("keeps an unnamed deal out of memo-ready status",()=>{const d=sampleDeal();d.name="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues[0]).toBe("Enter a deal name.");expect(r.score).toBeNull();});
  it("keeps a deal with no reporting period out of memo-ready status",()=>{const d=sampleDeal();d.period="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues).toContain("Identify the annual reporting period.");expect(r.score).toBeNull();});
 });
