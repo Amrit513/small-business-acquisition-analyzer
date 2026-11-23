@@ -391,3 +391,7 @@ The calculation boundary now converts any financial amount outside its documente
 ## Sensitivity-value isolation
 
 Current results and the year-one sensitivity matrix now share one pure financial-value validation boundary. A finite but unsupported input can no longer make a sensitivity cell look favorable after the main screen has correctly rejected it; every affected distribution and coverage cell stays unknown. Regression coverage includes negative maintenance capex and SDE beyond the documented magnitude limit. This is local model validation; interactive browser and physical-device acceptance remain pending.
+
+## Extension popup reflow
+
+The extension popup no longer forces its four post-capture actions into one crowded row. Its body respects the available viewport, the header and action group wrap, financial metric columns can shrink without overflowing, and action buttons settle into two columns or one column as space narrows. A source-level regression protects these CSS boundaries. Installed Chrome/Edge testing and manual 200% text enlargement remain pending because this workspace still cannot start Chromium.

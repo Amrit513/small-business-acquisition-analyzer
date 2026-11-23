@@ -71,6 +71,15 @@ describe("focus indicator contrast", () => {
     }
   });
 
+  it("lets the extension popup reflow instead of forcing a wide action row",()=>{
+    const css=readFileSync("extension/popup.css","utf8");
+    expect(css).toContain("width:min(390px,100vw);max-width:100%;overflow-x:hidden");
+    expect(css).toMatch(/header\{[^}]*flex-wrap:wrap/);
+    expect(css).toMatch(/\.metrics\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+    expect(css).toMatch(/\.actions\{[^}]*flex-wrap:wrap/);
+    expect(css).toMatch(/\.actions button\{[^}]*flex:1 1 145px/);
+  });
+
   it("announces PDF preparation outside the busy action group",()=>{
     const memo=readFileSync("components/workbench/Memo.tsx","utf8");
     expect(memo).toContain('<section className="sheet">');
