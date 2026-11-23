@@ -367,3 +367,7 @@ PDF preparation now marks only the action group as busy. The polite live progres
 ## Extension focus after clearing
 
 After a reviewed listing or unreadable saved draft is removed, the extension now returns keyboard focus to Capture this listing. Focus moves only after the serialized storage operation finishes and the Capture control is re-enabled, avoiding focus on a button inside newly hidden content. Simulated browser-API coverage exercises both successful removal paths; installed Chrome and Edge keyboard acceptance remains pending.
+
+## Saved-library focus after deletion
+
+After a local deal snapshot is successfully deleted, keyboard focus now moves from the removed Delete button to the persistent, labeled deal-library region. The region has the same visible high-contrast focus treatment as other programmatically focused workbench regions. A cancelled or failed deletion keeps the row and does not move focus; source regression coverage protects the success-only relationship, while manual browser and screen-reader acceptance remains pending.

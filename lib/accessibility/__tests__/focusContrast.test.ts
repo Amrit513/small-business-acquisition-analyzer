@@ -29,7 +29,14 @@ describe("focus indicator contrast", () => {
   it("shows focus on keyboard-scrollable tables and the active tab panel", () => {
     const css = readFileSync("app/workbench.css", "utf8");
     expect(css).toMatch(/\.tablescroll:focus-visible[^{}]*\{[^}]*outline:/);
+    expect(css).toMatch(/\.sidecard:focus-visible[^{}]*\{[^}]*outline:/);
     expect(css).toMatch(/\[role=tabpanel\]:focus-visible[^{}]*\{[^}]*outline:/);
+  });
+
+  it("moves focus to the persistent library only after deletion succeeds",()=>{
+    const workbench=readFileSync("components/Workbench.tsx","utf8");
+    expect(workbench).toContain('ref={libraryRef} tabIndex={-1} aria-labelledby="deal-library-title"');
+    expect(workbench).toContain('finally{finish();if(deleted)libraryRef.current?.focus();}');
   });
 
   it("stacks long memo and summary values at the narrow reflow breakpoint",()=>{
