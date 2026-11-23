@@ -63,7 +63,7 @@ function render(next: ListingDraft) {
   }
   $("warnings").replaceChildren(...next.warnings.map(message => { const item = document.createElement("li"); item.textContent = message; return item; })); updateRatios();
 }
-async function capture() {
+async function capture():Promise<{ focusId: string }|void> {
   if (draft && !globalThis.confirm("Replace the current reviewed listing? Save or export it first if you need a backup.")) {
     status("Current reviewed listing kept.");
     return;
@@ -90,6 +90,7 @@ async function capture() {
     const replacingUnreadable = unreadableSavedDraft;
     render(extractListing(capture.result.text, capture.result.title, capture.result.url));
     status(replacingUnreadable ? "Review the extracted amounts, then save to replace the unreadable draft." : "Review the extracted amounts before using them.");
+    return { focusId: "title" };
   } catch (error) { reportError(error instanceof Error ? error.message : "Capture failed. The website may restrict extension access."); }
 }
 type ActionResult = { focusId: string };

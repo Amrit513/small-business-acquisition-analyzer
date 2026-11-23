@@ -70,6 +70,8 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(() => expect(first.elements.status!.textContent).toContain("save to replace"));
     expect(first.elements.recovery!.hidden).toBe(true);
     expect(first.elements.review!.hidden).toBe(false);
+    expect(first.elements.capture!.disabled).toBe(false);
+    expect(first.elements.title!.focusCount).toBe(1);
 
     const purchasePrice = first.created.find(element => element.id === "listing-purchasePrice")!;
     purchasePrice.value = "$400K-$500K";
@@ -285,6 +287,7 @@ describe("extension popup local workflow", () => {
     expect(popup.elements.capture!.disabled).toBe(false);
     expect(popup.elements.review!.hidden).toBe(false);
     expect(popup.elements.title!.value).toBe("Restricted-page review");
+    expect(popup.elements.title!.focusCount).toBe(0);
   });
 
   it("keeps the review and offers an export fallback when handoff cannot open",async()=>{

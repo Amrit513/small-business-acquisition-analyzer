@@ -395,3 +395,7 @@ Current results and the year-one sensitivity matrix now share one pure financial
 ## Extension popup reflow
 
 The extension popup no longer forces its four post-capture actions into one crowded row. Its body respects the available viewport, the header and action group wrap, financial metric columns can shrink without overflowing, and action buttons settle into two columns or one column as space narrows. A source-level regression protects these CSS boundaries. Installed Chrome/Edge testing and manual 200% text enlargement remain pending because this workspace still cannot start Chromium.
+
+## Extension capture focus
+
+After a successful page capture, the extension now moves keyboard focus from Capture this listing to the newly revealed Business name review field. Focus moves only after the serialized capture operation has finished and controls are enabled; a restricted-page failure keeps the existing review and does not move focus into changed content. Simulated browser-API coverage protects both paths. Installed Chrome/Edge keyboard and screen-reader acceptance remain pending.
