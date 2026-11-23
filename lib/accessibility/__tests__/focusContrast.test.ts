@@ -48,9 +48,10 @@ describe("focus indicator contrast", () => {
     }
   });
 
-  it("announces local PDF preparation as a busy status",()=>{
+  it("announces PDF preparation outside the busy action group",()=>{
     const memo=readFileSync("components/workbench/Memo.tsx","utf8");
-    expect(memo).toContain('aria-busy={loading}');
+    expect(memo).toContain('<section className="sheet">');
+    expect(memo).toContain('<div className="memoaction" aria-busy={loading}>');
     expect(memo).toMatch(/role="status" aria-live="polite"/);
     expect(memo).toContain("Preparing the PDF memo on this device…");
   });

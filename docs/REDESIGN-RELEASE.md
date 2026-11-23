@@ -359,3 +359,7 @@ Deal JSON imports now distinguish an oversized file from malformed UTF-8 and uns
 ## Scoped scenario-table headers
 
 The scenario projection and year-one sensitivity tables now identify every column header explicitly, and both tables identify their first-column values as row headers. This gives assistive technology a stable relationship between each financial value and its year or earnings assumption inside the existing keyboard-scrollable regions. Source regression coverage protects these semantics; manual screen-reader acceptance remains pending.
+
+## Unblocked PDF progress announcements
+
+PDF preparation now marks only the action group as busy. The polite live progress message remains outside that busy subtree, so assistive technology does not have to defer “Preparing…” until the local render is already complete. Source regression coverage protects this relationship; manual screen-reader and browser-download acceptance remain pending.
