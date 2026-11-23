@@ -403,3 +403,7 @@ After a successful page capture, the extension now moves keyboard focus from Cap
 ## Assertive saved-deal import failures
 
 Malformed, unreadable and oversized saved-deal files now produce a dedicated assertive error announcement instead of sharing the workbench's polite status region. The active deal remains unchanged, messages use the existing stable recovery wording, and a new import attempt clears the previous error before validation begins. Source-level accessibility coverage protects the alert relationship; manual browser and screen-reader acceptance remains pending.
+
+## PDF renderer regression gate
+
+The automated suite now executes the same React PDF memo component used by the browser, loads the distributed Liberation Sans font files and requires a nonempty PDF document with a valid file signature. This catches renderer, font-path and empty-output failures that compilation alone cannot detect. The fixture is the explicitly fictional Atlas sample; visual page-break inspection and a browser-downloaded PDF remain separate manual release gates.

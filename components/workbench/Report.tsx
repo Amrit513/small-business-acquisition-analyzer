@@ -1,3 +1,4 @@
+import React from "react";
 import {Document,Page,Text,View,StyleSheet,Font} from "@react-pdf/renderer";
 import {metrics,metricText,modelVersion,usd,type Metric, type Result} from "@/lib/calculations/workbench";
 import {fields,type Deal} from "@/lib/workspace/deal";
