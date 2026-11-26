@@ -423,3 +423,7 @@ Long evidence disclosure badges can now shrink, wrap and break safely within the
 ## Guided next-action focus
 
 Activating the sidebar's guided next action now moves keyboard focus to the selected workspace tab after the tab change, instead of leaving focus behind in the sidebar. Choosing an action for the already active tab still focuses that tab immediately. The behavior is scoped to guided navigation so listing-import and saved-library focus transitions retain their purpose; manual keyboard and screen-reader acceptance remain pending.
+
+## Shared deal-name boundary
+
+The editor, current snapshot validator, legacy review-copy migration and maximum-name PDF fixture now use one exported 180-character deal-name contract. Exact-boundary regression coverage accepts 180 characters and rejects 181 before persistence, while the contributor guide now distinguishes the current limit from older recovery input. This removes duplicated limits without changing stored names or substituting sample data.

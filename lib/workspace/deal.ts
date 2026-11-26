@@ -1,5 +1,6 @@
 import { listingCaptureDate, type ListingDraft } from "@/lib/import/listing";
 
+export const MAX_DEAL_NAME_LENGTH = 180;
 export const fields = {
   purchasePrice: ["Purchase price", "USD"], annualRevenue: ["Annual revenue", "USD/year"],
   sde: ["Seller’s discretionary earnings (SDE)", "USD/year"], ebitda: ["EBITDA", "USD/year"],

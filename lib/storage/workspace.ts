@@ -3,7 +3,7 @@ import { MAX_DEAL_IMPORT_BYTES, parseDealExport, type SavedDeal } from "./analys
 import { parseListingDraft } from "@/lib/import/listing";
 import { parseJsonDocument } from "@/lib/import/json";
 import { plausiblePastInstant } from "@/lib/import/time";
-import { blankDeal, fieldKeys, newId, statuses, validAmount, type Deal, type Field, type Evidence, type Settings } from "@/lib/workspace/deal";
+import { blankDeal, fieldKeys, MAX_DEAL_NAME_LENGTH, newId, statuses, validAmount, type Deal, type Field, type Evidence, type Settings } from "@/lib/workspace/deal";
 
 const obj=(x:unknown):x is Record<string,unknown>=>!!x&&typeof x==="object"&&!Array.isArray(x);
 const str=(x:unknown,len:number):x is string=>typeof x==="string"&&x.length<=len;
@@ -19,7 +19,7 @@ export function validSettings(s:unknown):s is Settings {
   return ([["coverageTarget",0.01,10],["low",0.01,50],["high",0.01,50],["revenueChange",-100,100],["expenseChange",-100,100],["years",1,10]] as const).every(([k,min,max])=>typeof s[k]==="number"&&Number.isFinite(s[k])&&s[k]>=min&&s[k]<=max)&&Number.isInteger(s.years);
 }
 export function validateDeal(x:unknown):Deal {
-  if(!obj(x)||!only(x,["version","id","name","updatedAt","isSample","currency","period","values","evidence","settings","earningsNote","assumptionsReviewed","listing","migrationNote"])||x.version!==3||x.currency!=="USD"||!str(x.id,256)||!x.id.trim()||!str(x.name,180)||!x.name.trim()||
+  if(!obj(x)||!only(x,["version","id","name","updatedAt","isSample","currency","period","values","evidence","settings","earningsNote","assumptionsReviewed","listing","migrationNote"])||x.version!==3||x.currency!=="USD"||!str(x.id,256)||!x.id.trim()||!str(x.name,MAX_DEAL_NAME_LENGTH)||!x.name.trim()||
     !str(x.updatedAt,40)||!plausiblePastInstant(x.updatedAt)||typeof x.isSample!=="boolean"||!str(x.period,100)||!str(x.earningsNote,1500)||
     typeof x.assumptionsReviewed!=="boolean"||!validSettings(x.settings)||!obj(x.values)||!obj(x.evidence))return invalid();
   const v=x.values,e=x.evidence,d=blankDeal(x.id,x.updatedAt);
@@ -38,7 +38,7 @@ export function validateDeal(x:unknown):Deal {
 }
 function migrate(old:SavedDeal):Deal {
   const d=blankDeal(old.id,old.updatedAt),b=old.business,f=old.financing;
-  d.name=old.name.trim().slice(0,180)||"Legacy deal";d.listing=old.listingSource;
+  d.name=old.name.trim().slice(0,MAX_DEAL_NAME_LENGTH)||"Legacy deal";d.listing=old.listingSource;
   Object.assign(d.values,{purchasePrice:b.purchasePrice,annualRevenue:b.annualRevenue,sde:b.sde,ebitda:b.ebitda,expenses:b.currentExpenses,
     sellerCompensation:b.ownerSalary,closingCosts:f.closingCosts??null,equity:f.closingCosts===undefined?null:f.downPayment+f.closingCosts,
     bankDebt:f.loanAmount,bankRate:f.interestRate*100,bankYears:f.loanTermYears,sellerDebt:f.sellerFinancing?.amount??0,
@@ -61,7 +61,7 @@ async function db(){return openDB("acquisition-lens",1,{upgrade(data){const stor
 export type Stored={id:string;name:string;deal:Deal|null;original:string|null;legacy:boolean};
 export function readStored(x:unknown):Stored|null {
   if(!obj(x)||!str(x.id,256))return null;
-  const legacy=x.version!==3,name=str(x.name,1000)?x.name.slice(0,180):"Unreadable snapshot";
+  const legacy=x.version!==3,name=str(x.name,1000)?x.name.slice(0,MAX_DEAL_NAME_LENGTH):"Unreadable snapshot";
   let raw:string;
   try{raw=JSON.stringify({schemaVersion:legacy?2:3,deal:x});}
   catch{return {id:x.id,name,deal:null,original:null,legacy};}

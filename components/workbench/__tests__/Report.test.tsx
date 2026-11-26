@@ -2,7 +2,7 @@ import React from "react";
 import { pdf } from "@react-pdf/renderer";
 import { describe, expect, it } from "vitest";
 import { calculate } from "@/lib/calculations/workbench";
-import { sampleDeal } from "@/lib/workspace/deal";
+import { MAX_DEAL_NAME_LENGTH, sampleDeal } from "@/lib/workspace/deal";
 import { Report, registerReportFont } from "../Report";
 
 describe("investment memo PDF", () => {
@@ -22,7 +22,7 @@ describe("investment memo PDF", () => {
 
   it("renders the longest supported deal name without discarding it", async () => {
     const deal = sampleDeal();
-    deal.name = "A".repeat(180);
+    deal.name = "A".repeat(MAX_DEAL_NAME_LENGTH);
     registerReportFont(`${process.cwd()}/public/fonts`);
 
     const blob = await pdf(
