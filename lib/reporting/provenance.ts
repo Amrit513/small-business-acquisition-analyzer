@@ -7,3 +7,7 @@ export function evidenceMetadata(entry: Pick<Evidence, "location" | "period" | "
     date: entry.date.trim() || "Date not recorded",
   };
 }
+
+export function evidenceStatusLabel(status: Evidence["status"]): string {
+  return `User-selected status: ${status} · source not authenticated`;
+}

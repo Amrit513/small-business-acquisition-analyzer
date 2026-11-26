@@ -411,3 +411,7 @@ The automated suite now executes the same React PDF memo component used by the b
 ## Long-name PDF heading integrity
 
 The PDF keeps the exact saved deal name while reducing only the heading typography when the name is unusually long. Both page headers are now indivisible layout groups, so the memo renderer cannot split a heading from its identifying context at a page boundary. The real PDF engine renders the maximum supported 180-character name in regression coverage; visual inspection of a browser-downloaded memo remains pending.
+
+## Explicit user-selected evidence labels
+
+Every individual evidence status in the workspace, metric inspector, on-screen memo and PDF now says that it is user-selected and that the source is not authenticated. The source-note form gives the same qualification beside the selector, while stored status values and calculations remain unchanged. Pure regression coverage protects all supported labels; manual screen-reader and browser-downloaded PDF acceptance remain pending.

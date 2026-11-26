@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildEvidenceReport } from "@/lib/reporting/evidence";
-import { evidenceMetadata } from "@/lib/reporting/provenance";
+import { evidenceMetadata, evidenceStatusLabel } from "@/lib/reporting/provenance";
+import { statuses } from "@/lib/workspace/deal";
 
 describe("buildEvidenceReport", () => {
   it("uses conservative defaults when evidence is absent", () => {
@@ -21,5 +22,9 @@ describe("buildEvidenceReport", () => {
     expect(evidenceMetadata({ location: "  Listing page  ", period: "", date: "" })).toEqual({
       location: "Listing page", period: "Period not recorded", date: "Date not recorded",
     });
+  });
+
+  it.each(statuses)("qualifies the %s label as user-selected and unauthenticated", status => {
+    expect(evidenceStatusLabel(status)).toBe(`User-selected status: ${status} · source not authenticated`);
   });
 });
