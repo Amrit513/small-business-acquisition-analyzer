@@ -415,3 +415,7 @@ The PDF keeps the exact saved deal name while reducing only the heading typograp
 ## Explicit user-selected evidence labels
 
 Every individual evidence status in the workspace, metric inspector, on-screen memo and PDF now says that it is user-selected and that the source is not authenticated. The source-note form gives the same qualification beside the selector, while stored status values and calculations remain unchanged. Pure regression coverage protects all supported labels; manual screen-reader and browser-downloaded PDF acceptance remain pending.
+
+## Evidence-label narrow reflow
+
+Long evidence disclosure badges can now shrink, wrap and break safely within the evidence row instead of widening the page at phone widths or enlarged text sizes. The rule is scoped to evidence labels so compact status pills elsewhere keep their existing treatment. Source regression coverage protects the reflow boundary; physical-phone and manual 200% text-enlargement acceptance remain pending.

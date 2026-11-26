@@ -62,6 +62,12 @@ describe("focus indicator contrast", () => {
     expect(css).toMatch(/\.summarymetrics b\{white-space:normal;overflow-wrap:anywhere\}/);
   });
 
+  it("keeps explicit evidence labels inside the available width",()=>{
+    const css=readFileSync("app/workbench.css","utf8");
+    expect(css).toMatch(/\.spread>\*\{min-width:0\}/);
+    expect(css).toMatch(/\.evidence-row \.tag\{[^}]*max-width:100%;[^}]*white-space:normal;[^}]*overflow-wrap:anywhere/);
+  });
+
   it("keeps text-style actions and auxiliary links large enough to tap",()=>{
     const css=readFileSync("app/workbench.css","utf8");
     expect(css).toMatch(/\.textaction,\.smalllink\{[^}]*display:inline-flex;[^}]*min-height:44px/);
