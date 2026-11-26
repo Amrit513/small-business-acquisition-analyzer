@@ -48,6 +48,14 @@ describe("focus indicator contrast", () => {
     expect(importer).toContain('setOpen(false); toggleRef.current?.focus();');
   });
 
+  it("moves guided next-action focus to the selected workspace tab",()=>{
+    const workbench=readFileSync("components/Workbench.tsx","utf8");
+    expect(workbench).toContain("pendingTabFocus=useRef<Tab|null>(null)");
+    expect(workbench).toContain("pendingTabFocus.current=next;setTab(next)");
+    expect(workbench).toContain("tabsRef.current[tabs.indexOf(tab)]?.focus()");
+    expect(workbench).toContain("onClick={()=>moveToTab(nextAction.tab)}");
+  });
+
   it("focuses the listing amount that blocks reviewed import",()=>{
     const importer=readFileSync("components/ListingImport.tsx","utf8");
     expect(importer).toContain('amountRefs.current[reviewed.field]?.focus();');

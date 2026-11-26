@@ -419,3 +419,7 @@ Every individual evidence status in the workspace, metric inspector, on-screen m
 ## Evidence-label narrow reflow
 
 Long evidence disclosure badges can now shrink, wrap and break safely within the evidence row instead of widening the page at phone widths or enlarged text sizes. The rule is scoped to evidence labels so compact status pills elsewhere keep their existing treatment. Source regression coverage protects the reflow boundary; physical-phone and manual 200% text-enlargement acceptance remain pending.
+
+## Guided next-action focus
+
+Activating the sidebar's guided next action now moves keyboard focus to the selected workspace tab after the tab change, instead of leaving focus behind in the sidebar. Choosing an action for the already active tab still focuses that tab immediately. The behavior is scoped to guided navigation so listing-import and saved-library focus transitions retain their purpose; manual keyboard and screen-reader acceptance remain pending.
