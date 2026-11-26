@@ -407,3 +407,7 @@ Malformed, unreadable and oversized saved-deal files now produce a dedicated ass
 ## PDF renderer regression gate
 
 The automated suite now executes the same React PDF memo component used by the browser, loads the distributed Liberation Sans font files and requires a nonempty PDF document with a valid file signature. This catches renderer, font-path and empty-output failures that compilation alone cannot detect. The fixture is the explicitly fictional Atlas sample; visual page-break inspection and a browser-downloaded PDF remain separate manual release gates.
+
+## Long-name PDF heading integrity
+
+The PDF keeps the exact saved deal name while reducing only the heading typography when the name is unusually long. Both page headers are now indivisible layout groups, so the memo renderer cannot split a heading from its identifying context at a page boundary. The real PDF engine renders the maximum supported 180-character name in regression coverage; visual inspection of a browser-downloaded memo remains pending.
