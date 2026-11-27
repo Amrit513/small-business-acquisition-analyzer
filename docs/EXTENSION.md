@@ -36,3 +36,16 @@ Some websites, browser pages, PDF viewers and protected documents cannot be capt
 From the repository root, run `npm ci`, `npm run build:extension`, `npm test` and `npm run typecheck`. Build output is in `dist/extension`; the ZIP is in `public/downloads`. `npm run build` creates the extension package before building Next.js. Packaging reopens the generated ZIP and verifies its exact file allowlist, safe paths, compressed contents, sizes and CRCs. It also fails if the manifest expands beyond the reviewed click-only permissions, adds background or externally connectable surfaces, or enables extension-page network requests. The extractor and screening functions are shared by the web and extension bundles.
 
 The extension uses Manifest V3 and temporary activeTab permissions, following [Chrome's permission guidance](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab). Installation of the web app uses the [Next.js manifest convention](https://nextjs.org/docs/app/guides/progressive-web-apps).
+
+## Manual acceptance fixture
+
+The repository includes a fictional, dependency-free page at `public/extension-acceptance.html`. After `npm run dev`, open `http://localhost:3000/extension-acceptance.html` in the same Chrome or Edge profile where the unpacked extension is loaded. This is a repeatable manual check, not an automated-browser substitute.
+
+1. Capture with no text selected. Confirm the review shows Fictional Northstar Services, asking price $425,000, annual revenue $520,000, SDE $170,000 and EBITDA $125,000. The $99,000 decoy card must not appear.
+2. Edit one amount, save the draft, close the popup and reopen it. Confirm the edited value and source details restore.
+3. Export listing JSON and confirm the browser downloads `acquisition-lens-listing.json`. Reimport that file through the website's Import listing flow and review the same values.
+4. Select only `Asking Price: $240,000` in the selected-text section, capture again and confirm the selection overrides the main region after approving replacement.
+5. Use Review in full analyzer. Confirm the destination opens with the reviewed listing, removes the fragment from the visible URL after reading it, and requires confirmation before replacing unsaved work.
+6. Clear the extension draft, close and reopen the popup, and confirm no saved review returns.
+
+Record browser name/version, operating system, extension commit, each observed result and any failure. Do not mark the extension gate complete from unit tests, packaging, or this checklist alone.

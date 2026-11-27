@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
 import { readListingPage } from "../pageCapture";
+import { extractListing } from "@/lib/import/listing";
 
 function page(options: { selection?: string; main?: string[]; articles?: string[]; editing?: boolean }) {
   vi.stubGlobal("location", { href: "https://example.com/listing" });
@@ -35,5 +37,15 @@ describe("extension page capture", () => {
   it("caps returned text before it crosses the extension boundary", () => {
     page({ main: ["x".repeat(100000)] });
     expect(readListingPage().text).toHaveLength(60001);
+  });
+  it("captures the checked-in fictional acceptance fixture and ignores its decoy card", () => {
+    const html=readFileSync("public/extension-acceptance.html","utf8");
+    const main=html.match(/<main>([\s\S]*?)<\/main>/)?.[1]
+      ?.replace(/<[^>]+>/g,"\n").split("\n").map(line=>line.trim()).filter(Boolean).join("\n");
+    expect(main).toBeTruthy();
+    page({main:[main!],articles:["Asking Price: $99,000"]});
+    const captured=readListingPage();
+    expect(extractListing(captured.text).values).toEqual({purchasePrice:425000,annualRevenue:520000,sde:170000,ebitda:125000});
+    expect(captured.text).not.toContain("$99,000");
   });
 });

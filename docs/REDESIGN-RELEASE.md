@@ -487,3 +487,7 @@ JSON backups and prepared PDFs now derive a bounded browser filename from the pr
 ## Assertive local-storage recovery
 
 IndexedDB load, save and delete failures now use assertive, atomic error semantics instead of the polite channel reserved for progress and successful completion. Each failed save or delete control references the recovery message, and a startup library failure associates the same guidance with the persistent library region. Storage contents and operation serialization are unchanged; source-level accessibility coverage protects the relationships, while manual browser and screen-reader acceptance remains pending.
+
+## Reproducible extension acceptance fixture
+
+A checked-in fictional listing page now gives installed Chrome or Edge testing a stable main region, a selected-text override and a decoy article card. The capture test reads that real fixture and confirms the expected four claims while excluding the decoy. The extension guide adds an observed-result checklist for capture, edit, save, restore, JSON export/import, selected-text priority, handoff and clear. Chromium was launched again in the available desktop environment on November 27, 2026, but exited before creating a window; no installed-browser acceptance is claimed from this run.
