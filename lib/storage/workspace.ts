@@ -61,7 +61,7 @@ export function parseSnapshot(raw:string):Deal {
 async function db(){return openDB("acquisition-lens",1,{upgrade(data){const store=data.createObjectStore("deals",{keyPath:"id"});store.createIndex("by-updated","updatedAt");}});}
 export type Stored={id:string;name:string;deal:Deal|null;original:string|null;legacy:boolean};
 export function readStored(x:unknown):Stored|null {
-  if(!obj(x)||!str(x.id,256))return null;
+  if(!obj(x)||!str(x.id,256)||!x.id.trim())return null;
   const legacy=x.version!==3,name=str(x.name,1000)?x.name.slice(0,MAX_DEAL_NAME_LENGTH):"Unreadable snapshot";
   let raw:string;
   try{raw=JSON.stringify({schemaVersion:legacy?2:3,deal:x});}

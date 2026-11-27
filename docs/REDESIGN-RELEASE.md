@@ -491,3 +491,7 @@ IndexedDB load, save and delete failures now use assertive, atomic error semanti
 ## Reproducible extension acceptance fixture
 
 A checked-in fictional listing page now gives installed Chrome or Edge testing a stable main region, a selected-text override and a decoy article card. The capture test reads that real fixture and confirms the expected four claims while excluding the decoy. The extension guide adds an observed-result checklist for capture, edit, save, restore, JSON export/import, selected-text priority, handoff and clear. Chromium was launched again in the available desktop environment on November 27, 2026, but exited before creating a window; no installed-browser acceptance is claimed from this run.
+
+## Addressable saved-record boundary
+
+The local saved-deal reader now excludes corrupted IndexedDB records whose ID is empty or only whitespace. Current imports already reject that state; applying the same rule while loading prevents an unaddressable record from reaching restore, export or delete controls while preserving recovery access for corrupted records that still have a usable ID. A pure regression case protects the boundary. Browser storage-failure and recovery acceptance remains pending.
