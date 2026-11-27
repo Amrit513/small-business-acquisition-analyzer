@@ -443,3 +443,7 @@ The extension build now validates its real manifest before packaging. It fails i
 ## Extension ZIP round-trip gate
 
 The custom dependency-free packager now reopens its generated ZIP before publishing it. The build verifies the exact ten-file allowlist, rejects traversal, absolute, duplicate and backslash paths, inflates every entry, validates local and central metadata, sizes and CRCs, and compares every byte with the staged extension. Regression cases cover valid round trips, unsafe names, duplicate entries, corrupted metadata and allowlist mismatch. This validates the downloadable artifact structure; installed Chrome/Edge interaction remains pending.
+
+## Single unknown-preserving listing handoff
+
+Removed an unused legacy listing-to-engine adapter that represented every missing claim as zero to satisfy an older all-numeric input shape. The live version-three handoff is now the only listing-to-deal conversion path: missing purchase, earnings, financing and operating values stay unknown, while an explicit reported zero remains zero. Regression coverage exercises both cases through the actual current importer. No saved data or current user flow is migrated by this cleanup.

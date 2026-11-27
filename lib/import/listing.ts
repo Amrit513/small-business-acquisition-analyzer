@@ -1,5 +1,3 @@
-import type { BusinessInputs, FinancingInputs } from "@/types/business";
-import type { EvidenceMap } from "@/lib/evidence/provenance";
 import { parseJsonDocument } from "./json";
 import { plausiblePastInstant } from "./time";
 
@@ -173,13 +171,4 @@ export function listingFromFragment(fragment: string): ListingDraft | undefined 
   if (!fragment.startsWith("#listing=")) return undefined;
   if (fragment.length > 36000) throw new Error("This listing link is too large.");
   return parseListingDraft(decodeURIComponent(fragment.slice(9)));
-}
-
-/** Starting from zero prevents sample-deal financials leaking into an imported company. */
-export function listingToInputs(draft: ListingDraft): { business: BusinessInputs; financing: FinancingInputs; evidence: EvidenceMap } {
-  const business: BusinessInputs = { purchasePrice: 0, annualRevenue: 0, sde: 0, ebitda: 0, growthRate: 0, industry: "other", numberOfEmployees: 0, currentExpenses: 0, ownerSalary: 0, ...draft.values };
-  const financing: FinancingInputs = { downPayment: 0, loanAmount: 0, interestRate: 0, loanTermYears: 10, closingCosts: 0 };
-  const evidence: EvidenceMap = { purchasePrice: "unverified", annualRevenue: "unverified", sde: "unverified", ebitda: "unverified", currentExpenses: "unverified", ownerSalary: "unverified" };
-  for (const field of listingFields) if (draft.values[field] !== undefined) evidence[field] = "listing";
-  return { business, financing, evidence };
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { extractListing, LISTING_REVIEW_WARNING, listingFragment, listingFromFragment, listingToInputs, parseListingAmount, parseListingDraft, reviewListingAmounts, safeListingUrl } from "../listing";
+import { extractListing, LISTING_REVIEW_WARNING, listingFragment, listingFromFragment, parseListingAmount, parseListingDraft, reviewListingAmounts, safeListingUrl } from "../listing";
+import { fromListing } from "@/lib/workspace/deal";
 
 describe("listing import boundary", () => {
   it("extracts labeled USD figures and keeps source snippets", () => {
@@ -72,13 +73,14 @@ describe("listing import boundary", () => {
       { ...base, warnings: [5] },
     ]) expect(() => parseListingDraft(JSON.stringify(change))).toThrow();
   });
-  it("never fills missing listing values with sample assumptions", () => {
+  it("keeps missing listing values unknown while preserving explicit zero", () => {
     const draft = parseListingDraft(JSON.stringify(extractListing("Asking Price: $200K")));
-    const result = listingToInputs(draft);
-    expect(result.business.ownerSalary).toBe(0);
-    expect(result.business.sde).toBe(0);
-    expect(result.financing.loanAmount).toBe(0);
-    expect(result.evidence.purchasePrice).toBe("listing");
+    const deal = fromListing(draft, "listing-test", "2026-11-26T00:00:00.000Z");
+    expect(deal.values.purchasePrice).toBe(200000);
+    expect(deal.values.sde).toBeNull();
+    expect(deal.values.bankDebt).toBeNull();
+    const explicitZero = fromListing(parseListingDraft(JSON.stringify(extractListing("Asking Price: $0"))), "zero-test", "2026-11-26T00:00:00.000Z");
+    expect(explicitZero.values.purchasePrice).toBe(0);
   });
   it("rejects executable and credential-bearing source links", () => {
     expect(safeListingUrl("javascript:alert(1)")).toBe("");
