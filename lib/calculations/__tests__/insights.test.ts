@@ -27,4 +27,11 @@ describe("generateDealInsights", () => {
     const analysis = runAnalysis("All cash", business, { ...financing, downPayment: 400000, loanAmount: 0, loanTermYears: 0 });
     expect(generateDealInsights(analysis)).toContainEqual(expect.objectContaining({ id: "dscr-not-applicable", severity: "review" }));
   });
+
+  it("distinguishes zero buyer cash from a nonpositive-cash payback", () => {
+    const zeroCash = runAnalysis("Unfunded", business, { ...financing, downPayment: 0, closingCosts: 0 });
+    const noPayback = runAnalysis("No payback", { ...business, sde: 0 }, financing);
+    expect(generateDealInsights(zeroCash)).toContainEqual(expect.objectContaining({ id: "return-not-applicable", severity: "review" }));
+    expect(generateDealInsights(noPayback)).toContainEqual(expect.objectContaining({ id: "no-positive-payback", severity: "critical" }));
+  });
 });

@@ -92,7 +92,7 @@ Implementation: `lib/calculations/returns.ts` → `calculateCashFlow()`
 Total Cash Invested = Down Payment + Closing Costs
 Cash-on-Cash ROI = Annual Cash Flow After Debt / Total Cash Invested
 ```
-This is the metric buyers use to compare an acquisition against alternatives (index funds, other deals, real estate).
+The ratio is available only when total buyer cash invested is positive. Zero buyer cash returns `null`; it does not imply a 0% return or a fully financed transaction.
 
 Implementation: `lib/calculations/returns.ts` → `calculateReturns()`
 
@@ -101,7 +101,7 @@ Implementation: `lib/calculations/returns.ts` → `calculateReturns()`
 ```
 Payback Period (years) = Total Cash Invested / Annual Cash Flow After Debt
 ```
-Returns `Infinity` if cash flow after debt is zero or negative — the investment never pays back under current assumptions.
+The period is available only when buyer cash invested and annual cash flow are both positive. Zero buyer cash or nonpositive cash flow returns `null`, with the reason determined from the inputs; neither state is represented as zero or infinity.
 
 ## 9. Break-Even Timeline
 

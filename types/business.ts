@@ -113,8 +113,8 @@ export interface CashFlowResult {
 
 export interface ReturnsResult {
   totalCashInvested: number;
-  cashOnCashROI: number;
-  paybackPeriodYears: number;
+  cashOnCashROI: number | null;
+  paybackPeriodYears: number | null;
 }
 
 export interface DSCRResult {

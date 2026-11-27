@@ -40,10 +40,8 @@ export function calculateTotalCashInvested(financing: FinancingInputs): number {
 }
 
 /**
- * Cash-on-cash ROI: annual cash flow after debt, divided by the cash the
- * buyer actually put into the deal. This is the return metric buyers use
- * to compare a business acquisition against alternatives (index funds,
- * other deals, real estate).
+ * Cash-on-cash ROI: annual cash flow after debt, divided by positive buyer
+ * cash invested. Without positive buyer cash, the ratio is unavailable.
  *
  * Payback period is the inverse: how many years of cash flow it takes to
  * recoup the initial cash investment.
@@ -57,12 +55,12 @@ export function calculateReturns(
   const cashOnCashROI =
     totalCashInvested > 0
       ? roundToHundredths(cashFlow.annualCashFlowAfterDebt / totalCashInvested)
-      : 0;
+      : null;
 
   const paybackPeriodYears =
-    cashFlow.annualCashFlowAfterDebt > 0
+    totalCashInvested > 0 && cashFlow.annualCashFlowAfterDebt > 0
       ? roundToHundredths(totalCashInvested / cashFlow.annualCashFlowAfterDebt)
-      : Infinity;
+      : null;
 
   return {
     totalCashInvested,

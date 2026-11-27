@@ -519,3 +519,7 @@ The retained legacy input-integrity preflight now flags a sources-versus-price d
 ## Debt-free legacy coverage
 
 The retained financial engine now reports debt coverage, its rating and its illustrative 1.25× comparison as not applicable when scheduled debt is zero. It no longer serializes infinity, assigns an automatic strong rating, sets a lender-minimum flag or awards favorable coverage points to a debt-free case. Sensitivity output, deterministic diligence insights and the disabled AI research packet preserve the same null state. Regression coverage protects the calculation, serialization, sensitivity, scoring and insight boundaries; the active workbench already used the honest “No scheduled debt” label. This is model consistency work, not lender underwriting or approval.
+
+## Undefined legacy returns
+
+The retained financial engine now keeps cash-on-cash return unavailable when buyer cash invested is zero and keeps simple payback unavailable when buyer cash is zero or modeled annual cash is nonpositive. It no longer substitutes a fake 0% return or serializes an infinite payback. The legacy score awards no return points for unavailable ratios, diligence insights distinguish an unfunded draft from a nonpositive-cash case, and the disabled research packet preserves null values. Regression coverage protects calculation, serialization, scoring, insight and packet behavior. The active workbench already enforced the same economic distinction; this closes the secondary path without claiming investment performance.

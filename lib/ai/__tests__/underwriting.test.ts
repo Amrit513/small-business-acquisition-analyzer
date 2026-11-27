@@ -35,4 +35,9 @@ describe("AI underwriting controls", () => {
     expect(packet.engine_outputs.dscr).toBeNull();
     expect(packet.downside_checks.earningsDown20RateUp200bps?.passes125x).toBeNull();
   });
+
+  it("preserves unavailable zero-cash returns as null in the packet", () => {
+    const unfunded = runAnalysis("Unfunded", analysis.inputs, { ...analysis.financing, downPayment: 0, closingCosts: 0 });
+    expect(buildUnderwritingPacket(unfunded).engine_outputs).toMatchObject({ cashOnCashROI: null, paybackPeriodYears: null });
+  });
 });

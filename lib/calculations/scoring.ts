@@ -31,7 +31,8 @@ export function scoreDSCR(dscrResult: DSCRResult): number {
   return 0;
 }
 
-export function scoreROI(cashOnCashROI: number): number {
+export function scoreROI(cashOnCashROI: number | null): number {
+  if (cashOnCashROI === null) return 0;
   // Benchmarked loosely against public-market long-run averages (~8-10%)
   // and typical small-business buyer return expectations (20%+).
   if (cashOnCashROI >= 0.35) return 100;
@@ -42,8 +43,8 @@ export function scoreROI(cashOnCashROI: number): number {
   return 0;
 }
 
-export function scorePaybackPeriod(paybackPeriodYears: number): number {
-  if (!isFinite(paybackPeriodYears)) return 0;
+export function scorePaybackPeriod(paybackPeriodYears: number | null): number {
+  if (paybackPeriodYears === null || !isFinite(paybackPeriodYears)) return 0;
   if (paybackPeriodYears <= 3) return 100;
   if (paybackPeriodYears <= 4) return 85;
   if (paybackPeriodYears <= 5) return 65;
