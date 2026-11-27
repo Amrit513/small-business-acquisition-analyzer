@@ -503,3 +503,7 @@ A corrupted local snapshot with a usable ID but an empty or whitespace-only name
 ## Consistent funding-balance language
 
 Deal inputs, the on-screen memo, comparison and exported PDF now use one pure formatter for sources versus uses. They report Balanced, a positive-dollar shortfall, positive-dollar excess sources, or Unknown instead of mixing “gap,” “difference,” “excess funds” and an unexplained negative sign. Tests cover all four states and the comparison fixture; the model documentation defines the sign convention. Browser and downloaded-PDF acceptance remain pending.
+
+## Duplicate-property JSON rejection
+
+The shared saved-deal and listing JSON boundary now rejects duplicate object properties before the browser parser can silently keep only the final value. Keys are compared after escape decoding, so a literal financial field and an equivalent Unicode-escaped spelling still conflict; matching keys in separate objects remain valid. The dependency-free preflight also rejects more than 100 nested containers with a controlled error. Adversarial regression coverage protects these cases. Real file-picker import acceptance remains pending.
