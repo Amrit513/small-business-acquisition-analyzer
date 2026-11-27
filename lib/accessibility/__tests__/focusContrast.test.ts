@@ -115,6 +115,17 @@ describe("focus indicator contrast", () => {
     expect(workbench).toContain('role="alert" aria-live="assertive" aria-atomic="true"');
   });
 
+  it("announces JSON export failures assertively at the failed control",()=>{
+    const workbench=readFileSync("components/Workbench.tsx","utf8");
+    expect(workbench).toContain('[exportError,setExportError]=useState("")');
+    expect(workbench).toContain('[exportTarget,setExportTarget]=useState<string|null>(null)');
+    expect(workbench).toContain('aria-describedby={exportTarget==="current"?"deal-export-error":undefined}');
+    expect(workbench).toContain('aria-describedby={exportTarget===x.id?"deal-export-error":undefined}');
+    expect(workbench).toContain('id="deal-export-error"');
+    expect(workbench).toContain('setExportTarget("current");setExportError(');
+    expect(workbench).toContain('setExportTarget(item.id);setExportError(');
+  });
+
   it("announces source-note failures assertively and associates the affected fields",()=>{
     const evidence=readFileSync("components/workbench/Evidence.tsx","utf8");
     expect(evidence).toContain('role={feedback.error ? "alert" : "status"}');
