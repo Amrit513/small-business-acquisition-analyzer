@@ -21,4 +21,12 @@ describe("deal input integrity", () => {
     expect(issues.map((issue) => issue.id)).toEqual(["sde-above-revenue", "ebitda-above-revenue", "ebitda-above-sde", "funding-mismatch"]);
     expect(summarizeInputIntegrity(issues).warnings).toBe(4);
   });
+
+  it("flags a one-cent funding difference in either direction", () => {
+    const short = validateDealInputs(business, { ...financing, loanAmount: 339999.99 });
+    const excess = validateDealInputs(business, { ...financing, loanAmount: 340000.01 });
+
+    expect(short.find((issue) => issue.id === "funding-mismatch")?.title).toBe("Capital stack has a funding gap");
+    expect(excess.find((issue) => issue.id === "funding-mismatch")?.title).toBe("Capital stack exceeds the purchase price");
+  });
 });

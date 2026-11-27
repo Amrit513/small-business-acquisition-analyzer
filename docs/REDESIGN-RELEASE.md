@@ -511,3 +511,7 @@ The shared saved-deal and listing JSON boundary now rejects duplicate object pro
 ## Discoverable table scrolling
 
 Scenario projections, sensitivity results and saved-deal comparison now place a visible scroll instruction immediately before each independently scrollable table. Every focusable region references its instruction, including the arrow-key behavior, so the cue is available to narrow-screen, zoomed, keyboard and screen-reader users. The hint wraps at long text sizes and source regression coverage protects all three relationships. Manual phone, 200% zoom and assistive-technology acceptance remains pending.
+
+## One-cent funding preflight
+
+The retained legacy input-integrity preflight now flags a sources-versus-price difference of one cent in either direction, matching the active model's documented completeness boundary. Previously that secondary path tolerated differences below one dollar, so the same capital stack could receive conflicting structural results depending on the calculation entry point. Independent regression cases cover both a one-cent shortfall and one-cent excess; the historical formula documentation records the cent rounding and threshold. This consistency check does not establish that the proposed financing is available or lender-approved.

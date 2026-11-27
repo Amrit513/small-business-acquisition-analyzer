@@ -29,7 +29,7 @@ export function validateDealInputs(
   if (financing.loanAmount > 0 && (!Number.isFinite(financing.loanTermYears) || financing.loanTermYears <= 0)) issues.push({ id: "loan-term-invalid", severity: "blocking", field: "loanTermYears", title: "Loan term is required", explanation: "A financed purchase needs a positive repayment term." });
   if (!Number.isFinite(financing.interestRate) || financing.interestRate < 0) issues.push({ id: "interest-rate-invalid", severity: "blocking", field: "interestRate", title: "Interest rate is invalid", explanation: "Enter a non-negative annual interest rate." });
   const gap = calculateFundingGap(business.purchasePrice, financing);
-  if (Math.abs(gap) >= 1) issues.push({ id: "funding-mismatch", severity: "warning", field: "financing", title: gap > 0 ? "Capital stack has a funding gap" : "Capital stack exceeds the purchase price", explanation: gap > 0 ? "Down payment, bank debt, and seller financing do not fully fund the stated purchase price." : "Review the proposed sources of funds so they do not exceed the stated purchase price." });
+  if (Math.abs(gap) >= 0.01) issues.push({ id: "funding-mismatch", severity: "warning", field: "financing", title: gap > 0 ? "Capital stack has a funding gap" : "Capital stack exceeds the purchase price", explanation: gap > 0 ? "Down payment, bank debt, and seller financing do not fully fund the stated purchase price." : "Review the proposed sources of funds so they do not exceed the stated purchase price." });
   return issues;
 }
 
