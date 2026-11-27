@@ -40,4 +40,9 @@ describe("AI underwriting regression grading", () => {
     expect(result.score).toBe(0);
     expect(result.checks.filter((check) => !check.passed).map((check) => check.id)).toEqual(["verdict", "confidence", "missing-data", "risk-evidence", "evidence-caveat"]);
   });
+
+  it("does not treat missing debt coverage as a passing ratio", () => {
+    const allCash = runAnalysis("All cash", business, { ...financing, downPayment: 425000, loanAmount: 0, loanTermYears: 0 });
+    expect(buildUnderwritingRubric(allCash).allowedVerdicts).toEqual(["pause", "decline"]);
+  });
 });

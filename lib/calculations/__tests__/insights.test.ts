@@ -22,4 +22,9 @@ describe("generateDealInsights", () => {
     const analysis = runAnalysis("High growth", { ...business, growthRate: .3 }, financing);
     expect(generateDealInsights(analysis).some((item) => item.id === "growth-proof")).toBe(true);
   });
+
+  it("labels debt-free coverage as inapplicable without implying lender approval", () => {
+    const analysis = runAnalysis("All cash", business, { ...financing, downPayment: 400000, loanAmount: 0, loanTermYears: 0 });
+    expect(generateDealInsights(analysis)).toContainEqual(expect.objectContaining({ id: "dscr-not-applicable", severity: "review" }));
+  });
 });

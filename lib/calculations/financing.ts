@@ -169,21 +169,14 @@ function mergeSchedules(
 }
 
 /**
- * Debt Service Coverage Ratio (DSCR) — the single most important metric
- * a lender (especially SBA lenders) looks at when underwriting a business
- * acquisition loan.
- *
- *   DSCR = Annual Net Operating Income (SDE) / Annual Total Debt Service
- *
- * Interpretation (aligned with common SBA underwriting norms):
- *   >= 1.25 : strong / bankable
- *   1.0 - 1.25 : acceptable but thin — many lenders require 1.15-1.25 minimum
- *   0.8 - 1.0 : weak — the business barely or doesn't cover its own debt
- *   < 0.8 : critical — the business cannot service this debt load as structured
+ * Legacy screening coverage = reported SDE / scheduled annual debt service.
+ * The labels and 1.25x comparison are educational model conventions, not a
+ * lender rule or approval signal. With no scheduled debt the ratio does not
+ * exist, so every coverage classification remains explicitly inapplicable.
  */
 export function calculateDSCR(inputs: BusinessInputs, loan: LoanSummary): DSCRResult {
   if (loan.annualDebtService === 0) {
-    return { dscr: Infinity, rating: "strong", meetsTypicalLenderMinimum: true };
+    return { dscr: null, rating: "not-applicable", meetsIllustrativeThreshold: null };
   }
 
   const dscr = roundToHundredths(inputs.sde / loan.annualDebtService);
@@ -197,6 +190,6 @@ export function calculateDSCR(inputs: BusinessInputs, loan: LoanSummary): DSCRRe
   return {
     dscr,
     rating,
-    meetsTypicalLenderMinimum: dscr >= 1.25,
+    meetsIllustrativeThreshold: dscr >= 1.25,
   };
 }

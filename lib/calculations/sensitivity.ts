@@ -5,9 +5,9 @@ import { calculateDSCR, summarizeLoan } from "@/lib/calculations/financing";
 export interface SensitivityCell {
   earningsChange: number;
   interestRateChange: number;
-  dscr: number;
+  dscr: number | null;
   annualCashFlowAfterDebt: number;
-  passesLenderThreshold: boolean;
+  meetsIllustrativeThreshold: boolean | null;
 }
 
 /**
@@ -39,7 +39,7 @@ export function buildSensitivityMatrix(
         interestRateChange,
         dscr: dscr.dscr,
         annualCashFlowAfterDebt: cashFlow.annualCashFlowAfterDebt,
-        passesLenderThreshold: dscr.meetsTypicalLenderMinimum,
+        meetsIllustrativeThreshold: dscr.meetsIllustrativeThreshold,
       };
     })
   );

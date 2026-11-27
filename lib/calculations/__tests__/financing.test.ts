@@ -102,7 +102,7 @@ describe("calculateDSCR", () => {
     ownerSalary: 70000,
   };
 
-  it("rates a DSCR >= 1.25 as strong and bankable", () => {
+  it("rates a DSCR >= 1.25 above the illustrative screening threshold", () => {
     const loan = summarizeLoan({
       downPayment: 100000,
       loanAmount: 300000,
@@ -112,7 +112,7 @@ describe("calculateDSCR", () => {
     const result = calculateDSCR(inputs, loan);
     expect(result.dscr).toBeGreaterThanOrEqual(1.25);
     expect(result.rating).toBe("strong");
-    expect(result.meetsTypicalLenderMinimum).toBe(true);
+    expect(result.meetsIllustrativeThreshold).toBe(true);
   });
 
   it("rates a critically low DSCR when debt service overwhelms SDE", () => {
@@ -125,10 +125,10 @@ describe("calculateDSCR", () => {
     const result = calculateDSCR(inputs, loan);
     expect(result.dscr).toBeLessThan(0.8);
     expect(result.rating).toBe("critical");
-    expect(result.meetsTypicalLenderMinimum).toBe(false);
+    expect(result.meetsIllustrativeThreshold).toBe(false);
   });
 
-  it("treats zero debt service as an automatic strong rating", () => {
+  it("reports coverage as inapplicable when there is no scheduled debt", () => {
     const loan = summarizeLoan({
       downPayment: 450000,
       loanAmount: 0,
@@ -136,6 +136,7 @@ describe("calculateDSCR", () => {
       loanTermYears: 0,
     });
     const result = calculateDSCR(inputs, loan);
-    expect(result.meetsTypicalLenderMinimum).toBe(true);
+    expect(result).toEqual({ dscr: null, rating: "not-applicable", meetsIllustrativeThreshold: null });
+    expect(JSON.stringify(result)).not.toContain("Infinity");
   });
 });

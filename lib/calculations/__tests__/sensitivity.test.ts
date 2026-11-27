@@ -34,7 +34,9 @@ describe("buildSensitivityMatrix", () => {
     const base = matrix[2]?.[0];
     expect(downside).toBeDefined();
     expect(base).toBeDefined();
-    expect(downside!.dscr).toBeLessThan(base!.dscr);
+    expect(downside!.dscr).not.toBeNull();
+    expect(base!.dscr).not.toBeNull();
+    expect(downside!.dscr!).toBeLessThan(base!.dscr!);
     expect(downside!.annualCashFlowAfterDebt).toBeLessThan(base!.annualCashFlowAfterDebt);
   });
 
@@ -42,5 +44,10 @@ describe("buildSensitivityMatrix", () => {
     buildSensitivityMatrix(business, financing, [-0.2], [0.02]);
     expect(business.sde).toBe(170000);
     expect(financing.interestRate).toBe(0.095);
+  });
+
+  it("keeps debt-free coverage and its threshold comparison inapplicable", () => {
+    const cell = buildSensitivityMatrix(business, { ...financing, downPayment: 425000, loanAmount: 0, loanTermYears: 0 }, [0], [0])[0]?.[0];
+    expect(cell).toMatchObject({ dscr: null, meetsIllustrativeThreshold: null });
   });
 });

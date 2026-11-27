@@ -58,19 +58,21 @@ The legacy calculation rounds the difference to cents. Its structural preflight 
 
 Implementation: `lib/calculations/financing.ts` → `calculateFundingGap()`
 
-## 5. Debt Service Coverage Ratio (DSCR)
+## 5. Legacy screening debt coverage
 
-The single most important number to a lender:
+This retained engine divides reported SDE by annual scheduled debt service. The result is an educational screening ratio, not a lender standard or approval decision:
 ```
 DSCR = Annual SDE / Annual Total Debt Service
 ```
 
 | DSCR | Rating | Meaning |
 |---|---|---|
-| ≥ 1.25 | Strong | Meets typical SBA lender minimums |
-| 1.00 – 1.25 | Acceptable | Thin coverage; some lenders may still decline |
+| ≥ 1.25 | Strong | Clears the model's illustrative comparison threshold |
+| 1.00 – 1.25 | Acceptable | Covers modeled debt with a limited cushion |
 | 0.80 – 1.00 | Weak | Business barely/doesn't cover its own debt |
 | < 0.80 | Critical | Cannot service this debt as structured |
+
+With no scheduled debt, the ratio, rating and threshold comparison are not applicable. The calculation returns `null` rather than infinity, and the legacy score receives no favorable coverage points from that missing ratio.
 
 Implementation: `lib/calculations/financing.ts` → `calculateDSCR()`
 

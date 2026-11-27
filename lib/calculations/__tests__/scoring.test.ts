@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateAcquisitionScore } from "@/lib/calculations/scoring";
+import { calculateAcquisitionScore, scoreDSCR } from "@/lib/calculations/scoring";
 import { estimateValuation } from "@/lib/calculations/valuation";
 import { summarizeLoan, calculateDSCR } from "@/lib/calculations/financing";
 import { calculateCashFlow, calculateReturns } from "@/lib/calculations/returns";
@@ -87,5 +87,9 @@ describe("calculateAcquisitionScore", () => {
         score.valuationScore * 0.1
     );
     expect(score.totalScore).toBe(expectedTotal);
+  });
+
+  it("does not award a favorable coverage score when debt coverage is inapplicable", () => {
+    expect(scoreDSCR({ dscr: null, rating: "not-applicable", meetsIllustrativeThreshold: null })).toBe(0);
   });
 });

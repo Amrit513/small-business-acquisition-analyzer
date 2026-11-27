@@ -26,9 +26,9 @@ export interface EvaluationResult {
 export function buildUnderwritingRubric(analysis: AnalysisResult): UnderwritingRubric {
   const matrix = buildSensitivityMatrix(analysis.inputs, analysis.financing);
   const downside = matrix[0]?.[2];
-  const baseCoverageFails = analysis.dscr.dscr < 1;
-  const downsideFails = !downside || downside.dscr < 1 || downside.annualCashFlowAfterDebt < 0;
-  const downsideIsThin = !downsideFails && downside.dscr < 1.25;
+  const baseCoverageFails = analysis.dscr.dscr === null || analysis.dscr.dscr < 1;
+  const downsideFails = !downside || downside.dscr === null || downside.dscr < 1 || downside.annualCashFlowAfterDebt < 0;
+  const downsideIsThin = !downsideFails && downside.dscr !== null && downside.dscr < 1.25;
 
   if (baseCoverageFails || downsideFails) {
     return {

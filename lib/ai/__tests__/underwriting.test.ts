@@ -28,4 +28,11 @@ describe("AI underwriting controls", () => {
     expect(parseAIReview(JSON.stringify(valid)).confidence).toBe("medium");
     expect(() => parseAIReview('{"verdict":"advance"}')).toThrow();
   });
+
+  it("preserves an inapplicable debt-free ratio as null in the packet", () => {
+    const allCash = runAnalysis("All cash", analysis.inputs, { ...analysis.financing, downPayment: 425000, loanAmount: 0, loanTermYears: 0 });
+    const packet = buildUnderwritingPacket(allCash);
+    expect(packet.engine_outputs.dscr).toBeNull();
+    expect(packet.downside_checks.earningsDown20RateUp200bps?.passes125x).toBeNull();
+  });
 });

@@ -118,9 +118,9 @@ export interface ReturnsResult {
 }
 
 export interface DSCRResult {
-  dscr: number;
-  rating: "strong" | "acceptable" | "weak" | "critical";
-  meetsTypicalLenderMinimum: boolean;
+  dscr: number | null;
+  rating: "strong" | "acceptable" | "weak" | "critical" | "not-applicable";
+  meetsIllustrativeThreshold: boolean | null;
 }
 
 export interface BreakEvenPoint {

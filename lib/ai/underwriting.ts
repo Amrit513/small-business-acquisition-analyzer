@@ -65,7 +65,7 @@ export function buildUnderwritingPacket(analysis: AnalysisResult, evidence: Evid
     },
     downside_checks: {
       base: base ? { dscr: base.dscr, annualCashFlowAfterDebt: base.annualCashFlowAfterDebt } : null,
-      earningsDown20RateUp200bps: severeDownside ? { dscr: severeDownside.dscr, annualCashFlowAfterDebt: severeDownside.annualCashFlowAfterDebt, passes125x: severeDownside.passesLenderThreshold } : null,
+      earningsDown20RateUp200bps: severeDownside ? { dscr: severeDownside.dscr, annualCashFlowAfterDebt: severeDownside.annualCashFlowAfterDebt, passes125x: severeDownside.meetsIllustrativeThreshold } : null,
     },
     input_integrity: validateDealInputs(analysis.inputs, analysis.financing),
     field_sources: normalizeEvidence(evidence),

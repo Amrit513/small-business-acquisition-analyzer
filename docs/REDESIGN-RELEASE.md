@@ -515,3 +515,7 @@ Scenario projections, sensitivity results and saved-deal comparison now place a 
 ## One-cent funding preflight
 
 The retained legacy input-integrity preflight now flags a sources-versus-price difference of one cent in either direction, matching the active model's documented completeness boundary. Previously that secondary path tolerated differences below one dollar, so the same capital stack could receive conflicting structural results depending on the calculation entry point. Independent regression cases cover both a one-cent shortfall and one-cent excess; the historical formula documentation records the cent rounding and threshold. This consistency check does not establish that the proposed financing is available or lender-approved.
+
+## Debt-free legacy coverage
+
+The retained financial engine now reports debt coverage, its rating and its illustrative 1.25× comparison as not applicable when scheduled debt is zero. It no longer serializes infinity, assigns an automatic strong rating, sets a lender-minimum flag or awards favorable coverage points to a debt-free case. Sensitivity output, deterministic diligence insights and the disabled AI research packet preserve the same null state. Regression coverage protects the calculation, serialization, sensitivity, scoring and insight boundaries; the active workbench already used the honest “No scheduled debt” label. This is model consistency work, not lender underwriting or approval.

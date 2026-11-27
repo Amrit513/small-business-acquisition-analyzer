@@ -11,7 +11,7 @@ import type {
  * this deal, all things considered?"
  *
  * Weights (documented here AND in docs/FORMULAS.md — keep both in sync):
- *   DSCR                          30%  — can this deal even get financed / survive its own debt
+ *   DSCR                          30%  — modeled cushion above scheduled debt
  *   Cash-on-cash ROI              25%  — is the return competitive with alternatives
  *   Payback period                20%  — faster payback = lower risk
  *   Revenue/margin quality        15%  — growth rate + profit margin of the underlying business
@@ -23,6 +23,7 @@ import type {
 
 export function scoreDSCR(dscrResult: DSCRResult): number {
   const { dscr } = dscrResult;
+  if (dscr === null) return 0;
   if (dscr >= 1.5) return 100;
   if (dscr >= 1.25) return 85;
   if (dscr >= 1.0) return 60;
