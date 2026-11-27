@@ -151,6 +151,7 @@ export function parseListingDraft(raw: string): ListingDraft {
     }
     const quote = rawQuotes[field];
     if (quote !== undefined && (typeof quote !== "string" || quote.length > 180)) throw new Error(`Invalid ${listingLabels[field].toLowerCase()} excerpt in listing.`);
+    if (quote !== undefined && amount === undefined) throw new Error(`${listingLabels[field]} excerpt requires a matching amount.`);
     if (amount !== undefined && typeof quote === "string") quotes[field] = quote.slice(0, 180);
   }
   return {

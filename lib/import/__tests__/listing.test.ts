@@ -73,6 +73,11 @@ describe("listing import boundary", () => {
       { ...base, warnings: [5] },
     ]) expect(() => parseListingDraft(JSON.stringify(change))).toThrow();
   });
+  it("rejects an orphan source excerpt instead of silently discarding provenance", () => {
+    const base = extractListing("Asking Price: $200K");
+    delete base.values.purchasePrice;
+    expect(() => parseListingDraft(JSON.stringify(base))).toThrow("Asking price excerpt requires a matching amount.");
+  });
   it("keeps missing listing values unknown while preserving explicit zero", () => {
     const draft = parseListingDraft(JSON.stringify(extractListing("Asking Price: $200K")));
     const deal = fromListing(draft, "listing-test", "2026-11-26T00:00:00.000Z");

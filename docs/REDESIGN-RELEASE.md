@@ -459,3 +459,7 @@ An unreadable saved extension draft now produces an assertive alert instead of l
 ## Ordered valuation-range imports
 
 The version-three snapshot validator now enforces the same ordered valuation-multiple range as the pure calculation engine. An imported low multiple above its high multiple is rejected before persistence instead of entering the workspace as a permanently incomplete setting; equal bounds remain valid for a deliberate single-multiple illustration. Regression coverage protects both sides of the boundary, and the model continues to label every range as a user-entered educational assumption rather than an appraisal.
+
+## Matched listing provenance imports
+
+Listing JSON imports now reject a source excerpt when its matching normalized financial value is absent. The importer no longer silently discards that orphan excerpt or leaves the user unable to tell whether provenance survived the handoff. Missing financial values still remain unknown, and a supported value without an excerpt remains allowed as an unlinked claim. Regression coverage protects the inconsistent boundary; listing evidence remains user-reviewed and unauthenticated.
