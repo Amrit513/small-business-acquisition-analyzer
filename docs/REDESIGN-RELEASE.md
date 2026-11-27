@@ -435,3 +435,7 @@ The pure workbench calculation now applies the same 180-character deal-name limi
 ## Reporting-period readiness boundary
 
 The editor, current snapshot and evidence validators, and pure workbench now share one exported 100-character reporting-period limit. A direct in-memory caller cannot obtain a memo-ready result or screening index for a period the app cannot save. Regression coverage protects the issue and score suppression, while the model documentation records the completeness boundary. This is local integrity validation; manual browser and assistive-technology acceptance remains pending.
+
+## Extension manifest privacy gate
+
+The extension build now validates its real manifest before packaging. It fails if permissions expand beyond activeTab, scripting and storage; if broad or optional host access, background execution, content scripts, external connections or web-accessible resources appear; or if the popup content policy permits network requests. Adversarial regression cases protect these boundaries. A native Chromium window launched in this environment, but its isolated browser session could not reach the host dev server and an unpacked install was not completed, so real Chrome/Edge capture acceptance remains pending.

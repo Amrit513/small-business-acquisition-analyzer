@@ -1,6 +1,7 @@
 import { build } from "esbuild";
 import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
 import { deflateSync, deflateRawSync } from "node:zlib";
+import { readValidatedExtensionManifest } from "./validate-extension-manifest.mjs";
 
 // Small deterministic PNG and ZIP writers keep packaging independent of OS tools.
 function crc32(bytes) {
@@ -39,6 +40,7 @@ async function zipFiles(root, paths) {
 }
 
 const output = "dist/extension";
+await readValidatedExtensionManifest();
 await mkdir(`${output}/icons`, { recursive: true }); await mkdir("public/icons", { recursive: true }); await mkdir("public/downloads", { recursive: true });
 for (const size of [16,48,128]) await writeFile(`${output}/icons/icon-${size}.png`, icon(size));
 for (const size of [180,192,512]) await writeFile(`public/icons/icon-${size}.png`, icon(size));
