@@ -495,3 +495,7 @@ A checked-in fictional listing page now gives installed Chrome or Edge testing a
 ## Addressable saved-record boundary
 
 The local saved-deal reader now excludes corrupted IndexedDB records whose ID is empty or only whitespace. Current imports already reject that state; applying the same rule while loading prevents an unaddressable record from reaching restore, export or delete controls while preserving recovery access for corrupted records that still have a usable ID. A pure regression case protects the boundary. Browser storage-failure and recovery acceptance remains pending.
+
+## Named corrupt-record recovery
+
+A corrupted local snapshot with a usable ID but an empty or whitespace-only name now receives the display label “Unreadable snapshot.” The fallback keeps its library row and repeated Export and Delete controls identifiable without altering the original recovery JSON; a successfully migrated legacy deal instead uses its validated migrated name. Pure regression coverage protects the label and original-name preservation. Manual browser and screen-reader recovery acceptance remains pending.

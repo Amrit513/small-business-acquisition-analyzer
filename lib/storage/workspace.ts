@@ -62,12 +62,12 @@ async function db(){return openDB("acquisition-lens",1,{upgrade(data){const stor
 export type Stored={id:string;name:string;deal:Deal|null;original:string|null;legacy:boolean};
 export function readStored(x:unknown):Stored|null {
   if(!obj(x)||!str(x.id,256)||!x.id.trim())return null;
-  const legacy=x.version!==3,name=str(x.name,1000)?x.name.slice(0,MAX_DEAL_NAME_LENGTH):"Unreadable snapshot";
+  const legacy=x.version!==3,storedName=str(x.name,1000)?x.name.slice(0,MAX_DEAL_NAME_LENGTH):"",recoveryName=storedName.trim()?storedName:"Unreadable snapshot";
   let raw:string;
   try{raw=JSON.stringify({schemaVersion:legacy?2:3,deal:x});}
-  catch{return {id:x.id,name,deal:null,original:null,legacy};}
+  catch{return {id:x.id,name:recoveryName,deal:null,original:null,legacy};}
   let deal:Deal|null=null;try{deal=parseSnapshot(raw);}catch{/* Keep original available for recovery. */}
-  return {id:x.id,name,deal,original:raw,legacy};
+  return {id:x.id,name:deal?.name??recoveryName,deal,original:raw,legacy};
 }
 export async function library():Promise<Stored[]>{const dbi=await db();try{return (await dbi.getAll("deals")).map(readStored).filter((x):x is Stored=>x!==null).sort((a,b)=>(b.deal?.updatedAt??"").localeCompare(a.deal?.updatedAt??""));}finally{dbi.close();}}
 export async function persist(deal:Deal){const d=validateDeal(deal),dbi=await db();try{await dbi.put("deals",d);}finally{dbi.close();}}
