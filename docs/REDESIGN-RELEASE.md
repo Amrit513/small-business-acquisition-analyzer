@@ -475,3 +475,7 @@ The visible Import JSON action now references its active assertive error message
 ## Assertive JSON export recovery
 
 Active-deal and saved-deal JSON export failures now use a dedicated assertive, atomic alert instead of the polite success-status channel. The exact export control that failed references the recovery message, while a successful retry clears the prior error before the browser download begins. Existing pure download-boundary tests continue to protect URL cleanup and stable on-device recovery wording; manual browser-download and screen-reader acceptance remain pending.
+
+## Listing-import recovery relationships
+
+Malformed extension handoff links, listing-file failures and cancelled deal replacements now associate their alert with the textarea, file-import action or reviewed-handoff action that can resolve the problem. A reviewed listing with no amounts marks and focuses the first amount field instead of moving focus without an invalid-state relationship. New text and file attempts clear obsolete messages; source-level accessibility coverage protects each target, while manual browser and screen-reader acceptance remains pending.

@@ -48,6 +48,17 @@ describe("focus indicator contrast", () => {
     expect(importer).toContain('setOpen(false); toggleRef.current?.focus();');
   });
 
+  it("associates listing-import recovery with the control that can resolve it",()=>{
+    const importer=readFileSync("components/ListingImport.tsx","utf8");
+    expect(importer).toContain('setErrorTarget("text")');
+    expect(importer).toContain('setErrorTarget("file")');
+    expect(importer).toContain('setErrorTarget("apply")');
+    expect(importer).toContain('aria-describedby={errorTarget==="text"?"listing-review-error":undefined}');
+    expect(importer).toContain('aria-describedby={errorTarget==="file"?"listing-review-error":undefined}');
+    expect(importer).toContain('aria-describedby={errorTarget==="apply"?"listing-review-error":undefined}');
+    expect(importer).toContain('setInvalidField("purchasePrice")');
+  });
+
   it("moves guided next-action focus to the selected workspace tab",()=>{
     const workbench=readFileSync("components/Workbench.tsx","utf8");
     expect(workbench).toContain("pendingTabFocus=useRef<Tab|null>(null)");
