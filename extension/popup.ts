@@ -22,7 +22,13 @@ const inputs = new Map<string, HTMLInputElement>();
 const operationControlIds = ["capture", "open", "save", "export", "clear", "discard-corrupt"] as const;
 type BrowserTab = { id?: number; url?: string };
 type PageCapture = ReturnType<typeof readListingPage>;
-function showRecovery(show: boolean) { unreadableSavedDraft = show; $("recovery").hidden = !show; }
+function showRecovery(show: boolean) {
+  unreadableSavedDraft = show;
+  $("recovery").hidden = !show;
+  const discard = $("discard-corrupt");
+  if (show) discard.setAttribute("aria-describedby", "status");
+  else discard.removeAttribute("aria-describedby");
+}
 function setOperationBusy(busy: boolean) {
   operationInProgress = busy;
   $("workspace").setAttribute("aria-busy", String(busy));
@@ -127,6 +133,6 @@ $("clear").addEventListener("click", () => void action(async () => {
   draft = undefined; showRecovery(false); $("review").hidden = true; inputs.clear(); status("Draft cleared from this browser.");
   return { focusId: "capture" };
 }));
-void action(async () => { let saved: Record<string, unknown>; try { saved = await chrome.storage.local.get("listingDraft"); } catch { throw new Error("Local draft storage is unavailable. Capture and export still work, but saving may fail."); } if (saved.listingDraft) { try { render(parseListingDraft(JSON.stringify(saved.listingDraft))); status("Restored your saved draft."); } catch { showRecovery(true); status("The saved draft could not be read. You can clear it or capture a new listing."); } } });
+void action(async () => { let saved: Record<string, unknown>; try { saved = await chrome.storage.local.get("listingDraft"); } catch { throw new Error("Local draft storage is unavailable. Capture and export still work, but saving may fail."); } if (saved.listingDraft) { try { render(parseListingDraft(JSON.stringify(saved.listingDraft))); status("Restored your saved draft."); } catch { showRecovery(true); reportError("The saved draft could not be read. You can clear it or capture a new listing."); } } });
 
 $("discard-corrupt").addEventListener("click", () => void action(async () => {try { await chrome.storage.local.remove("listingDraft"); } catch { throw new Error("Unreadable draft could not be removed from browser storage."); }showRecovery(false);status("Unreadable draft removed.");return { focusId:"capture" };}));

@@ -451,3 +451,7 @@ Removed an unused legacy listing-to-engine adapter that represented every missin
 ## Evidence-form error announcements
 
 Source-note validation and restore failures now use an assertive, atomic alert, while successful link, remove and restore messages remain polite status updates. The source location, excerpt and review-date controls reference the active error message so keyboard and screen-reader users can identify the affected form context. Source-level accessibility coverage protects the alert/status split and all three relationships; manual assistive-technology acceptance remains pending.
+
+## Unreadable extension-draft recovery
+
+An unreadable saved extension draft now produces an assertive alert instead of looking like a successful restore status. The visible Clear unreadable draft action references that alert until the corrupt state is replaced or removed, giving keyboard and screen-reader users the recovery context at the actionable control. Simulated browser-API coverage protects the error semantics and relationship; installed Chrome/Edge acceptance remains pending because the Chromium binary supplied to this workspace could not start.

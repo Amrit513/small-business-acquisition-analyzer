@@ -65,10 +65,14 @@ describe("extension popup local workflow", () => {
     await import("../popup");
     await vi.waitFor(() => expect(first.elements.recovery!.hidden).toBe(false));
     expect(first.elements.status!.textContent).toContain("could not be read");
+    expect(first.elements.status!.attributes.get("role")).toBe("alert");
+    expect(first.elements.status!.attributes.get("aria-live")).toBe("assertive");
+    expect(first.elements["discard-corrupt"]!.attributes.get("aria-describedby")).toBe("status");
 
     first.elements.capture!.click();
     await vi.waitFor(() => expect(first.elements.status!.textContent).toContain("save to replace"));
     expect(first.elements.recovery!.hidden).toBe(true);
+    expect(first.elements["discard-corrupt"]!.attributes.has("aria-describedby")).toBe(false);
     expect(first.elements.review!.hidden).toBe(false);
     expect(first.elements.capture!.disabled).toBe(false);
     expect(first.elements.title!.focusCount).toBe(1);
