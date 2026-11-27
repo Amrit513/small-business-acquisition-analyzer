@@ -98,7 +98,11 @@ describe("focus indicator contrast", () => {
     const memo=readFileSync("components/workbench/Memo.tsx","utf8");
     expect(memo).toContain('<section className="sheet">');
     expect(memo).toContain('<div className="memoaction" aria-busy={loading}>');
-    expect(memo).toMatch(/role="status" aria-live="polite"/);
+    expect(memo).toContain('aria-describedby="pdf-memo-status"');
+    expect(memo).toContain('id="pdf-memo-status"');
+    expect(memo).toContain('role={error?"alert":"status"}');
+    expect(memo).toContain('aria-live={error?"assertive":"polite"}');
+    expect(memo).toContain('aria-atomic="true"');
     expect(memo).toContain("Preparing the PDF memo on this device…");
   });
 

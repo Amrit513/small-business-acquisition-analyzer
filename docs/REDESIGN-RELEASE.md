@@ -463,3 +463,7 @@ The version-three snapshot validator now enforces the same ordered valuation-mul
 ## Matched listing provenance imports
 
 Listing JSON imports now reject a source excerpt when its matching normalized financial value is absent. The importer no longer silently discards that orphan excerpt or leaves the user unable to tell whether provenance survived the handoff. Missing financial values still remain unknown, and a supported value without an excerpt remains allowed as an unlinked claim. Regression coverage protects the inconsistent boundary; listing evidence remains user-reviewed and unauthenticated.
+
+## Assertive PDF preparation failures
+
+PDF preparation failures now use an assertive, atomic alert instead of the polite status semantics reserved for progress and successful completion. The Prepare PDF memo control references the same live message, so keyboard and screen-reader users can identify the failed action and its recovery guidance at the control. Source-level accessibility coverage protects the alert/status split and relationship; manual screen-reader and browser-download acceptance remain pending.
