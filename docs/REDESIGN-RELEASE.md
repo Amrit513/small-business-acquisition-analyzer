@@ -467,3 +467,7 @@ Listing JSON imports now reject a source excerpt when its matching normalized fi
 ## Assertive PDF preparation failures
 
 PDF preparation failures now use an assertive, atomic alert instead of the polite status semantics reserved for progress and successful completion. The Prepare PDF memo control references the same live message, so keyboard and screen-reader users can identify the failed action and its recovery guidance at the control. Source-level accessibility coverage protects the alert/status split and relationship; manual screen-reader and browser-download acceptance remain pending.
+
+## Saved-deal import error relationship
+
+The visible Import JSON action now references its active assertive error message after a saved-deal file fails validation or decoding. Keyboard and screen-reader users can return to the trigger with the failure and recovery guidance attached instead of finding an isolated page-level alert. A new selection still clears the prior error before reading; source-level accessibility coverage protects the relationship, while manual browser and screen-reader acceptance remains pending.

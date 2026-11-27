@@ -110,6 +110,8 @@ describe("focus indicator contrast", () => {
     const workbench=readFileSync("components/Workbench.tsx","utf8");
     expect(workbench).toContain('[importError,setImportError]=useState("")');
     expect(workbench).toContain('setImportError(dealImportFailureMessage(error))');
+    expect(workbench).toContain('aria-describedby={importError?"deal-import-error":undefined}');
+    expect(workbench).toContain('id="deal-import-error"');
     expect(workbench).toContain('role="alert" aria-live="assertive" aria-atomic="true"');
   });
 
