@@ -1,6 +1,6 @@
 import {describe,it,expect} from "vitest";
 import {calculate,scheduledPayments,sensitivity,metricText} from "../workbench";
-import {amountValidationMessage,blankDeal,MAX_DEAL_NAME_LENGTH,sampleDeal,editValue,editPeriod,fromListing,linkableEvidenceFields,removeEvidence,restoreEvidence} from "@/lib/workspace/deal";
+import {amountValidationMessage,blankDeal,MAX_DEAL_NAME_LENGTH,MAX_REPORTING_PERIOD_LENGTH,sampleDeal,editValue,editPeriod,fromListing,linkableEvidenceFields,removeEvidence,restoreEvidence} from "@/lib/workspace/deal";
 import {serialize,parseSnapshot,readStored,journalEntry,todayLocalDate} from "@/lib/storage/workspace";
 import {extractListing,parseListingDraft} from "@/lib/import/listing";
 
@@ -55,4 +55,5 @@ describe("v3 workbench against independent examples",()=>{
  it("keeps an unnamed deal out of memo-ready status",()=>{const d=sampleDeal();d.name="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues[0]).toBe("Enter a deal name.");expect(r.score).toBeNull();});
  it("keeps an overlong in-memory deal out of memo-ready status",()=>{const d=sampleDeal();d.name="A".repeat(MAX_DEAL_NAME_LENGTH+1);const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues[0]).toBe(`Keep the deal name to ${MAX_DEAL_NAME_LENGTH} characters or fewer.`);expect(r.score).toBeNull();});
  it("keeps a deal with no reporting period out of memo-ready status",()=>{const d=sampleDeal();d.period="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues).toContain("Identify the annual reporting period.");expect(r.score).toBeNull();});
+ it("keeps an overlong in-memory period out of memo-ready status",()=>{const d=sampleDeal();d.period="A".repeat(MAX_REPORTING_PERIOD_LENGTH+1);const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues).toContain(`Keep the annual reporting period to ${MAX_REPORTING_PERIOD_LENGTH} characters or fewer.`);expect(r.score).toBeNull();});
 });

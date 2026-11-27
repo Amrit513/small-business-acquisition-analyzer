@@ -1,5 +1,5 @@
 import { buildAmortizationSchedule } from "./financing";
-import { fieldKeys, fields, MAX_DEAL_NAME_LENGTH, validAmount, type Deal, type Field, type Values } from "@/lib/workspace/deal";
+import { fieldKeys, fields, MAX_DEAL_NAME_LENGTH, MAX_REPORTING_PERIOD_LENGTH, validAmount, type Deal, type Field, type Values } from "@/lib/workspace/deal";
 
 export const modelVersion="3.0";
 type N=number|null;
@@ -49,6 +49,7 @@ export function calculate(d:Deal) {
   for(const k of fieldKeys) if(entered[k]!==null&&!validAmount(k,entered[k]))issues.push("Review "+fields[k][0].toLowerCase()+": outside the supported range.");
   const missing=required.filter(k=>entered[k]===null);if(missing.length)issues.push("Enter: "+missing.map(k=>fields[k][0].toLowerCase()).join(", ")+".");
   if(!d.period.trim())issues.push("Identify the annual reporting period.");
+  else if(d.period.length>MAX_REPORTING_PERIOD_LENGTH)issues.push(`Keep the annual reporting period to ${MAX_REPORTING_PERIOD_LENGTH} characters or fewer.`);
   if(v.purchasePrice!==null&&v.purchasePrice<=0)issues.push("Enter a positive purchase price for this transaction.");
   if(gap!==null&&Math.abs(gap)>=0.01)issues.push(gap>0?"Funding is short. Reconcile sources and uses.":"Excess financing needs an identified use.");
   if(payments===null&&(v.bankDebt!==null||v.sellerDebt!==null))issues.push("Complete the amount, rate and term for each funded note.");

@@ -431,3 +431,7 @@ The editor, current snapshot validator, legacy review-copy migration and maximum
 ## Deal-name readiness boundary
 
 The pure workbench calculation now applies the same 180-character deal-name limit as the editor and snapshot validator. A direct in-memory caller that bypasses those boundaries cannot obtain a memo-ready result or screening index for a deal that the app cannot save. Regression coverage protects the issue text and score suppression, and the model documentation now includes the name limit in screen completeness. This is local integrity validation; manual browser and assistive-technology acceptance remains pending.
+
+## Reporting-period readiness boundary
+
+The editor, current snapshot and evidence validators, and pure workbench now share one exported 100-character reporting-period limit. A direct in-memory caller cannot obtain a memo-ready result or screening index for a period the app cannot save. Regression coverage protects the issue and score suppression, while the model documentation records the completeness boundary. This is local integrity validation; manual browser and assistive-technology acceptance remains pending.
