@@ -455,3 +455,7 @@ Source-note validation and restore failures now use an assertive, atomic alert, 
 ## Unreadable extension-draft recovery
 
 An unreadable saved extension draft now produces an assertive alert instead of looking like a successful restore status. The visible Clear unreadable draft action references that alert until the corrupt state is replaced or removed, giving keyboard and screen-reader users the recovery context at the actionable control. Simulated browser-API coverage protects the error semantics and relationship; installed Chrome/Edge acceptance remains pending because the Chromium binary supplied to this workspace could not start.
+
+## Ordered valuation-range imports
+
+The version-three snapshot validator now enforces the same ordered valuation-multiple range as the pure calculation engine. An imported low multiple above its high multiple is rejected before persistence instead of entering the workspace as a permanently incomplete setting; equal bounds remain valid for a deliberate single-multiple illustration. Regression coverage protects both sides of the boundary, and the model continues to label every range as a user-entered educational assumption rather than an appraisal.

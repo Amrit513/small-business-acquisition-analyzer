@@ -27,6 +27,12 @@ describe("v3 workbench against independent examples",()=>{
   (x:Record<string,unknown>)=>{((x.deal as Record<string,unknown>).evidence as Record<string,unknown>).unexpected={};},
   (x:Record<string,unknown>)=>{((((x.deal as Record<string,unknown>).evidence as Record<string,unknown>).sde) as Record<string,unknown>).unexpected=true;},
  ]){const imported=JSON.parse(serialize(sampleDeal())) as Record<string,unknown>;mutate(imported);expect(()=>parseSnapshot(JSON.stringify(imported))).toThrow(/invalid deal file/);}});
+ it("rejects an inverted imported valuation range while accepting equal bounds",()=>{
+  const inverted=JSON.parse(serialize(sampleDeal())) as {deal:{settings:{low:number;high:number}}};inverted.deal.settings.low=5;inverted.deal.settings.high=2;
+  expect(()=>parseSnapshot(JSON.stringify(inverted))).toThrow(/invalid deal file/);
+  const equal=sampleDeal();equal.settings.low=2;equal.settings.high=2;
+  expect(parseSnapshot(serialize(equal)).settings).toMatchObject({low:2,high:2});
+ });
  it("requires a review date for a newly entered source note",()=>{const d=sampleDeal();expect(()=>journalEntry(d,"sde","User assumption","Workbook p. 2","Entered SDE: $170,000","")).toThrow(/review date/);});
  it("rejects future evidence dates in manual notes and imported snapshots",()=>{const d=sampleDeal();expect(()=>journalEntry(d,"sde","User assumption","Workbook p. 2","Entered SDE: $170,000","9999-01-01")).toThrow(/not in the future/);d.evidence.sde!.date="9999-01-01";expect(()=>serialize(d)).toThrow(/invalid deal file/);});
  it("rejects future saved-record timestamps before they can distort library recency",()=>{const d=sampleDeal();d.updatedAt="9999-01-01T00:00:00.000Z";expect(()=>serialize(d)).toThrow(/invalid deal file/);expect(readStored(d)?.deal).toBeNull();});

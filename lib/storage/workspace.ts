@@ -16,7 +16,8 @@ const evidenceDate=(x:unknown):x is string=>str(x,10)&&(x===""||(/^\d{4}-\d{2}-\
 const invalid=():never=>{throw new Error("Unsupported or invalid deal file. Your current deal has not been changed.");};
 export function validSettings(s:unknown):s is Settings {
   if(!obj(s)||!only(s,["coverageTarget","low","high","revenueChange","expenseChange","years"]))return false;
-  return ([["coverageTarget",0.01,10],["low",0.01,50],["high",0.01,50],["revenueChange",-100,100],["expenseChange",-100,100],["years",1,10]] as const).every(([k,min,max])=>typeof s[k]==="number"&&Number.isFinite(s[k])&&s[k]>=min&&s[k]<=max)&&Number.isInteger(s.years);
+  const bounded=([["coverageTarget",0.01,10],["low",0.01,50],["high",0.01,50],["revenueChange",-100,100],["expenseChange",-100,100],["years",1,10]] as const).every(([k,min,max])=>typeof s[k]==="number"&&Number.isFinite(s[k])&&s[k]>=min&&s[k]<=max);
+  return bounded&&typeof s.low==="number"&&typeof s.high==="number"&&s.low<=s.high&&Number.isInteger(s.years);
 }
 export function validateDeal(x:unknown):Deal {
   if(!obj(x)||!only(x,["version","id","name","updatedAt","isSample","currency","period","values","evidence","settings","earningsNote","assumptionsReviewed","listing","migrationNote"])||x.version!==3||x.currency!=="USD"||!str(x.id,256)||!x.id.trim()||!str(x.name,MAX_DEAL_NAME_LENGTH)||!x.name.trim()||
