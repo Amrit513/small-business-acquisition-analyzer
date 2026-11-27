@@ -483,3 +483,7 @@ Malformed extension handoff links, listing-file failures and cancelled deal repl
 ## Safe imported-deal download names
 
 JSON backups and prepared PDFs now derive a bounded browser filename from the preserved deal ID instead of copying an imported ID directly into the download attribute. Path separators, control characters and reserved filename punctuation are removed without changing the stored ID, deal contents or round-trip behavior. Pure regression cases cover path-like, empty-after-cleaning and oversized IDs; real browser downloads remain a separate acceptance gate.
+
+## Assertive local-storage recovery
+
+IndexedDB load, save and delete failures now use assertive, atomic error semantics instead of the polite channel reserved for progress and successful completion. Each failed save or delete control references the recovery message, and a startup library failure associates the same guidance with the persistent library region. Storage contents and operation serialization are unchanged; source-level accessibility coverage protects the relationships, while manual browser and screen-reader acceptance remains pending.

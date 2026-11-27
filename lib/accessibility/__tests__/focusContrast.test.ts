@@ -137,6 +137,17 @@ describe("focus indicator contrast", () => {
     expect(workbench).toContain('setExportTarget(item.id);setExportError(');
   });
 
+  it("announces local-storage failures assertively at the affected action",()=>{
+    const workbench=readFileSync("components/Workbench.tsx","utf8");
+    expect(workbench).toContain('[noticeError,setNoticeError]=useState(false)');
+    expect(workbench).toContain('role={noticeError?"alert":"status"}');
+    expect(workbench).toContain('aria-live={noticeError?"assertive":"polite"}');
+    expect(workbench).toContain('aria-describedby={noticeTarget==="save-current"?"workspace-notice":undefined}');
+    expect(workbench).toContain('aria-describedby={noticeTarget==="save-alternative"?"workspace-notice":undefined}');
+    expect(workbench).toContain('aria-describedby={noticeTarget==="library"?"workspace-notice":undefined}');
+    expect(workbench).toContain('aria-describedby={noticeTarget===`delete:${x.id}`?"workspace-notice":undefined}');
+  });
+
   it("announces source-note failures assertively and associates the affected fields",()=>{
     const evidence=readFileSync("components/workbench/Evidence.tsx","utf8");
     expect(evidence).toContain('role={feedback.error ? "alert" : "status"}');
