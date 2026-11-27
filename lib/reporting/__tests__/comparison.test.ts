@@ -12,6 +12,7 @@ describe("comparison reporting",()=>{
   expect(row("Bank note · rate · term")?.[0]).toBe("$340,000 · 9.5% annual · 10 years");
   expect(row("Bank note · rate · term")?.[1]).toBe("Unknown amount · rate unknown · term unknown");
   expect(row("Seller note · rate · term")?.[0]).toBe("No note");
+  expect(row("Funding balance")).toEqual(["Balanced","Unknown"]);
   expect(row("Seller compensation in SDE add-backs")).toEqual(["$80,000","Unknown"]);
   expect(row("Earnings bridge")).toEqual(["$80,000","Unknown"]);
   expect(row("Remaining adjustment after seller compensation")).toEqual(["$0","Unknown"]);

@@ -1,6 +1,6 @@
 import {calculate,metricText,usd} from "@/lib/calculations/workbench";
 import type {Deal,Field} from "@/lib/workspace/deal";
-import {formatDebtTerms} from "@/lib/reporting/transaction";
+import {formatDebtTerms,formatFundingBalance} from "@/lib/reporting/transaction";
 import {modelScreenStatus,sourceNoteStatus} from "@/lib/reporting/status";
 
 export interface ComparisonRow { label:string; values:string[] }
@@ -23,7 +23,7 @@ export function buildComparisonRows(deals:Deal[]):ComparisonRow[] {
     {label:"Remaining adjustment after seller compensation",values:results.map(result=>usd(result.remainingAdjustments))},
     {label:"Bank note · rate · term",values:deals.map(deal=>formatDebtTerms(deal,"bank"))},
     {label:"Seller note · rate · term",values:deals.map(deal=>formatDebtTerms(deal,"seller"))},
-    {label:"Funding difference (uses − sources)",values:results.map(result=>usd(result.gap))},
+    {label:"Funding balance",values:results.map(result=>formatFundingBalance(result.gap))},
     {label:"Coverage comparison target",values:deals.map(deal=>deal.settings.coverageTarget+"× user assumption")},
     {label:"Screening debt coverage",values:results.map(result=>metricText("coverage",result))},
     {label:"Pretax cash to equity",values:results.map(result=>metricText("distribution",result))},

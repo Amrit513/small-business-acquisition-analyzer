@@ -1,5 +1,5 @@
 import {describe,expect,it} from "vitest";
-import {formatDebtTerms} from "@/lib/reporting/transaction";
+import {formatDebtTerms,formatFundingBalance} from "@/lib/reporting/transaction";
 import {blankDeal} from "@/lib/workspace/deal";
 
 describe("debt term reporting",()=>{
@@ -21,5 +21,14 @@ describe("debt term reporting",()=>{
     deal.values.sellerRate=8;
     deal.values.sellerYears=5;
     expect(formatDebtTerms(deal,"seller")).toBe("No note");
+  });
+});
+
+describe("funding-balance reporting",()=>{
+  it("distinguishes balanced, short, excess and unknown sources without ambiguous signs",()=>{
+    expect(formatFundingBalance(0)).toBe("Balanced");
+    expect(formatFundingBalance(2500)).toBe("$2,500 shortfall");
+    expect(formatFundingBalance(-2500)).toBe("$2,500 excess sources");
+    expect(formatFundingBalance(null)).toBe("Unknown");
   });
 });

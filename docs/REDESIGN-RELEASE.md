@@ -499,3 +499,7 @@ The local saved-deal reader now excludes corrupted IndexedDB records whose ID is
 ## Named corrupt-record recovery
 
 A corrupted local snapshot with a usable ID but an empty or whitespace-only name now receives the display label “Unreadable snapshot.” The fallback keeps its library row and repeated Export and Delete controls identifiable without altering the original recovery JSON; a successfully migrated legacy deal instead uses its validated migrated name. Pure regression coverage protects the label and original-name preservation. Manual browser and screen-reader recovery acceptance remains pending.
+
+## Consistent funding-balance language
+
+Deal inputs, the on-screen memo, comparison and exported PDF now use one pure formatter for sources versus uses. They report Balanced, a positive-dollar shortfall, positive-dollar excess sources, or Unknown instead of mixing “gap,” “difference,” “excess funds” and an unexplained negative sign. Tests cover all four states and the comparison fixture; the model documentation defines the sign convention. Browser and downloaded-PDF acceptance remain pending.
