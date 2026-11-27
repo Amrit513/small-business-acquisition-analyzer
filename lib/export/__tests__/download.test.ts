@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { downloadJson, type JsonDownloadEnvironment } from "@/lib/export/download";
+import { dealDownloadName, downloadJson, type JsonDownloadEnvironment } from "@/lib/export/download";
 
 function fixture(overrides: Partial<JsonDownloadEnvironment> = {}) {
   const anchor = { href: "", download: "", click: vi.fn() };
@@ -14,6 +14,12 @@ function fixture(overrides: Partial<JsonDownloadEnvironment> = {}) {
 }
 
 describe("local JSON downloads", () => {
+  it("turns untrusted imported IDs into bounded JSON and PDF filenames", () => {
+    expect(dealDownloadName("../../private\\deal:\n*?", "json")).toBe("acquisition-lens-private-deal.json");
+    expect(dealDownloadName(" \u0000 / ", "pdf")).toBe("acquisition-lens-deal.pdf");
+    expect(dealDownloadName("a".repeat(300), "json")).toBe(`acquisition-lens-${"a".repeat(80)}.json`);
+  });
+
   it("hands the JSON to the browser and schedules Blob URL cleanup", () => {
     const { anchor, environment } = fixture();
     downloadJson('{"schemaVersion":3}', "deal.json", environment);

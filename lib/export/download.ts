@@ -18,6 +18,18 @@ function safelyRevoke(environment: JsonDownloadEnvironment, url: string) {
   try { environment.revokeObjectUrl(url); } catch { /* The download has already been handed to the browser. */ }
 }
 
+/** Keep imported record IDs intact while preventing them from becoming unsafe filenames. */
+export function dealDownloadName(id: string, extension: "json" | "pdf"): string {
+  const stem = id.normalize("NFKC")
+    .replace(/[\u0000-\u001f\u007f<>:"/\\|?*]+/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[.-]+|[.-]+$/g, "")
+    .slice(0, 80)
+    .replace(/[.-]+$/g, "");
+  return `acquisition-lens-${stem || "deal"}.${extension}`;
+}
+
 export function downloadJson(raw: string, name: string, environment = browserEnvironment()) {
   let url: string | undefined;
   let anchor: Pick<HTMLAnchorElement, "href" | "download" | "click">;

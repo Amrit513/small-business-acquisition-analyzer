@@ -479,3 +479,7 @@ Active-deal and saved-deal JSON export failures now use a dedicated assertive, a
 ## Listing-import recovery relationships
 
 Malformed extension handoff links, listing-file failures and cancelled deal replacements now associate their alert with the textarea, file-import action or reviewed-handoff action that can resolve the problem. A reviewed listing with no amounts marks and focuses the first amount field instead of moving focus without an invalid-state relationship. New text and file attempts clear obsolete messages; source-level accessibility coverage protects each target, while manual browser and screen-reader acceptance remains pending.
+
+## Safe imported-deal download names
+
+JSON backups and prepared PDFs now derive a bounded browser filename from the preserved deal ID instead of copying an imported ID directly into the download attribute. Path separators, control characters and reserved filename punctuation are removed without changing the stored ID, deal contents or round-trip behavior. Pure regression cases cover path-like, empty-after-cleaning and oversized IDs; real browser downloads remain a separate acceptance gate.
