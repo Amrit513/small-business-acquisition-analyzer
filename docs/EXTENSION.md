@@ -33,6 +33,6 @@ Some websites, browser pages, PDF viewers and protected documents cannot be capt
 
 ## Build and validation
 
-From the repository root, run `npm ci`, `npm run build:extension`, `npm test` and `npm run typecheck`. Build output is in `dist/extension`; the ZIP is in `public/downloads`. `npm run build` creates the extension package before building Next.js. Packaging fails if the manifest expands beyond the reviewed click-only permissions, adds background or externally connectable surfaces, or enables extension-page network requests. The extractor and screening functions are shared by the web and extension bundles.
+From the repository root, run `npm ci`, `npm run build:extension`, `npm test` and `npm run typecheck`. Build output is in `dist/extension`; the ZIP is in `public/downloads`. `npm run build` creates the extension package before building Next.js. Packaging reopens the generated ZIP and verifies its exact file allowlist, safe paths, compressed contents, sizes and CRCs. It also fails if the manifest expands beyond the reviewed click-only permissions, adds background or externally connectable surfaces, or enables extension-page network requests. The extractor and screening functions are shared by the web and extension bundles.
 
 The extension uses Manifest V3 and temporary activeTab permissions, following [Chrome's permission guidance](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab). Installation of the web app uses the [Next.js manifest convention](https://nextjs.org/docs/app/guides/progressive-web-apps).

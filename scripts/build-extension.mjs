@@ -1,14 +1,10 @@
 import { build } from "esbuild";
 import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
-import { deflateSync, deflateRawSync } from "node:zlib";
+import { deflateSync } from "node:zlib";
+import { assertZipEntries, crc32, zipEntries } from "./extension-zip.mjs";
 import { readValidatedExtensionManifest } from "./validate-extension-manifest.mjs";
 
 // Small deterministic PNG and ZIP writers keep packaging independent of OS tools.
-function crc32(bytes) {
-  let crc = 0xffffffff;
-  for (const byte of bytes) { crc ^= byte; for (let i = 0; i < 8; i++) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1)); }
-  return (crc ^ 0xffffffff) >>> 0;
-}
 function chunk(type, data) {
   const body = Buffer.concat([Buffer.from(type), data]); const output = Buffer.alloc(data.length + 12);
   output.writeUInt32BE(data.length); body.copy(output, 4); output.writeUInt32BE(crc32(body), output.length - 4); return output;
@@ -27,18 +23,6 @@ function icon(size) {
   const header = Buffer.alloc(13); header.writeUInt32BE(size); header.writeUInt32BE(size, 4); header[8] = 8; header[9] = 2;
   return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]), chunk("IHDR", header), chunk("IDAT", deflateSync(pixels)), chunk("IEND", Buffer.alloc(0))]);
 }
-async function zipFiles(root, paths) {
-  const parts = [], directory = []; let offset = 0;
-  for (const path of paths) {
-    const name = Buffer.from(path), bytes = await readFile(`${root}/${path}`), data = deflateRawSync(bytes), crc = crc32(bytes);
-    const local = Buffer.alloc(30); local.writeUInt32LE(0x04034b50); local.writeUInt16LE(20, 4); local.writeUInt16LE(8, 8); local.writeUInt16LE(33, 12); local.writeUInt32LE(crc, 14); local.writeUInt32LE(data.length, 18); local.writeUInt32LE(bytes.length, 22); local.writeUInt16LE(name.length, 26);
-    const entry = Buffer.alloc(46); entry.writeUInt32LE(0x02014b50); entry.writeUInt16LE(20, 4); entry.writeUInt16LE(20, 6); entry.writeUInt16LE(8, 10); entry.writeUInt16LE(33, 14); entry.writeUInt32LE(crc, 16); entry.writeUInt32LE(data.length, 20); entry.writeUInt32LE(bytes.length, 24); entry.writeUInt16LE(name.length, 28); entry.writeUInt32LE(offset, 42);
-    parts.push(local, name, data); directory.push(entry, name); offset += local.length + name.length + data.length;
-  }
-  const central = Buffer.concat(directory), end = Buffer.alloc(22); end.writeUInt32LE(0x06054b50); end.writeUInt16LE(paths.length, 8); end.writeUInt16LE(paths.length, 10); end.writeUInt32LE(central.length, 12); end.writeUInt32LE(offset, 16);
-  return Buffer.concat([...parts, central, end]);
-}
-
 const output = "dist/extension";
 await readValidatedExtensionManifest();
 await mkdir(`${output}/icons`, { recursive: true }); await mkdir("public/icons", { recursive: true }); await mkdir("public/downloads", { recursive: true });
@@ -50,5 +34,7 @@ await build({ entryPoints: ["extension/popup.ts"], outfile: `${output}/popup.js`
 await copyFile("LICENSE", `${output}/LICENSE`);
 await copyFile("extension/PRIVACY.txt", `${output}/PRIVACY.txt`);
 const files = ["LICENSE","PRIVACY.txt","manifest.json", "popup.html", "popup.css", "popup.js", "README.md", "icons/icon-16.png", "icons/icon-48.png", "icons/icon-128.png"];
-await writeFile("public/downloads/acquisition-lens-extension.zip", await zipFiles(output, files));
+const entries = await Promise.all(files.map(async path => [path, await readFile(`${output}/${path}`)]));
+const archive = zipEntries(entries); assertZipEntries(archive, entries);
+await writeFile("public/downloads/acquisition-lens-extension.zip", archive);
 console.log(`Extension built: ${files.length} files; app icons and downloadable ZIP ready.`);

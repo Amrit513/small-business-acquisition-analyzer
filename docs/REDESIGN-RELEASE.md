@@ -439,3 +439,7 @@ The editor, current snapshot and evidence validators, and pure workbench now sha
 ## Extension manifest privacy gate
 
 The extension build now validates its real manifest before packaging. It fails if permissions expand beyond activeTab, scripting and storage; if broad or optional host access, background execution, content scripts, external connections or web-accessible resources appear; or if the popup content policy permits network requests. Adversarial regression cases protect these boundaries. A native Chromium window launched in this environment, but its isolated browser session could not reach the host dev server and an unpacked install was not completed, so real Chrome/Edge capture acceptance remains pending.
+
+## Extension ZIP round-trip gate
+
+The custom dependency-free packager now reopens its generated ZIP before publishing it. The build verifies the exact ten-file allowlist, rejects traversal, absolute, duplicate and backslash paths, inflates every entry, validates local and central metadata, sizes and CRCs, and compares every byte with the staged extension. Regression cases cover valid round trips, unsafe names, duplicate entries, corrupted metadata and allowlist mismatch. This validates the downloadable artifact structure; installed Chrome/Edge interaction remains pending.
