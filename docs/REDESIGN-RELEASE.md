@@ -507,3 +507,7 @@ Deal inputs, the on-screen memo, comparison and exported PDF now use one pure fo
 ## Duplicate-property JSON rejection
 
 The shared saved-deal and listing JSON boundary now rejects duplicate object properties before the browser parser can silently keep only the final value. Keys are compared after escape decoding, so a literal financial field and an equivalent Unicode-escaped spelling still conflict; matching keys in separate objects remain valid. The dependency-free preflight also rejects more than 100 nested containers with a controlled error. Adversarial regression coverage protects these cases. Real file-picker import acceptance remains pending.
+
+## Discoverable table scrolling
+
+Scenario projections, sensitivity results and saved-deal comparison now place a visible scroll instruction immediately before each independently scrollable table. Every focusable region references its instruction, including the arrow-key behavior, so the cue is available to narrow-screen, zoomed, keyboard and screen-reader users. The hint wraps at long text sizes and source regression coverage protects all three relationships. Manual phone, 200% zoom and assistive-technology acceptance remains pending.

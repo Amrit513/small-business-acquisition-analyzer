@@ -33,6 +33,20 @@ describe("focus indicator contrast", () => {
     expect(css).toMatch(/\[role=tabpanel\]:focus-visible[^{}]*\{[^}]*outline:/);
   });
 
+  it("links every keyboard-scrollable financial table to visible scroll guidance",()=>{
+    const scenarios=readFileSync("components/workbench/Scenarios.tsx","utf8");
+    const comparison=readFileSync("components/workbench/Comparison.tsx","utf8");
+    for(const id of ["scenario-scroll-help","sensitivity-scroll-help"]){
+      expect(scenarios).toContain(`id="${id}"`);
+      expect(scenarios).toContain(`aria-describedby="${id}"`);
+    }
+    expect(comparison).toContain('id="comparison-scroll-help"');
+    expect(comparison).toContain('aria-describedby="comparison-scroll-help"');
+    expect(scenarios).toContain("Keyboard users can focus the table region and use the arrow keys.");
+    expect(comparison).toContain("Keyboard users can focus the table region and use the arrow keys.");
+    expect(readFileSync("app/workbench.css","utf8")).toMatch(/\.scrollhint\{[^}]*font-size:14px;[^}]*overflow-wrap:anywhere/);
+  });
+
   it("moves focus to the persistent library only after deletion succeeds",()=>{
     const workbench=readFileSync("components/Workbench.tsx","utf8");
     expect(workbench).toContain('ref={libraryRef} tabIndex={-1} aria-labelledby="deal-library-title"');
