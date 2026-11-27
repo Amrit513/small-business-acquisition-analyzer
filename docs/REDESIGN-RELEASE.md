@@ -447,3 +447,7 @@ The custom dependency-free packager now reopens its generated ZIP before publish
 ## Single unknown-preserving listing handoff
 
 Removed an unused legacy listing-to-engine adapter that represented every missing claim as zero to satisfy an older all-numeric input shape. The live version-three handoff is now the only listing-to-deal conversion path: missing purchase, earnings, financing and operating values stay unknown, while an explicit reported zero remains zero. Regression coverage exercises both cases through the actual current importer. No saved data or current user flow is migrated by this cleanup.
+
+## Evidence-form error announcements
+
+Source-note validation and restore failures now use an assertive, atomic alert, while successful link, remove and restore messages remain polite status updates. The source location, excerpt and review-date controls reference the active error message so keyboard and screen-reader users can identify the affected form context. Source-level accessibility coverage protects the alert/status split and all three relationships; manual assistive-technology acceptance remains pending.

@@ -109,6 +109,15 @@ describe("focus indicator contrast", () => {
     expect(workbench).toContain('role="alert" aria-live="assertive" aria-atomic="true"');
   });
 
+  it("announces source-note failures assertively and associates the affected fields",()=>{
+    const evidence=readFileSync("components/workbench/Evidence.tsx","utf8");
+    expect(evidence).toContain('role={feedback.error ? "alert" : "status"}');
+    expect(evidence).toContain('aria-live={feedback.error ? "assertive" : "polite"}');
+    expect(evidence).toContain('id="source-note-feedback"');
+    expect(evidence.match(/aria-describedby={describedBy}/g)).toHaveLength(3);
+    expect(evidence).toContain('error.message : "Check the source note.", true');
+  });
+
   it("associates the memo-required reporting period with its guidance",()=>{
     const inputs=readFileSync("components/workbench/Inputs.tsx","utf8");
     expect(inputs).toContain('aria-invalid={missingPeriod}');
