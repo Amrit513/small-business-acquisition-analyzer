@@ -53,5 +53,6 @@ describe("v3 workbench against independent examples",()=>{
   const revenue=sampleDeal();revenue.values.annualRevenue=Number.POSITIVE_INFINITY;r=calculate(revenue);expect(r.operating).toBeNull();expect(r.years.every(y=>y.revenue===null&&y.sde===null)).toBe(true);expect(r.scoreParts.margin).toBeNull();expect(r.ready).toBe(false);
  });
  it("keeps an unnamed deal out of memo-ready status",()=>{const d=sampleDeal();d.name="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues[0]).toBe("Enter a deal name.");expect(r.score).toBeNull();});
+ it("keeps an overlong in-memory deal out of memo-ready status",()=>{const d=sampleDeal();d.name="A".repeat(MAX_DEAL_NAME_LENGTH+1);const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues[0]).toBe(`Keep the deal name to ${MAX_DEAL_NAME_LENGTH} characters or fewer.`);expect(r.score).toBeNull();});
  it("keeps a deal with no reporting period out of memo-ready status",()=>{const d=sampleDeal();d.period="   ";const r=calculate(d);expect(r.ready).toBe(false);expect(r.issues).toContain("Identify the annual reporting period.");expect(r.score).toBeNull();});
 });

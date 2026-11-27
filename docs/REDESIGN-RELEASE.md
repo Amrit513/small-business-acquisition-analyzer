@@ -427,3 +427,7 @@ Activating the sidebar's guided next action now moves keyboard focus to the sele
 ## Shared deal-name boundary
 
 The editor, current snapshot validator, legacy review-copy migration and maximum-name PDF fixture now use one exported 180-character deal-name contract. Exact-boundary regression coverage accepts 180 characters and rejects 181 before persistence, while the contributor guide now distinguishes the current limit from older recovery input. This removes duplicated limits without changing stored names or substituting sample data.
+
+## Deal-name readiness boundary
+
+The pure workbench calculation now applies the same 180-character deal-name limit as the editor and snapshot validator. A direct in-memory caller that bypasses those boundaries cannot obtain a memo-ready result or screening index for a deal that the app cannot save. Regression coverage protects the issue text and score suppression, and the model documentation now includes the name limit in screen completeness. This is local integrity validation; manual browser and assistive-technology acceptance remains pending.

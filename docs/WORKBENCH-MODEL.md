@@ -25,4 +25,4 @@ Maturities: a $12,000 two-year zero-interest note pays $500 monthly. A $3,000 si
 
 ## Screen completeness
 
-A memo-ready screen requires a nonblank deal name and annual reporting period, every required transaction and operating input, reconciled sources and uses, complete terms for each funded note, valid bounded model settings, an explained earnings bridge when applicable, and the user's review acknowledgement. These checks establish model completeness only; they do not authenticate evidence or make an acquisition decision-ready.
+A memo-ready screen requires a nonblank deal name within the current 180-character storage boundary, an annual reporting period, every required transaction and operating input, reconciled sources and uses, complete terms for each funded note, valid bounded model settings, an explained earnings bridge when applicable, and the user's review acknowledgement. These checks establish model completeness only; they do not authenticate evidence or make an acquisition decision-ready.

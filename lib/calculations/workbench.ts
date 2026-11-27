@@ -1,5 +1,5 @@
 import { buildAmortizationSchedule } from "./financing";
-import { fieldKeys, fields, validAmount, type Deal, type Field, type Values } from "@/lib/workspace/deal";
+import { fieldKeys, fields, MAX_DEAL_NAME_LENGTH, validAmount, type Deal, type Field, type Values } from "@/lib/workspace/deal";
 
 export const modelVersion="3.0";
 type N=number|null;
@@ -45,6 +45,7 @@ export function calculate(d:Deal) {
   const operating=subtract(v.annualRevenue,v.expenses),bridge=subtract(v.sde,operating),remainingAdjustments=subtract(bridge,v.sellerCompensation);
   const issues:string[]=[];
   if(!d.name.trim())issues.push("Enter a deal name.");
+  else if(d.name.length>MAX_DEAL_NAME_LENGTH)issues.push(`Keep the deal name to ${MAX_DEAL_NAME_LENGTH} characters or fewer.`);
   for(const k of fieldKeys) if(entered[k]!==null&&!validAmount(k,entered[k]))issues.push("Review "+fields[k][0].toLowerCase()+": outside the supported range.");
   const missing=required.filter(k=>entered[k]===null);if(missing.length)issues.push("Enter: "+missing.map(k=>fields[k][0].toLowerCase()).join(", ")+".");
   if(!d.period.trim())issues.push("Identify the annual reporting period.");
