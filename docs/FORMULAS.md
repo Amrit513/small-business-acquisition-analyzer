@@ -45,6 +45,8 @@ Monthly Payment = Principal × [ r(1+r)ⁿ ] / [ (1+r)ⁿ − 1 ]
 ```
 Special case: at 0% interest, payment is simply `Principal / n` (straight-line), since the formula above divides by zero at r = 0.
 
+The financed principal is normalized to cents before applying either formula. Every scheduled payment, principal portion, interest amount and remaining balance is then kept at cent precision, with the final payment adjusted to reconcile the rounded principal exactly.
+
 Implementation: `lib/calculations/financing.ts` → `calculateMonthlyLoanPayment()`, `buildAmortizationSchedule()`
 
 If seller financing is present, it's calculated as a second, independent amortizing loan and combined with the primary loan (`summarizeLoan()`).

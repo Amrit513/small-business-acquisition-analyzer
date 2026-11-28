@@ -567,3 +567,7 @@ Active workbench calculations, retained calculations and listing-amount normaliz
 ## Unsigned financial zero
 
 The shared rounding boundary now normalizes a sub-cent negative amount that rounds to zero into ordinary zero. The workbench currency formatter also guards direct signed-zero input, preventing JavaScript's internal `-0` from appearing as `−$0` in the workspace, comparison or memo. Regression cases cover pure rounding, active cash flow, listing normalization and display. This is presentation and arithmetic integrity; it does not change a nonzero cent-level loss into zero.
+
+## Cent-precise financed principal
+
+The shared loan schedule now rounds the financed principal to cents before calculating the regular payment and monthly rows. A fractional-cent input can no longer survive into the final principal row while the displayed payment and balance use cents; the last payment instead reconciles the same rounded principal used by sources and uses. An independent two-month, zero-interest case confirms that $1.005 becomes $1.01, produces only cent-precise rows and repays exactly $1.01. This is arithmetic consistency, not evidence that the proposed loan amount or terms are available.

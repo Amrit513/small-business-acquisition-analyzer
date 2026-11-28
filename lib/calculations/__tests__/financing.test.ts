@@ -20,6 +20,10 @@ describe("calculateMonthlyLoanPayment", () => {
     expect(payment).toBeCloseTo(1000, 2); // 120000 / 120 months
   });
 
+  it("rounds the financed principal to cents before calculating payment", () => {
+    expect(calculateMonthlyLoanPayment(1.005, 0, 1 / 6)).toBe(0.51);
+  });
+
   it("returns 0 for a 0 or negative principal", () => {
     expect(calculateMonthlyLoanPayment(0, 0.1, 10)).toBe(0);
     expect(calculateMonthlyLoanPayment(-500, 0.1, 10)).toBe(0);
@@ -43,6 +47,16 @@ describe("buildAmortizationSchedule", () => {
     expect(last).toBeDefined();
     expect(last!.interest).toBeLessThan(first!.interest);
     expect(last!.principal).toBeGreaterThan(first!.principal);
+  });
+
+  it("keeps every row at cent precision and reconciles a fractional-cent principal", () => {
+    const schedule = buildAmortizationSchedule(1.005, 0, 1 / 6);
+    const hasCentPrecision = (value: number) => Number.isInteger(value * 100);
+    expect(schedule).toHaveLength(2);
+    expect(schedule.every(row => [row.payment, row.principal, row.interest, row.remainingBalance].every(hasCentPrecision))).toBe(true);
+    expect(schedule.reduce((total, row) => total + row.principal, 0)).toBe(1.01);
+    expect(schedule.at(-1)?.remainingBalance).toBe(0);
+    expect(buildAmortizationSchedule(0.004, 0, 1)).toEqual([]);
   });
 });
 

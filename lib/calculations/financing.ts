@@ -28,13 +28,14 @@ export function calculateMonthlyLoanPayment(
 ): number {
   if (principal <= 0 || termYears <= 0) return 0;
 
+  const principalCents = roundToCents(principal);
   const n = Math.max(1, Math.round(termYears * 12));
   const r = annualInterestRate / 12;
   if (r === 0) {
-    return roundToCents(principal / n);
+    return roundToCents(principalCents / n);
   }
 
-  const payment = principal * (r / -Math.expm1(-n * Math.log1p(r)));
+  const payment = principalCents * (r / -Math.expm1(-n * Math.log1p(r)));
   return roundToCents(payment);
 }
 
@@ -46,12 +47,14 @@ export function buildAmortizationSchedule(
 ): AmortizationRow[] {
   if (principal <= 0 || termYears <= 0) return [];
 
+  const principalCents = roundToCents(principal);
+  if (principalCents === 0) return [];
   const n = Math.max(1, Math.round(termYears * 12));
   const monthlyPayment = calculateMonthlyLoanPayment(principal, annualInterestRate, termYears);
   const r = annualInterestRate / 12;
 
   const schedule: AmortizationRow[] = [];
-  let balance = principal;
+  let balance = principalCents;
 
   for (let month = 1; month <= n; month++) {
     const interest = roundToCents(balance * r);
