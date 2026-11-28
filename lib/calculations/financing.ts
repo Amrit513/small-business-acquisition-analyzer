@@ -109,15 +109,14 @@ export function summarizeLoan(financing: FinancingInputs): LoanSummary {
     : 0;
 
   const monthlyPayment = roundToCents(primaryMonthlyPayment + sellerMonthlyPayment);
-  const annualDebtService = roundToCents(monthlyPayment * 12);
+  const amortizationSchedule = mergeSchedules(primarySchedule, sellerSchedule);
+  const annualDebtService = roundToCents(
+    amortizationSchedule.slice(0, 12).reduce((total, row) => total + row.payment, 0)
+  );
 
   const totalInterestPaid = roundToCents(
     sumInterest(primarySchedule) + sumInterest(sellerSchedule)
   );
-
-  // Merge schedules month-by-month for a combined view when seller
-  // financing is present; otherwise just use the primary schedule.
-  const amortizationSchedule = mergeSchedules(primarySchedule, sellerSchedule);
 
   return {
     monthlyPayment,

@@ -69,6 +69,20 @@ describe("summarizeLoan", () => {
     const with_ = summarizeLoan(withSeller);
     expect(with_.monthlyPayment).toBeGreaterThan(withoutSeller.monthlyPayment);
   });
+
+  it("sums only payments actually scheduled in the first year", () => {
+    const loan = summarizeLoan({
+      downPayment: 0,
+      loanAmount: 0,
+      interestRate: 0,
+      loanTermYears: 0,
+      sellerFinancing: { amount: 3000, interestRate: 0, termYears: 0.5 },
+    });
+    expect(loan.monthlyPayment).toBe(500);
+    expect(loan.amortizationSchedule).toHaveLength(6);
+    expect(loan.annualDebtService).toBe(3000);
+    expect(loan.annualDebtService).not.toBe(loan.monthlyPayment * 12);
+  });
 });
 
 describe("calculateFundingGap", () => {

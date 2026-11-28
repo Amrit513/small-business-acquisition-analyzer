@@ -555,3 +555,7 @@ The extension now freezes the reviewed business name and amount fields for the s
 ## Matched earnings-reconciliation boundary
 
 The editor, current snapshot validator and pure workbench calculation now share one exported 1,500-character limit for the earnings reconciliation. An in-memory caller can no longer obtain a memo-ready result or optional screening index for text that the workspace cannot save or export, and the PDF action remains blocked until the conflict is corrected. Regression coverage protects both sides of the boundary; this is local integrity evidence, not browser PDF acceptance.
+
+## Partial-year legacy debt service
+
+The retained financial engine now derives first-year debt service from the actual combined amortization rows in months one through twelve. A six-month seller note no longer has its opening monthly payment incorrectly extended across a full year, so retained cash flow, coverage and scoring consume the same maturity-aware amount. An independently worked zero-interest case confirms that six $500 payments on a $3,000 note total $3,000 rather than $6,000. The active workbench already used actual scheduled payments; this aligns the secondary path without claiming lender underwriting.

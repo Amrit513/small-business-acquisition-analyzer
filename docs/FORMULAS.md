@@ -63,7 +63,10 @@ Implementation: `lib/calculations/financing.ts` → `calculateFundingGap()`
 This retained engine divides reported SDE by annual scheduled debt service. The result is an educational screening ratio, not a lender standard or approval decision:
 ```
 DSCR = Annual SDE / Annual Total Debt Service
+Annual Total Debt Service = sum of actual scheduled payments in months 1–12
 ```
+
+A note that matures during the first year contributes only its scheduled payments through maturity; the engine does not extend its opening monthly payment across all twelve months.
 
 | DSCR | Rating | Meaning |
 |---|---|---|
