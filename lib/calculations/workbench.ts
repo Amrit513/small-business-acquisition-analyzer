@@ -90,7 +90,7 @@ export function sensitivity(d:Deal) {
   }));
 }
 const money=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
-export function usd(n:N):string {return n===null?"Unknown":money.format(n);}
+export function usd(n:N):string {return n===null?"Unknown":money.format(n===0?0:n);}
 export function metricText(key:Metric,r:Pick<Result,Metric|"debt">):string{
   const n=r[key];if(n===null)return key==="coverage"&&r.debt===0?"No scheduled debt":key==="payback"||key==="roi"?"Not available":"Unknown";
   if(key==="distribution")return usd(n);if(key==="coverage")return n.toFixed(2)+"×";if(key==="roi")return (100*n).toFixed(1)+"%";return n.toFixed(2)+" years";

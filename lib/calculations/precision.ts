@@ -7,7 +7,8 @@ function shiftDecimal(value:number,places:number):number {
 export function roundDecimal(value:number,places:number):number {
   if(!Number.isFinite(value))return value;
   const sign=value<0?-1:1;
-  return sign*shiftDecimal(Math.round(shiftDecimal(Math.abs(value),places)),-places);
+  const rounded=sign*shiftDecimal(Math.round(shiftDecimal(Math.abs(value),places)),-places);
+  return rounded===0?0:rounded;
 }
 
 export const roundToCents=(value:number)=>roundDecimal(value,2);

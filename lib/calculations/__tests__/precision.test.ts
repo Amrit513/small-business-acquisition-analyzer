@@ -11,4 +11,10 @@ describe("financial decimal rounding",()=>{
     expect(roundDecimal(1.23456,4)).toBe(1.2346);
     expect(roundDecimal(-1.23456,4)).toBe(-1.2346);
   });
+
+  it("normalizes a rounded sub-cent loss to unsigned zero",()=>{
+    const rounded=roundToCents(-0.004);
+    expect(rounded).toBe(0);
+    expect(Object.is(rounded,-0)).toBe(false);
+  });
 });

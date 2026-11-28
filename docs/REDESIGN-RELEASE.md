@@ -563,3 +563,7 @@ The retained financial engine now derives first-year debt service from the actua
 ## Symmetric financial rounding
 
 Active workbench calculations, retained calculations and listing-amount normalization now use one pure decimal-rounding function. Exact half-cent gains and losses round away from zero, so $1.005 becomes $1.01 and −$1.005 becomes −$1.01 instead of giving the loss a one-cent favorable bias. Regression cases cover both signs, larger magnitudes, four-decimal ratios and the listing boundary. This improves deterministic arithmetic; it does not make source figures more accurate than the underlying evidence.
+
+## Unsigned financial zero
+
+The shared rounding boundary now normalizes a sub-cent negative amount that rounds to zero into ordinary zero. The workbench currency formatter also guards direct signed-zero input, preventing JavaScript's internal `-0` from appearing as `−$0` in the workspace, comparison or memo. Regression cases cover pure rounding, active cash flow, listing normalization and display. This is presentation and arithmetic integrity; it does not change a nonzero cent-level loss into zero.

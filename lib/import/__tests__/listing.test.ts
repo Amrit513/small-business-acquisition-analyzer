@@ -13,6 +13,9 @@ describe("listing import boundary", () => {
   it("rounds positive claims and reported losses symmetrically to cents",()=>{
     expect(parseListingAmount("$1.005","purchasePrice")).toBe(1.01);
     expect(parseListingAmount("-$1.005","sde")).toBe(-1.01);
+    const subCentLoss=parseListingAmount("-$0.004","sde");
+    expect(subCentLoss).toBe(0);
+    expect(Object.is(subCentLoss,-0)).toBe(false);
   });
   it("does not convert ambiguous cash flow to SDE or select one of conflicting revenue figures", () => {
     const draft = extractListing("Cash Flow: $100,000\nRevenue: $300,000\nRevenue: $500,000");

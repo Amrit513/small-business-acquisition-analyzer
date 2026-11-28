@@ -175,7 +175,7 @@ Implementation: `lib/calculations/scoring.ts` → `calculateAcquisitionScore()`,
 
 ---
 
-**A note on precision:** cent and ratio rounding is sign-symmetric; exact halfway cases round away from zero so a gain and equal loss do not receive different treatment. Every number this tool produces is an estimate built from the inputs a user provides and educational assumptions. It is not a substitute for a professional valuation, accountant, attorney, or lender's own underwriting. The goal is to help someone reason clearly about a potential deal — not to replace due diligence.
+**A note on precision:** cent and ratio rounding is sign-symmetric; exact halfway cases round away from zero so a gain and equal loss do not receive different treatment. A magnitude below the displayed precision that rounds to zero is normalized to unsigned zero, avoiding a misleading negative-zero amount. Every number this tool produces is an estimate built from the inputs a user provides and educational assumptions. It is not a substitute for a professional valuation, accountant, attorney, or lender's own underwriting. The goal is to help someone reason clearly about a potential deal — not to replace due diligence.
 
 ## Listing screening ratios
 
