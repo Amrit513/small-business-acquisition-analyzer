@@ -29,9 +29,10 @@ export function validateDeal(x:unknown):Deal {
   for(const k of fieldKeys) {
     const n=v[k];if(n!==null&&!validAmount(k,n))return invalid();d.values[k]=n;
     const row=e[k];if(row===undefined)continue;
+    const acceptedStatus=obj(row)?statuses.find(status=>status===row.status):undefined;
     if(!obj(row)||!only(row,["value","period","location","excerpt","date","status"])||n===null||row.value!==n||!str(row.period,MAX_REPORTING_PERIOD_LENGTH)||row.period!==d.period||!str(row.location,800)||!str(row.excerpt,600)||
-      !evidenceDate(row.date)||!statuses.some(status=>status===row.status))return invalid();
-    d.evidence[k]={value:n,period:row.period,location:row.location,excerpt:row.excerpt,date:row.date,status:row.status as Evidence["status"]};
+      !row.location.trim()||!row.excerpt.trim()||!evidenceDate(row.date)||!acceptedStatus||(row.date===""&&acceptedStatus!=="Listing claim"))return invalid();
+    d.evidence[k]={value:n,period:row.period,location:row.location,excerpt:row.excerpt,date:row.date,status:acceptedStatus};
   }
   if(x.migrationNote!==undefined){if(!str(x.migrationNote,1600))return invalid();d.migrationNote=x.migrationNote;}
   if(x.listing!==undefined)d.listing=parseListingDraft(JSON.stringify(x.listing));

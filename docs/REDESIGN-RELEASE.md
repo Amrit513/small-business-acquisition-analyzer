@@ -535,3 +535,7 @@ The retained sector multiple ranges no longer cite broad provider names without 
 ## Strict imported timestamps
 
 Saved-deal and listing timestamps now require a valid timezone-aware ISO instant rather than relying on JavaScript's permissive date parser. Informal dates, timezone-free values and impossible calendar dates are rejected before they can distort saved-library ordering or provenance; valid UTC and offset timestamps remain supported with the existing five-minute device-clock tolerance. Regression coverage protects leap dates, offset forms, future skew and both legacy and current deal-import boundaries. Real file-picker and device-clock acceptance remain pending.
+
+## Complete imported source notes
+
+Version-three deal imports now reject a source note whose location or excerpt is blank. They also require a review date for user assumptions and document-reviewed labels; only an unauthenticated listing claim may keep an unknown date when the original capture time was unavailable. This aligns imported notes with the form boundary and prevents an empty or undated high-confidence label from appearing in the Evidence view or exported memo. Regression coverage preserves the unknown listing-date round trip while rejecting the misleading variants. Browser file-picker and downloaded-PDF acceptance remain pending.
