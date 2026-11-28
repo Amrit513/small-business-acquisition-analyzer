@@ -539,3 +539,7 @@ Saved-deal and listing timestamps now require a valid timezone-aware ISO instant
 ## Complete imported source notes
 
 Version-three deal imports now reject a source note whose location or excerpt is blank. They also require a review date for user assumptions and document-reviewed labels; only an unauthenticated listing claim may keep an unknown date when the original capture time was unavailable. This aligns imported notes with the form boundary and prevents an empty or undated high-confidence label from appearing in the Evidence view or exported memo. Regression coverage preserves the unknown listing-date round trip while rejecting the misleading variants. Browser file-picker and downloaded-PDF acceptance remain pending.
+
+## Visible cent-level funding differences
+
+The shared funding-balance formatter now keeps cents when a sources-versus-uses difference is not a whole dollar. A one-cent shortfall or excess therefore appears as $0.01 in Deal inputs, comparison, the on-screen memo and the exported PDF instead of the contradictory “$0 shortfall” produced by whole-dollar display rounding. Whole-dollar balances retain the compact existing format, and pure regression cases cover both signs and a fractional-dollar amount. A two-page local stress memo rendered successfully, and PDF text extraction confirmed both “$0.01 shortfall” and the incomplete-model status. Browser download and visual PDF acceptance remain pending.

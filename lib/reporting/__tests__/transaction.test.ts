@@ -31,4 +31,10 @@ describe("funding-balance reporting",()=>{
     expect(formatFundingBalance(-2500)).toBe("$2,500 excess sources");
     expect(formatFundingBalance(null)).toBe("Unknown");
   });
+
+  it("keeps a material cent difference visible instead of rounding it to zero",()=>{
+    expect(formatFundingBalance(.01)).toBe("$0.01 shortfall");
+    expect(formatFundingBalance(-.01)).toBe("$0.01 excess sources");
+    expect(formatFundingBalance(12.5)).toBe("$12.50 shortfall");
+  });
 });
