@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fields, fieldKeys, linkableEvidenceFields, removeEvidence, restoreEvidence, statuses, type Field, type Evidence as Entry } from "@/lib/workspace/deal";
+import { fields, fieldKeys, linkableEvidenceFields, MAX_EARNINGS_NOTE_LENGTH, removeEvidence, restoreEvidence, statuses, type Field, type Evidence as Entry } from "@/lib/workspace/deal";
 import { journalEntry, todayLocalDate } from "@/lib/storage/workspace";
 import { usd, type Result } from "@/lib/calculations/workbench";
 import { evidenceStatusLabel } from "@/lib/reporting/provenance";
@@ -44,5 +44,5 @@ export function Evidence({ d, set, r }: Editor & { r: Result }) {
       <p id="source-note-feedback" role={feedback.error ? "alert" : "status"} aria-live={feedback.error ? "assertive" : "polite"} aria-atomic="true">{removed ? "" : feedback.message}</p>
     </form></details>
   </section>
-  <section className="sheet"><div className="sectionhead"><span className="folio">EARNINGS BRIDGE</span><h2>Explain the adjustment</h2><p>Revenue less expenses is {usd(r.operating)}. The difference to entered SDE is {usd(r.bridge)}. After entered seller compensation, the remaining adjustment is {usd(r.remainingAdjustments)}. Document every other add-back or difference.</p></div><label>Earnings reconciliation<textarea maxLength={1500} value={d.earningsNote} onChange={event => set({ ...d, earningsNote: event.target.value, assumptionsReviewed: false })} /></label><label className="check"><input type="checkbox" checked={d.assumptionsReviewed} onChange={event => set({ ...d, assumptionsReviewed: event.target.checked })} />I reviewed the period, earnings bridge and funding assumptions for this screen.</label></section></>;
+  <section className="sheet"><div className="sectionhead"><span className="folio">EARNINGS BRIDGE</span><h2>Explain the adjustment</h2><p>Revenue less expenses is {usd(r.operating)}. The difference to entered SDE is {usd(r.bridge)}. After entered seller compensation, the remaining adjustment is {usd(r.remainingAdjustments)}. Document every other add-back or difference.</p></div><label>Earnings reconciliation<textarea maxLength={MAX_EARNINGS_NOTE_LENGTH} value={d.earningsNote} onChange={event => set({ ...d, earningsNote: event.target.value, assumptionsReviewed: false })} /></label><label className="check"><input type="checkbox" checked={d.assumptionsReviewed} onChange={event => set({ ...d, assumptionsReviewed: event.target.checked })} />I reviewed the period, earnings bridge and funding assumptions for this screen.</label></section></>;
 }

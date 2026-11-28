@@ -3,7 +3,7 @@ import { MAX_DEAL_IMPORT_BYTES, parseDealExport, type SavedDeal } from "./analys
 import { parseListingDraft } from "@/lib/import/listing";
 import { parseJsonDocument } from "@/lib/import/json";
 import { plausiblePastInstant } from "@/lib/import/time";
-import { blankDeal, fieldKeys, MAX_DEAL_NAME_LENGTH, MAX_REPORTING_PERIOD_LENGTH, newId, statuses, validAmount, type Deal, type Field, type Evidence, type Settings } from "@/lib/workspace/deal";
+import { blankDeal, fieldKeys, MAX_DEAL_NAME_LENGTH, MAX_EARNINGS_NOTE_LENGTH, MAX_REPORTING_PERIOD_LENGTH, newId, statuses, validAmount, type Deal, type Field, type Evidence, type Settings } from "@/lib/workspace/deal";
 
 const obj=(x:unknown):x is Record<string,unknown>=>!!x&&typeof x==="object"&&!Array.isArray(x);
 const str=(x:unknown,len:number):x is string=>typeof x==="string"&&x.length<=len;
@@ -21,7 +21,7 @@ export function validSettings(s:unknown):s is Settings {
 }
 export function validateDeal(x:unknown):Deal {
   if(!obj(x)||!only(x,["version","id","name","updatedAt","isSample","currency","period","values","evidence","settings","earningsNote","assumptionsReviewed","listing","migrationNote"])||x.version!==3||x.currency!=="USD"||!str(x.id,256)||!x.id.trim()||!str(x.name,MAX_DEAL_NAME_LENGTH)||!x.name.trim()||
-    !str(x.updatedAt,40)||!plausiblePastInstant(x.updatedAt)||typeof x.isSample!=="boolean"||!str(x.period,MAX_REPORTING_PERIOD_LENGTH)||!str(x.earningsNote,1500)||
+    !str(x.updatedAt,40)||!plausiblePastInstant(x.updatedAt)||typeof x.isSample!=="boolean"||!str(x.period,MAX_REPORTING_PERIOD_LENGTH)||!str(x.earningsNote,MAX_EARNINGS_NOTE_LENGTH)||
     typeof x.assumptionsReviewed!=="boolean"||!validSettings(x.settings)||!obj(x.values)||!obj(x.evidence))return invalid();
   const v=x.values,e=x.evidence,d=blankDeal(x.id,x.updatedAt);
   if(!only(v,fieldKeys)||Object.keys(v).length!==fieldKeys.length||!only(e,fieldKeys))return invalid();

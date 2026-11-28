@@ -1,5 +1,5 @@
 import { buildAmortizationSchedule } from "./financing";
-import { fieldKeys, fields, MAX_DEAL_NAME_LENGTH, MAX_REPORTING_PERIOD_LENGTH, validAmount, type Deal, type Field, type Values } from "@/lib/workspace/deal";
+import { fieldKeys, fields, MAX_DEAL_NAME_LENGTH, MAX_EARNINGS_NOTE_LENGTH, MAX_REPORTING_PERIOD_LENGTH, validAmount, type Deal, type Field, type Values } from "@/lib/workspace/deal";
 
 export const modelVersion="3.0";
 type N=number|null;
@@ -54,6 +54,7 @@ export function calculate(d:Deal) {
   if(gap!==null&&Math.abs(gap)>=0.01)issues.push(gap>0?"Funding is short. Reconcile sources and uses.":"Excess financing needs an identified use.");
   if(payments===null&&(v.bankDebt!==null||v.sellerDebt!==null))issues.push("Complete the amount, rate and term for each funded note.");
   if(bridge!==null&&(Math.abs(bridge)>=0.01||(v.sellerCompensation??0)>0)&&!d.earningsNote.trim())issues.push("Explain the earnings bridge and seller add-backs.");
+  if(d.earningsNote.length>MAX_EARNINGS_NOTE_LENGTH)issues.push(`Keep the earnings reconciliation to ${MAX_EARNINGS_NOTE_LENGTH.toLocaleString("en-US")} characters or fewer.`);
   if(!validCoverageTarget)issues.push("Use a finite coverage target from 0.01× to 10×.");
   if(!validValuation)issues.push("Use ordered finite valuation multiples from 0.01× to 50×.");
   if(!validGrowth)issues.push("Use finite scenario changes from −100% to 100%.");

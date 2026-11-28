@@ -551,3 +551,7 @@ The horizontally scrollable five-section workspace now has visible guidance for 
 ## Stable extension operations
 
 The extension now freezes the reviewed business name and amount fields for the same short operation window that already locks capture, save, export, handoff and clear actions. A delayed browser-storage write can no longer finish with a “saved” message while a newer visible edit was excluded from that saved snapshot. Newly rendered capture fields inherit the busy state until the operation completes, and all fields become editable again on either success or failure. A simulated delayed-save regression protects the boundary; installed Chrome/Edge interaction remains pending.
+
+## Matched earnings-reconciliation boundary
+
+The editor, current snapshot validator and pure workbench calculation now share one exported 1,500-character limit for the earnings reconciliation. An in-memory caller can no longer obtain a memo-ready result or optional screening index for text that the workspace cannot save or export, and the PDF action remains blocked until the conflict is corrected. Regression coverage protects both sides of the boundary; this is local integrity evidence, not browser PDF acceptance.
