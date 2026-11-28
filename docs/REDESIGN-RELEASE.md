@@ -547,3 +547,7 @@ The shared funding-balance formatter now keeps cents when a sources-versus-uses 
 ## Discoverable workspace tabs at narrow widths
 
 The horizontally scrollable five-section workspace now has visible guidance for both Left/Right Arrow navigation and narrow-screen horizontal scrolling, linked to the tab list with `aria-describedby`. Proximity snapping keeps a newly revealed tab aligned without changing the existing roving-tab keyboard behavior, and every tab retains its 46-pixel target. Source regression coverage protects the instruction, relationship and reflow rules. A supported local browser could not be opened in this environment on November 28, 2026 because the installed Chromium command points to a missing binary; phone, 200% zoom and screen-reader acceptance therefore remain pending rather than being inferred from source checks.
+
+## Stable extension operations
+
+The extension now freezes the reviewed business name and amount fields for the same short operation window that already locks capture, save, export, handoff and clear actions. A delayed browser-storage write can no longer finish with a “saved” message while a newer visible edit was excluded from that saved snapshot. Newly rendered capture fields inherit the busy state until the operation completes, and all fields become editable again on either success or failure. A simulated delayed-save regression protects the boundary; installed Chrome/Edge interaction remains pending.

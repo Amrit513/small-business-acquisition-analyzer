@@ -134,6 +134,8 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(() => expect(popup.elements.status!.textContent).toContain("Export JSON"));
     expect(popup.elements.status!.textContent).not.toContain("browser-internal");
     expect(popup.elements.review!.hidden).toBe(false);
+    expect(popup.elements.title!.disabled).toBe(false);
+    expect(popup.created.find(element => element.id === "listing-purchasePrice")!.disabled).toBe(false);
 
     popup.elements.clear!.click();
     await vi.waitFor(() => expect(popup.elements.status!.textContent).toContain("remains visible"));
@@ -157,6 +159,9 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(() => expect(set).toHaveBeenCalledOnce());
     expect(popup.elements.workspace!.attributes.get("aria-busy")).toBe("true");
     for (const id of ["capture", "open", "save", "export", "clear", "discard-corrupt"]) expect(popup.elements[id]!.disabled).toBe(true);
+    const sde = popup.created.find(element => element.id === "listing-sde")!;
+    expect(popup.elements.title!.disabled).toBe(true);
+    expect(sde.disabled).toBe(true);
 
     popup.elements.clear!.click();
     expect(confirm).not.toHaveBeenCalled();
@@ -166,6 +171,8 @@ describe("extension popup local workflow", () => {
     await vi.waitFor(() => expect(popup.elements.status!.textContent).toBe("Draft saved in this browser."));
     expect(popup.elements.workspace!.attributes.get("aria-busy")).toBe("false");
     for (const id of ["capture", "open", "save", "export", "clear", "discard-corrupt"]) expect(popup.elements[id]!.disabled).toBe(false);
+    expect(popup.elements.title!.disabled).toBe(false);
+    expect(sde.disabled).toBe(false);
   });
 
   it("keeps the reviewed listing when clear is cancelled",async()=>{

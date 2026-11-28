@@ -33,6 +33,8 @@ function setOperationBusy(busy: boolean) {
   operationInProgress = busy;
   $("workspace").setAttribute("aria-busy", String(busy));
   for (const id of operationControlIds) ($(id) as HTMLButtonElement).disabled = busy;
+  ($("title") as HTMLInputElement).disabled = busy;
+  for (const input of inputs.values()) input.disabled = busy;
 }
 
 function readReviewed(): ListingDraft {
@@ -62,7 +64,7 @@ function render(next: ListingDraft) {
   $("fields").replaceChildren(); inputs.clear();
   for (const field of listingFields) {
     const label = document.createElement("label"); label.textContent = `${listingLabels[field]} · USD`;
-    const input = document.createElement("input"); input.id = `listing-${field}`; input.inputMode = "decimal"; input.placeholder = "Not found"; input.value = next.values[field]?.toString() ?? "";
+    const input = document.createElement("input"); input.id = `listing-${field}`; input.inputMode = "decimal"; input.placeholder = "Not found"; input.value = next.values[field]?.toString() ?? ""; input.disabled = operationInProgress;
     input.addEventListener("input", updateRatios); label.append(input); inputs.set(field, input);
     if (next.quotes[field]) { const quote = document.createElement("span"); quote.className = "quote"; quote.textContent = `Source: ${next.quotes[field]}`; label.append(quote); }
     $("fields").append(label);
