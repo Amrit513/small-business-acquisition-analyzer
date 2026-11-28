@@ -45,7 +45,7 @@ export function Workbench(){
  {importError&&<p id="deal-import-error" className="notice error" role="alert" aria-live="assertive" aria-atomic="true">{importError}</p>}
  {exportError&&<p id="deal-export-error" className="notice error" role="alert" aria-live="assertive" aria-atomic="true">{exportError}</p>}
  <ListingImport onApply={listing=>{if(!maybeReplace())return false;set(fromListing(listing,newId(),new Date().toISOString()));setTab("Evidence");return true;}}/>
- <div className="layout"><div><div className="tabs" role="tablist" aria-label="Deal workspace">{tabs.map((t,i)=><button ref={el=>{tabsRef.current[i]=el;}} key={t} role="tab" id={"tab-"+i} aria-controls={"panel-"+i} aria-selected={tab===t} tabIndex={tab===t?0:-1} onKeyDown={e=>keyNav(e,i)} onClick={()=>setTab(t)}>{t}</button>)}</div><div role="tabpanel" tabIndex={0} id={"panel-"+tabs.indexOf(tab)} aria-labelledby={"tab-"+tabs.indexOf(tab)}>
+ <div className="layout"><div><p className="tabhint" id="workspace-tab-help">Use Left and Right Arrow keys to move between sections. On narrow screens, scroll horizontally to see every section.</p><div className="tabs" role="tablist" aria-label="Deal workspace" aria-describedby="workspace-tab-help">{tabs.map((t,i)=><button ref={el=>{tabsRef.current[i]=el;}} key={t} role="tab" id={"tab-"+i} aria-controls={"panel-"+i} aria-selected={tab===t} tabIndex={tab===t?0:-1} onKeyDown={e=>keyNav(e,i)} onClick={()=>setTab(t)}>{t}</button>)}</div><div role="tabpanel" tabIndex={0} id={"panel-"+tabs.indexOf(tab)} aria-labelledby={"tab-"+tabs.indexOf(tab)}>
  {tab==="Deal inputs"&&<Inputs d={d} set={set} r={result}/>}
  {tab==="Evidence"&&<Evidence d={d} set={set} r={result}/>}
  {tab==="Scenarios"&&<Scenarios d={d} set={set} r={result}/>}

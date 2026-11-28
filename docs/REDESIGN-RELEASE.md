@@ -543,3 +543,7 @@ Version-three deal imports now reject a source note whose location or excerpt is
 ## Visible cent-level funding differences
 
 The shared funding-balance formatter now keeps cents when a sources-versus-uses difference is not a whole dollar. A one-cent shortfall or excess therefore appears as $0.01 in Deal inputs, comparison, the on-screen memo and the exported PDF instead of the contradictory “$0 shortfall” produced by whole-dollar display rounding. Whole-dollar balances retain the compact existing format, and pure regression cases cover both signs and a fractional-dollar amount. A two-page local stress memo rendered successfully, and PDF text extraction confirmed both “$0.01 shortfall” and the incomplete-model status. Browser download and visual PDF acceptance remain pending.
+
+## Discoverable workspace tabs at narrow widths
+
+The horizontally scrollable five-section workspace now has visible guidance for both Left/Right Arrow navigation and narrow-screen horizontal scrolling, linked to the tab list with `aria-describedby`. Proximity snapping keeps a newly revealed tab aligned without changing the existing roving-tab keyboard behavior, and every tab retains its 46-pixel target. Source regression coverage protects the instruction, relationship and reflow rules. A supported local browser could not be opened in this environment on November 28, 2026 because the installed Chromium command points to a missing binary; phone, 200% zoom and screen-reader acceptance therefore remain pending rather than being inferred from source checks.

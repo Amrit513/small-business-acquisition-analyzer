@@ -47,6 +47,18 @@ describe("focus indicator contrast", () => {
     expect(readFileSync("app/workbench.css","utf8")).toMatch(/\.scrollhint\{[^}]*font-size:14px;[^}]*overflow-wrap:anywhere/);
   });
 
+  it("explains keyboard and narrow-screen navigation for the scrollable workspace tabs",()=>{
+    const workbench=readFileSync("components/Workbench.tsx","utf8");
+    const css=readFileSync("app/workbench.css","utf8");
+    expect(workbench).toContain('id="workspace-tab-help"');
+    expect(workbench).toContain('aria-describedby="workspace-tab-help"');
+    expect(workbench).toContain("Use Left and Right Arrow keys to move between sections.");
+    expect(workbench).toContain("On narrow screens, scroll horizontally to see every section.");
+    expect(css).toMatch(/\.tabhint\{[^}]*font-size:14px;[^}]*overflow-wrap:anywhere/);
+    expect(css).toMatch(/\.tabs\{[^}]*overflow-x:auto;[^}]*scroll-snap-type:x proximity/);
+    expect(css).toMatch(/\.tabs button\{[^}]*min-height:46px;[^}]*scroll-snap-align:start/);
+  });
+
   it("moves focus to the persistent library only after deletion succeeds",()=>{
     const workbench=readFileSync("components/Workbench.tsx","utf8");
     expect(workbench).toContain('ref={libraryRef} tabIndex={-1} aria-labelledby="deal-library-title"');
