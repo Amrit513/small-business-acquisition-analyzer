@@ -1,0 +1,7 @@
+# Dependency and font notices
+
+The web distribution generates [the complete browser package notice text](../public/downloads/THIRD-PARTY-NOTICES.txt) from the pinned npm lockfile at build time with `npm run build:notices`. This includes directly and transitively bundled browser libraries and preserves licenses/attributions beyond a package's single SPDX field where relevant, including PDF font/rendering dependencies. The builder checks installed package texts against snapshots in [licenses](licenses/) and fails when an expected notice changes; review a regenerated inventory after dependency updates. Native Next.js tooling and optional platform binaries are listed separately as not browser-distributed.
+
+The shipped unmodified Liberation Sans Regular and Bold fonts in `public/fonts` are licensed under SIL OFL 1.1. The full original notice and reserved name statement are at [public/fonts/LICENSE.txt](../public/fonts/LICENSE.txt). PDF output embeds these fonts but the generated memo is not licensed under the font license. The extension ZIP contains its own README, project MIT LICENSE, and PRIVACY.txt; it bundles only owned extension source and the shared extractor/screening modules, not the web PDF renderer.
+
+This inventory is an engineering check, not a legal opinion. Before a release, inspect exact shipped artifacts against the recorded notice file and resolve any uncertain upstream provenance. Do not assume all packages have identical terms.

@@ -4,6 +4,7 @@ import {
   buildAmortizationSchedule,
   summarizeLoan,
   calculateDSCR,
+  calculateFundingGap,
 } from "@/lib/calculations/financing";
 import type { BusinessInputs, FinancingInputs } from "@/types/business";
 
@@ -17,6 +18,10 @@ describe("calculateMonthlyLoanPayment", () => {
   it("handles 0% interest as straight-line principal payments", () => {
     const payment = calculateMonthlyLoanPayment(120000, 0, 10);
     expect(payment).toBeCloseTo(1000, 2); // 120000 / 120 months
+  });
+
+  it("rounds the financed principal to cents before calculating payment", () => {
+    expect(calculateMonthlyLoanPayment(1.005, 0, 1 / 6)).toBe(0.51);
   });
 
   it("returns 0 for a 0 or negative principal", () => {
@@ -43,6 +48,16 @@ describe("buildAmortizationSchedule", () => {
     expect(last!.interest).toBeLessThan(first!.interest);
     expect(last!.principal).toBeGreaterThan(first!.principal);
   });
+
+  it("keeps every row at cent precision and reconciles a fractional-cent principal", () => {
+    const schedule = buildAmortizationSchedule(1.005, 0, 1 / 6);
+    const hasCentPrecision = (value: number) => Number.isInteger(value * 100);
+    expect(schedule).toHaveLength(2);
+    expect(schedule.every(row => [row.payment, row.principal, row.interest, row.remainingBalance].every(hasCentPrecision))).toBe(true);
+    expect(schedule.reduce((total, row) => total + row.principal, 0)).toBe(1.01);
+    expect(schedule.at(-1)?.remainingBalance).toBe(0);
+    expect(buildAmortizationSchedule(0.004, 0, 1)).toEqual([]);
+  });
 });
 
 describe("summarizeLoan", () => {
@@ -68,6 +83,44 @@ describe("summarizeLoan", () => {
     const with_ = summarizeLoan(withSeller);
     expect(with_.monthlyPayment).toBeGreaterThan(withoutSeller.monthlyPayment);
   });
+
+  it("sums only payments actually scheduled in the first year", () => {
+    const loan = summarizeLoan({
+      downPayment: 0,
+      loanAmount: 0,
+      interestRate: 0,
+      loanTermYears: 0,
+      sellerFinancing: { amount: 3000, interestRate: 0, termYears: 0.5 },
+    });
+    expect(loan.monthlyPayment).toBe(500);
+    expect(loan.amortizationSchedule).toHaveLength(6);
+    expect(loan.annualDebtService).toBe(3000);
+    expect(loan.annualDebtService).not.toBe(loan.monthlyPayment * 12);
+  });
+});
+
+describe("calculateFundingGap", () => {
+  it("returns zero when the proposed sources balance", () => {
+    expect(calculateFundingGap(450000, {
+      downPayment: 100000,
+      loanAmount: 300000,
+      interestRate: 0.09,
+      loanTermYears: 10,
+      sellerFinancing: { amount: 50000, interestRate: 0.06, termYears: 5 },
+    })).toBe(0);
+  });
+
+  it("identifies a gap and excess funding", () => {
+    const financing = { downPayment: 50000, loanAmount: 300000, interestRate: 0.09, loanTermYears: 10 };
+    expect(calculateFundingGap(400000, financing)).toBe(50000);
+    expect(calculateFundingGap(300000, financing)).toBe(-50000);
+  });
+
+  it("normalizes every source before comparing it with the purchase price", () => {
+    expect(calculateFundingGap(.01, {
+      downPayment:.005, loanAmount:.005, interestRate:0, loanTermYears:1,
+    })).toBe(-.01);
+  });
 });
 
 describe("calculateDSCR", () => {
@@ -83,7 +136,7 @@ describe("calculateDSCR", () => {
     ownerSalary: 70000,
   };
 
-  it("rates a DSCR >= 1.25 as strong and bankable", () => {
+  it("rates a DSCR >= 1.25 above the illustrative screening threshold", () => {
     const loan = summarizeLoan({
       downPayment: 100000,
       loanAmount: 300000,
@@ -93,7 +146,7 @@ describe("calculateDSCR", () => {
     const result = calculateDSCR(inputs, loan);
     expect(result.dscr).toBeGreaterThanOrEqual(1.25);
     expect(result.rating).toBe("strong");
-    expect(result.meetsTypicalLenderMinimum).toBe(true);
+    expect(result.meetsIllustrativeThreshold).toBe(true);
   });
 
   it("rates a critically low DSCR when debt service overwhelms SDE", () => {
@@ -106,10 +159,10 @@ describe("calculateDSCR", () => {
     const result = calculateDSCR(inputs, loan);
     expect(result.dscr).toBeLessThan(0.8);
     expect(result.rating).toBe("critical");
-    expect(result.meetsTypicalLenderMinimum).toBe(false);
+    expect(result.meetsIllustrativeThreshold).toBe(false);
   });
 
-  it("treats zero debt service as an automatic strong rating", () => {
+  it("reports coverage as inapplicable when there is no scheduled debt", () => {
     const loan = summarizeLoan({
       downPayment: 450000,
       loanAmount: 0,
@@ -117,6 +170,7 @@ describe("calculateDSCR", () => {
       loanTermYears: 0,
     });
     const result = calculateDSCR(inputs, loan);
-    expect(result.meetsTypicalLenderMinimum).toBe(true);
+    expect(result).toEqual({ dscr: null, rating: "not-applicable", meetsIllustrativeThreshold: null });
+    expect(JSON.stringify(result)).not.toContain("Infinity");
   });
 });

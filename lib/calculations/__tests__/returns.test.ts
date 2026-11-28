@@ -71,7 +71,7 @@ describe("calculateReturns", () => {
     );
   });
 
-  it("returns Infinity payback period when cash flow after debt is 0 or negative", () => {
+  it("keeps payback unavailable when cash flow after debt is nonpositive", () => {
     const badFinancing: FinancingInputs = {
       downPayment: 20000,
       loanAmount: 700000,
@@ -81,7 +81,15 @@ describe("calculateReturns", () => {
     const loan = summarizeLoan(badFinancing);
     const cashFlow = calculateCashFlow(inputs, loan);
     const returns = calculateReturns(badFinancing, cashFlow);
-    expect(returns.paybackPeriodYears).toBe(Infinity);
+    expect(returns.cashOnCashROI).toBeLessThanOrEqual(0);
+    expect(returns.paybackPeriodYears).toBeNull();
+    expect(JSON.stringify(returns)).not.toContain("Infinity");
+  });
+
+  it("does not turn zero buyer cash into a zero return or immediate payback", () => {
+    const zeroCash: FinancingInputs = { downPayment: 0, loanAmount: 450000, interestRate: 0.095, loanTermYears: 10, closingCosts: 0 };
+    const returns = calculateReturns(zeroCash, calculateCashFlow(inputs, summarizeLoan(zeroCash)));
+    expect(returns).toMatchObject({ totalCashInvested: 0, cashOnCashROI: null, paybackPeriodYears: null });
   });
 });
 

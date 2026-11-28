@@ -1,6 +1,5 @@
 import type {
   BusinessInputs,
-  FinancingInputs,
   GrowthScenario,
   LoanSummary,
   ScenarioAssumptions,
@@ -44,42 +43,46 @@ export interface YearProjection {
   revenue: number;
   expenses: number;
   sde: number;
+  /** Unverified reconciliation to entered baseline SDE; held flat in nominal dollars. */
+  earningsReconciliation: number;
+  annualDebtService: number;
   annualCashFlowAfterDebt: number;
 }
 
 /**
  * Projects revenue, expenses, and resulting SDE/cash flow forward under a
- * given scenario's growth assumptions. Debt service is held constant
- * (a fixed-rate loan doesn't change with performance), so improved SDE
- * flows straight through to improved cash flow — this is what lets a user
- * see "what happens if revenue grows 5%/year for 5 years."
- *
- * Simplifying assumption: SDE margin (SDE / Revenue) is held constant
- * unless expenses are explicitly grown faster than revenue, in which case
- * margin compresses. This keeps the model transparent and auditable
- * rather than trying to model every line item independently.
+ * given scenario's growth assumptions. Preserve entered SDE with a visible,
+ * fixed-dollar reconciliation, not an invented add-back. Debt service is the
+ * sum of actual scheduled payments in each projected year, stopping at maturity.
+ * This is a pretax screening model, not a lender-specific cash-flow forecast.
  */
 export function projectScenario(
   inputs: BusinessInputs,
   loan: LoanSummary,
   assumptions: ScenarioAssumptions
 ): YearProjection[] {
+  if (!Number.isInteger(assumptions.projectionYears) || assumptions.projectionYears < 1 || assumptions.projectionYears > 10
+    || ![assumptions.revenueGrowthRate, assumptions.expenseGrowthRate].every(rate => Number.isFinite(rate) && rate >= -1 && rate <= 10)) {
+    throw new Error("Scenarios require 1–10 whole years and growth rates between -100% and 1000%.");
+  }
   const projections: YearProjection[] = [];
 
   let revenue = inputs.annualRevenue;
   let expenses = inputs.currentExpenses;
+  const earningsReconciliation = roundToCents(inputs.sde - (inputs.annualRevenue - inputs.currentExpenses));
 
   for (let year = 1; year <= assumptions.projectionYears; year++) {
     revenue = roundToCents(revenue * (1 + assumptions.revenueGrowthRate));
     expenses = roundToCents(expenses * (1 + assumptions.expenseGrowthRate));
 
-    // SDE = Revenue - Expenses (expenses here exclude owner salary, per
-    // the SDE definition, since SDE already adds owner comp back).
-    const sde = roundToCents(revenue - expenses);
+    const sde = roundToCents(revenue - expenses + earningsReconciliation);
+    const annualDebtService = roundToCents(loan.amortizationSchedule
+      .filter(row => row.month > (year - 1) * 12 && row.month <= year * 12)
+      .reduce((total, row) => total + row.payment, 0));
 
-    const annualCashFlowAfterDebt = roundToCents(sde - loan.annualDebtService);
+    const annualCashFlowAfterDebt = roundToCents(sde - annualDebtService);
 
-    projections.push({ year, revenue, expenses, sde, annualCashFlowAfterDebt });
+    projections.push({ year, revenue, expenses, sde, earningsReconciliation, annualDebtService, annualCashFlowAfterDebt });
   }
 
   return projections;

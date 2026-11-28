@@ -11,7 +11,7 @@ import type {
  * this deal, all things considered?"
  *
  * Weights (documented here AND in docs/FORMULAS.md — keep both in sync):
- *   DSCR                          30%  — can this deal even get financed / survive its own debt
+ *   DSCR                          30%  — modeled cushion above scheduled debt
  *   Cash-on-cash ROI              25%  — is the return competitive with alternatives
  *   Payback period                20%  — faster payback = lower risk
  *   Revenue/margin quality        15%  — growth rate + profit margin of the underlying business
@@ -21,8 +21,11 @@ import type {
  * so the total is fully auditable — this is intentionally NOT a black box.
  */
 
-export function scoreDSCR(dscrResult: DSCRResult): number {
+const boundScore = (value: number): number => Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
+
+export function scoreDSCR(dscrResult: DSCRResult): number | null {
   const { dscr } = dscrResult;
+  if (dscr === null || !Number.isFinite(dscr)) return null;
   if (dscr >= 1.5) return 100;
   if (dscr >= 1.25) return 85;
   if (dscr >= 1.0) return 60;
@@ -30,7 +33,8 @@ export function scoreDSCR(dscrResult: DSCRResult): number {
   return 0;
 }
 
-export function scoreROI(cashOnCashROI: number): number {
+export function scoreROI(cashOnCashROI: number | null): number | null {
+  if (cashOnCashROI === null || !Number.isFinite(cashOnCashROI)) return null;
   // Benchmarked loosely against public-market long-run averages (~8-10%)
   // and typical small-business buyer return expectations (20%+).
   if (cashOnCashROI >= 0.35) return 100;
@@ -41,8 +45,9 @@ export function scoreROI(cashOnCashROI: number): number {
   return 0;
 }
 
-export function scorePaybackPeriod(paybackPeriodYears: number): number {
-  if (!isFinite(paybackPeriodYears)) return 0;
+export function scorePaybackPeriod(paybackPeriodYears: number | null): number | null {
+  if (paybackPeriodYears === null || !Number.isFinite(paybackPeriodYears)) return null;
+  if (paybackPeriodYears <= 0) return 0;
   if (paybackPeriodYears <= 3) return 100;
   if (paybackPeriodYears <= 4) return 85;
   if (paybackPeriodYears <= 5) return 65;
@@ -50,14 +55,15 @@ export function scorePaybackPeriod(paybackPeriodYears: number): number {
   return 15;
 }
 
-export function scoreGrowthAndMargin(inputs: BusinessInputs): number {
-  const margin = inputs.annualRevenue > 0 ? inputs.sde / inputs.annualRevenue : 0;
+export function scoreGrowthAndMargin(inputs: BusinessInputs): number | null {
+  if (!Number.isFinite(inputs.annualRevenue) || inputs.annualRevenue <= 0 || !Number.isFinite(inputs.sde) || !Number.isFinite(inputs.growthRate)) return null;
+  const margin = inputs.sde / inputs.annualRevenue;
   const growth = inputs.growthRate;
 
   // Blend margin quality (0-15%+ considered strong for Main Street) and
   // growth rate into one 0-100 sub-score.
-  const marginScore = Math.min((margin / 0.2) * 100, 100); // 20%+ margin = full marks
-  const growthScore = Math.min((growth / 0.1) * 100, 100); // 10%+ growth = full marks
+  const marginScore = boundScore((margin / 0.2) * 100); // 20%+ margin = full marks
+  const growthScore = boundScore((growth / 0.1) * 100); // 10%+ growth = full marks
 
   return Math.round(marginScore * 0.6 + growthScore * 0.4);
 }
@@ -65,10 +71,10 @@ export function scoreGrowthAndMargin(inputs: BusinessInputs): number {
 export function scoreValuation(
   inputs: BusinessInputs,
   valuation: ValuationEstimate
-): number {
+): number | null {
   // Compare purchase price to the blended estimate. Paying at or below the
   // blended estimate scores well; significantly overpaying scores poorly.
-  if (valuation.blendedEstimate <= 0) return 50; // insufficient data, neutral score
+  if (!Number.isFinite(inputs.purchasePrice) || inputs.purchasePrice <= 0 || !Number.isFinite(valuation.blendedEstimate) || valuation.blendedEstimate <= 0) return null;
 
   const priceToValueRatio = inputs.purchasePrice / valuation.blendedEstimate;
 
@@ -91,16 +97,18 @@ export function calculateAcquisitionScore(
   const growthScore = scoreGrowthAndMargin(inputs);
   const valuationScore = scoreValuation(inputs, valuation);
 
-  const totalScore = Math.round(
-    dscrScore * 0.3 +
-      roiScore * 0.25 +
-      paybackScore * 0.2 +
-      growthScore * 0.15 +
-      valuationScore * 0.1
-  );
+  const complete = [dscrScore, roiScore, paybackScore, growthScore, valuationScore].every((score) => score !== null);
+  const totalScore = complete ? Math.round(
+    dscrScore! * 0.3 +
+      roiScore! * 0.25 +
+      paybackScore! * 0.2 +
+      growthScore! * 0.15 +
+      valuationScore! * 0.1
+  ) : null;
 
   let rating: AcquisitionScoreBreakdown["rating"];
-  if (totalScore >= 85) rating = "excellent";
+  if (totalScore === null) rating = "unavailable";
+  else if (totalScore >= 85) rating = "excellent";
   else if (totalScore >= 70) rating = "good";
   else if (totalScore >= 50) rating = "fair";
   else if (totalScore >= 30) rating = "risky";

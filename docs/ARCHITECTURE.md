@@ -63,3 +63,9 @@ Adding a new calculated metric:
 6. Only then build the UI to display it.
 
 This order (types → pure function → test → orchestrator → docs → UI) is intentional — it keeps the engine correct and documented before any UI depends on it.
+
+## Listing capture and app installation
+
+`extension/popup.ts` and `components/ListingImport.tsx` share `lib/import/listing.ts`; the extension bundles only browser-safe modules. `lib/calculations/listingScreen.ts` owns screening ratios. Capture requires a toolbar gesture and an explicit capture click. No automatic scripts or broad host access are used. Only allowlisted numbers and short source excerpts cross the extension/web boundary, in a URL fragment that the receiver removes immediately before parsing. Every import has a review step and starts a new deal without sample financials. Source metadata and the remaining-assumptions flag are persisted with snapshots. Pending imports are excluded from comparison ranking.
+
+The manifest and `/install` page provide a home-screen web app, not a native App Store package. There is no offline shell or cross-device synchronization in this release. The extension works without the server for capture, drafts, ratios and JSON export.

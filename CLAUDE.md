@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+The active workbench uses lib/calculations/workbench.ts and docs/WORKBENCH-MODEL.md. Legacy financial code remains for historical tests; its illustrative thresholds and benchmark blends do not drive the current interface. Cloud AI remains disabled.
+
 This file gives Claude Code (or any contributor) the context needed to work on this project correctly. Read this before making changes.
 
 ## What this project is
@@ -12,7 +14,7 @@ This file gives Claude Code (or any contributor) the context needed to work on t
 
 1. **Never put calculation logic in a component.** All math lives in `lib/calculations/*.ts` as pure, exported, unit-tested functions. Components only call these functions and render the result. If you're about to write `revenue * multiple` inside a `.tsx` file, stop — it belongs in `lib/calculations`.
 2. **Every calculation function needs a test.** `lib/calculations/__tests__/` mirrors `lib/calculations/` one-to-one. Run `npm test` before considering any calculation change done. Currently: 35/35 tests passing across valuation, financing, returns, scenarios, and scoring — keep it green.
-3. **No invented financial data.** Industry benchmark multiples (`lib/benchmarks/industryMultiples.ts`) must cite a source in the `source` field. If you don't have a sourced number, mark it clearly as an estimate rather than presenting it as authoritative — this tool's credibility depends on not pretending precision it doesn't have.
+3. **No invented financial data.** A benchmark number must cite an exact source, publication date, covered period and relevant segment. If that evidence is absent, label the number as an educational assumption rather than attributing it broadly to a provider or presenting it as market evidence.
 4. **Formulas must match `docs/FORMULAS.md` exactly.** If you change a formula or a scoring weight in code, update that doc in the same commit. They must never drift apart — a contributor should be able to read the doc and verify the code does what it says.
 5. **TypeScript strict mode stays on.** Don't add `any` to get past a type error — fix the type. `noUncheckedIndexedAccess` is on for a reason (array access safety); don't turn it off.
 6. **Privacy-first architecture.** This tool analyzes potentially sensitive business financials. Default behavior is fully client-side (IndexedDB, no server round-trip for analysis data). Don't add a backend/database for analysis data without discussing it first — that's an intentional design decision, not an oversight.
@@ -35,8 +37,8 @@ lib/
     scoring.ts               weighted acquisition score (0-100)
     index.ts                 runAnalysis() — the single orchestrator, wires everything together
     __tests__/                one test file per module above
-  benchmarks/               industry multiple datasets (sourced)
-  storage/                  IndexedDB read/write, export/import (not yet built)
+  benchmarks/               retained educational multiple assumptions
+  storage/                  IndexedDB read/write, validated versioned JSON export/import
 types/business.ts           the shared contract — BusinessInputs, FinancingInputs, AnalysisResult, etc.
 docs/
   FORMULAS.md                every formula explained, must match code
@@ -47,23 +49,46 @@ docs/
 
 ## Current state (update this section as you go)
 
+**Release direction:** follow `docs/REDESIGN-RELEASE.md` for the owner's master-spec milestones and evidence gates. Preserve production until the redesign and required verification are ready. Do not enable cloud AI.
+
 **Done:**
-- Full calculation engine: valuation, financing/DSCR, returns/cash flow, scenario modeling, acquisition scoring — all pure, typed, unit-tested (35 tests passing).
+- Scenario projections preserve entered SDE with an explicit fixed-dollar reconciliation and stop debt service at bank/seller maturities. Reconciliation and scheduled debt are visible in the scenario workspace; labor/capex/working-capital exclusions remain explicit.
+- Manifest V3 Chrome/Edge extension: click-only listing capture, editable review, on-device ratios, local draft, JSON export, and fragment handoff to the website.
+- Shared conservative USD listing extractor with ambiguity and missing-value handling; saved source metadata and explicit remaining-assumptions review.
+- Installable web app manifest, mobile-friendly input sizing, and `/install` instructions/download route.
+- Extension packaging is reproducible with `npm run build:extension`; `npm run build` runs it automatically.
+- Saved-deal JSON import validates nested fields and metadata before persistence, caps file reads at 256 KiB, and bounds amortization work. Valid version-one/two exports preserve financial values and source evidence.
+- Workspace tabs use one keyboard tab stop plus Arrow/Home/End navigation, skipping the locked memo. The defect was reproduced in the public desktop app before the local fix.
+- September 5 checkpoint: 128 unit tests pass; TypeScript, extension packaging and Next.js production build verified locally. Phone and extension acceptance on physical devices still pending.
+- Full calculation engine: valuation, financing/DSCR, returns/cash flow, scenario modeling, acquisition scoring, funding-gap validation, and explainable diligence insights — all pure, typed, unit-tested (40 tests passing).
 - `runAnalysis()` orchestrator ties every module together into one `AnalysisResult`.
 - Project scaffolding: Next.js 14 + TypeScript + Tailwind, Vitest configured with `@/` path alias, industry benchmark dataset with 10 industries.
+- Responsive acquisition workspace with business and financing inputs, live deal scoring, and sample-data reset.
+- Investment memo dashboard with valuation, DSCR, cash-on-cash ROI, payback period, score transparency, valuation cross-checks, and five-year scenario charts/tables.
+- Private IndexedDB deal snapshots plus versioned JSON import/export.
+- Seller-financing inputs with combined debt-service modeling and a sources-and-uses funding check.
+- Side-by-side comparison workspace for ranking up to four saved acquisitions by score, ROI, DSCR, cash flow, valuation, and payback.
+- Investor-style PDF memo export, custom one-to-ten-year scenarios, an earnings/rate sensitivity matrix, and deterministic due-diligence priorities with next-step guidance.
+- AI research modules and regression fixtures preserved. Cloud AI is disabled for this release; the route returns 503 with no network call. See `docs/AI_METHODOLOGY.md`.
+- Unit-tested Gemini transport boundary covering structured request configuration, compact evidence transmission, and defensive response extraction.
+- Initial accessibility pass: skip navigation, semantic tab panels, screen-reader field help, keyboard focus visibility, polite status announcements, and reduced-motion support.
+- Deterministic AI regression rubric with scenario-specific verdict gates, confidence limits, evidence-citation checks, and CI-ready fixtures.
+- Private field-level evidence provenance for key financial claims, persisted through saved deals and versioned JSON exports and included in the AI evidence packet.
+- Evidence-quality appendix in the PDF investment memo, with explicit verification flags and a user-selected-label disclaimer.
+- Deterministic input-integrity preflight that blocks unusable core inputs and flags unusual earnings relationships or mismatched funding before memo and AI interpretation.
 
 **Not yet built (in priority order — this is the roadmap):**
-1. `components/inputs/BusinessInfoForm.tsx` + `FinancingForm.tsx` — the actual data entry UI
-2. `components/results/*` — dashboard showing valuation, DSCR, cash flow, ROI, payback, break-even chart (use Recharts)
-3. `app/analysis/[id]/page.tsx` — wire the form + results together into one working single-business analysis flow (this completes the MVP)
-4. `lib/storage/` — IndexedDB persistence (use the `idb` package, already in package.json) + JSON export/import
-5. `components/scenarios/*` — scenario toggle/slider + comparison table/chart
-6. `app/compare/page.tsx` — multi-business side-by-side comparison
-7. `components/results/ScoreBreakdown.tsx` — visualize the acquisition score with its sub-score breakdown (transparency matters here — show the weights, not just the number)
-8. PDF report export via `@react-pdf/renderer`
-9. Polish: screenshots, demo GIF for README, deploy to Vercel
+1. Browser acceptance testing of the extension and phone installation on actual devices
+2. Browser acceptance of saved-deal JSON import/error recovery
+3. Extend listing extraction using representative, permitted fixtures; preserve unknown values
+4. PDF document extraction with evidence review
+5. Offline web app support; cloud AI requires a separately eligible operator
 
 ## Commands
+
+### Saved-deal import limits
+
+Imports reject malformed data rather than coercing strings or inventing missing numbers. JSON object properties must be unique after escape decoding, and nesting is limited to 100 containers. Technical supported bounds: 256 KiB UTF-8, monetary magnitudes up to $1 trillion (negative SDE/EBITDA allowed), growth from -100% to 1000%, nonnegative integer employee counts up to 10 million, interest rates from 0% to 100%, and loan terms from 0 to 100 years (at most 1,200 schedule rows per loan). These are parser/resource limits, not underwriting recommendations. Zero or economically inconsistent inputs still go through the existing financial preflight. IDs must be nonblank and at most 256 characters; current workspace names are limited to 180 characters, reporting periods to 100 characters and earnings reconciliations to 1,500 characters. Legacy recovery accepts an older name up to 1,000 characters and truncates its review copy to the current boundary. Saved and listing timestamps must be valid timezone-aware ISO instants and cannot be more than five minutes ahead of the device clock. Imported source notes require a nonblank location and excerpt; only a listing claim may preserve an unknown source date. Listing source objects use the separate listing validator. No cloud call is involved.
 
 ```bash
 npm run dev              # local dev server

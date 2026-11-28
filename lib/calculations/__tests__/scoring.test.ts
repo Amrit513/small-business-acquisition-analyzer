@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateAcquisitionScore } from "@/lib/calculations/scoring";
+import { calculateAcquisitionScore, scoreDSCR, scoreGrowthAndMargin, scorePaybackPeriod, scoreROI, scoreValuation } from "@/lib/calculations/scoring";
 import { estimateValuation } from "@/lib/calculations/valuation";
 import { summarizeLoan, calculateDSCR } from "@/lib/calculations/financing";
 import { calculateCashFlow, calculateReturns } from "@/lib/calculations/returns";
@@ -53,39 +53,54 @@ function scoreDeal(inputs: BusinessInputs, financing: FinancingInputs) {
 }
 
 describe("calculateAcquisitionScore", () => {
-  it("scores a well-financed, healthy business significantly higher than a weak one", () => {
+  it("scores a complete healthy business and suppresses an incomplete index", () => {
     const strongScore = scoreDeal(strongDealInputs, strongDealFinancing);
     const weakScore = scoreDeal(weakDealInputs, weakDealFinancing);
 
-    expect(strongScore.totalScore).toBeGreaterThan(weakScore.totalScore);
+    expect(strongScore.totalScore).not.toBeNull();
+    expect(weakScore).toMatchObject({ paybackScore: null, totalScore: null, rating: "unavailable" });
   });
 
   it("keeps the total score within 0-100", () => {
     const strongScore = scoreDeal(strongDealInputs, strongDealFinancing);
-    const weakScore = scoreDeal(weakDealInputs, weakDealFinancing);
-
-    for (const score of [strongScore, weakScore]) {
-      expect(score.totalScore).toBeGreaterThanOrEqual(0);
-      expect(score.totalScore).toBeLessThanOrEqual(100);
-    }
+    expect(strongScore.totalScore).not.toBeNull();
+    expect(strongScore.totalScore!).toBeGreaterThanOrEqual(0);
+    expect(strongScore.totalScore!).toBeLessThanOrEqual(100);
   });
 
-  it("assigns a rating consistent with the total score thresholds", () => {
-    const weakScore = scoreDeal(weakDealInputs, weakDealFinancing);
-    if (weakScore.totalScore < 30) {
-      expect(weakScore.rating).toBe("poor");
-    }
+  it("assigns a rating consistent with a complete total score", () => {
+    const strongScore = scoreDeal(strongDealInputs, strongDealFinancing);
+    expect(strongScore.rating).not.toBe("unavailable");
   });
 
   it("computes the total as the documented weighted sum of sub-scores", () => {
     const score = scoreDeal(strongDealInputs, strongDealFinancing);
     const expectedTotal = Math.round(
-      score.dscrScore * 0.3 +
-        score.roiScore * 0.25 +
-        score.paybackScore * 0.2 +
-        score.growthScore * 0.15 +
-        score.valuationScore * 0.1
+      score.dscrScore! * 0.3 +
+        score.roiScore! * 0.25 +
+        score.paybackScore! * 0.2 +
+        score.growthScore! * 0.15 +
+        score.valuationScore! * 0.1
     );
     expect(score.totalScore).toBe(expectedTotal);
+  });
+
+  it("does not award a favorable coverage score when debt coverage is inapplicable", () => {
+    expect(scoreDSCR({ dscr: null, rating: "not-applicable", meetsIllustrativeThreshold: null })).toBeNull();
+  });
+
+  it("does not award return points for unavailable ratios", () => {
+    expect(scoreROI(null)).toBeNull();
+    expect(scorePaybackPeriod(null)).toBeNull();
+  });
+
+  it("bounds finite growth and margin performance to the intended scale", () => {
+    expect(scoreGrowthAndMargin({ ...strongDealInputs, sde: -100000, growthRate: -1 })).toBe(0);
+    expect(scoreGrowthAndMargin({ ...strongDealInputs, sde: 9000000, growthRate: 10 })).toBe(100);
+  });
+
+  it("keeps invalid growth or valuation inputs unavailable", () => {
+    expect(scoreGrowthAndMargin({ ...strongDealInputs, annualRevenue: 0 })).toBeNull();
+    expect(scoreValuation({ ...strongDealInputs, purchasePrice: 0 }, estimateValuation(strongDealInputs))).toBeNull();
   });
 });

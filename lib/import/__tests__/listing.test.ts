@@ -1,0 +1,120 @@
+import { describe, expect, it } from "vitest";
+import { extractListing, LISTING_REVIEW_WARNING, listingFragment, listingFromFragment, parseListingAmount, parseListingDraft, reviewListingAmounts, safeListingUrl } from "../listing";
+import { fromListing } from "@/lib/workspace/deal";
+
+describe("listing import boundary", () => {
+  it("extracts labeled USD figures and keeps source snippets", () => {
+    const draft = extractListing("Asking Price: $425,000\nAnnual Revenue\n$520K\nCash Flow (SDE): $170,000\nEBITDA: USD 125000", "Atlas", "https://example.com/business?token=secret#x");
+    expect(draft.values).toEqual({ purchasePrice: 425000, annualRevenue: 520000, sde: 170000, ebitda: 125000 });
+    expect(draft.url).toBe("https://example.com/business");
+    expect(draft.quotes.annualRevenue).toContain("$520K");
+  });
+  it.each(["$1M-$2M", "$10,000 / month", "€400000", "CAD 100000", "3.5x", "-1000", "1,23", "Undisclosed", "$500,000+", "£20K", "1e8"])("leaves unsupported amount %s unknown", raw => expect(parseListingAmount(raw)).toBeUndefined());
+  it("rounds positive claims and reported losses symmetrically to cents",()=>{
+    expect(parseListingAmount("$1.005","purchasePrice")).toBe(1.01);
+    expect(parseListingAmount("-$1.005","sde")).toBe(-1.01);
+    const subCentLoss=parseListingAmount("-$0.004","sde");
+    expect(subCentLoss).toBe(0);
+    expect(Object.is(subCentLoss,-0)).toBe(false);
+  });
+  it("does not convert ambiguous cash flow to SDE or select one of conflicting revenue figures", () => {
+    const draft = extractListing("Cash Flow: $100,000\nRevenue: $300,000\nRevenue: $500,000");
+    expect(draft.values).toEqual({});
+    expect(draft.warnings.join(" ")).toContain("Cash flow");
+  });
+  it("does not hide an uncertain amount behind another matching label", () => {
+    expect(extractListing("Asking Price: $500K\nAsking Price: $400K-$600K").values.purchasePrice).toBeUndefined();
+  });
+  it("flags monthly claims without annualizing them", () => {
+    const draft = extractListing("Monthly Revenue: $50K\nAnnual Revenue: $600K\nSDE per month: $10K\nEBITDA: $120K / mo");
+    expect(draft.values).toEqual({ annualRevenue: 600000 });
+    expect(draft.warnings).toContain("Annual revenue includes a monthly claim. It was not annualized; confirm and enter an annual USD amount manually.");
+    expect(draft.warnings).toContain("SDE includes a monthly claim. It was not annualized; confirm and enter an annual USD amount manually.");
+    expect(draft.warnings).toContain("EBITDA includes a monthly claim. It was not annualized; confirm and enter an annual USD amount manually.");
+  });
+  it("flags a revenue amount whose label does not state its period", () => {
+    const draft = extractListing("Revenue: $300K");
+    expect(draft.values.annualRevenue).toBe(300000);
+    expect(draft.warnings).toContain("The revenue label did not state an annual or TTM period. Confirm its reporting period before use.");
+  });
+  it("round-trips unicode through a fragment without putting values in a server query", () => {
+    const draft = extractListing("Asking Price: $20K", "Café & co.");
+    const fragment = listingFragment(draft);
+    expect(listingFromFragment(fragment)?.title).toBe("Café & co.");
+    expect(new URL(`https://example.com/${fragment}`).search).toBe("");
+  });
+  it("keeps the largest accepted warning set safe for export and handoff", () => {
+    const raw = { ...extractListing("Asking Price: $20K"), warnings: Array.from({ length: 19 }, (_, index) => `Review note ${index + 1}`) };
+    const parsed = parseListingDraft(JSON.stringify(raw));
+    const restored = listingFromFragment(listingFragment(parsed));
+    expect(parsed.warnings).toHaveLength(20);
+    expect(parsed.warnings).toContain(LISTING_REVIEW_WARNING);
+    expect(restored?.warnings).toEqual(parsed.warnings);
+  });
+  it("rejects warning sets that normalization would make unsafe to reimport", () => {
+    const raw = { ...extractListing("Asking Price: $20K"), warnings: Array.from({ length: 20 }, (_, index) => `Review note ${index + 1}`) };
+    expect(() => parseListingDraft(JSON.stringify(raw))).toThrow("This listing has too many warnings.");
+  });
+  it("rejects oversized, nonfinite and invalid values", () => {
+    expect(() => parseListingDraft(" ".repeat(12001))).toThrow();
+    expect(() => parseListingDraft('{"kind":"acquisition-lens-listing","version":1,"values":{"sde":1e999}}')).toThrow();
+    expect(() => listingFromFragment("#listing=%BAD")).toThrow();
+  });
+  it("accepts a valid listing file saved with a UTF-8 byte-order mark", () => {
+    const raw = "\ufeff" + JSON.stringify(extractListing("Asking Price: $200K"));
+    expect(parseListingDraft(raw).values.purchasePrice).toBe(200000);
+  });
+  it("normalizes listing titles without allowing a whitespace-only deal name",()=>{
+    const base=extractListing("Asking Price: $200K","  Atlas Services  ");
+    expect(base.title).toBe("Atlas Services");
+    expect(parseListingDraft(JSON.stringify({...base,title:"   "})).title).toBe("Imported listing");
+    const reviewed=reviewListingAmounts({...base,title:" \t "},{purchasePrice:"200000"});
+    expect(reviewed.ok&&reviewed.draft.title).toBe("Imported listing");
+  });
+  it("rejects unsupported structure instead of silently discarding it", () => {
+    const base = extractListing("Asking Price: $200K");
+    for (const change of [
+      { ...base, evidence: { purchasePrice: "document-supported" } },
+      { ...base, values: { purchasePrice: 200000, ownerSalary: 50000 } },
+      { ...base, quotes: { purchasePrice: "Asking Price: $200K", ownerSalary: "Seller pay: $50K" } },
+      { ...base, warnings: [5] },
+    ]) expect(() => parseListingDraft(JSON.stringify(change))).toThrow();
+  });
+  it("rejects an orphan source excerpt instead of silently discarding provenance", () => {
+    const base = extractListing("Asking Price: $200K");
+    delete base.values.purchasePrice;
+    expect(() => parseListingDraft(JSON.stringify(base))).toThrow("Asking price excerpt requires a matching amount.");
+  });
+  it("keeps missing listing values unknown while preserving explicit zero", () => {
+    const draft = parseListingDraft(JSON.stringify(extractListing("Asking Price: $200K")));
+    const deal = fromListing(draft, "listing-test", "2026-11-26T00:00:00.000Z");
+    expect(deal.values.purchasePrice).toBe(200000);
+    expect(deal.values.sde).toBeNull();
+    expect(deal.values.bankDebt).toBeNull();
+    const explicitZero = fromListing(parseListingDraft(JSON.stringify(extractListing("Asking Price: $0"))), "zero-test", "2026-11-26T00:00:00.000Z");
+    expect(explicitZero.values.purchasePrice).toBe(0);
+  });
+  it("rejects executable and credential-bearing source links", () => {
+    expect(safeListingUrl("javascript:alert(1)")).toBe("");
+    expect(safeListingUrl("https://user:password@example.com")).toBe("");
+  });
+  it("reviews edited amounts consistently and unlinks changed excerpts", () => {
+    const draft=extractListing("Asking Price: $200K\nAnnual Revenue: $300K");
+    const invalid=reviewListingAmounts(draft,{purchasePrice:"$100K-$200K",annualRevenue:"300000"});
+    expect(invalid).toMatchObject({ok:false,field:"purchasePrice"});
+    const reviewed=reviewListingAmounts(draft,{purchasePrice:"250000",annualRevenue:"300000"});
+    expect(reviewed.ok&&reviewed.draft.values).toEqual({purchasePrice:250000,annualRevenue:300000});
+    expect(reviewed.ok&&reviewed.draft.quotes.purchasePrice).toBeUndefined();
+    expect(reviewed.ok&&reviewed.draft.quotes.annualRevenue).toContain("Annual Revenue");
+  });
+  it("keeps missing or malformed capture provenance unknown", () => {
+    const base = { ...extractListing("Asking Price: $200K"), capturedAt: undefined };
+    expect(parseListingDraft(JSON.stringify(base)).capturedAt).toBe("");
+    expect(parseListingDraft(JSON.stringify({ ...base, capturedAt: "January 1" })).capturedAt).toBe("");
+    expect(parseListingDraft(JSON.stringify({ ...base, capturedAt: "2026-11-15T12:30:00-05:00" })).capturedAt).toBe("2026-11-15T17:30:00.000Z");
+  });
+  it("does not present a far-future timestamp as capture provenance", () => {
+    const base = extractListing("Asking Price: $200K");
+    expect(parseListingDraft(JSON.stringify({ ...base, capturedAt: "9999-01-01T00:00:00Z" })).capturedAt).toBe("");
+  });
+});

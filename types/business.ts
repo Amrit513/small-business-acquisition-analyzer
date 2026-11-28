@@ -113,14 +113,14 @@ export interface CashFlowResult {
 
 export interface ReturnsResult {
   totalCashInvested: number;
-  cashOnCashROI: number;
-  paybackPeriodYears: number;
+  cashOnCashROI: number | null;
+  paybackPeriodYears: number | null;
 }
 
 export interface DSCRResult {
-  dscr: number;
-  rating: "strong" | "acceptable" | "weak" | "critical";
-  meetsTypicalLenderMinimum: boolean;
+  dscr: number | null;
+  rating: "strong" | "acceptable" | "weak" | "critical" | "not-applicable";
+  meetsIllustrativeThreshold: boolean | null;
 }
 
 export interface BreakEvenPoint {
@@ -129,13 +129,13 @@ export interface BreakEvenPoint {
 }
 
 export interface AcquisitionScoreBreakdown {
-  dscrScore: number;
-  roiScore: number;
-  paybackScore: number;
-  growthScore: number;
-  valuationScore: number;
-  totalScore: number;
-  rating: "excellent" | "good" | "fair" | "risky" | "poor";
+  dscrScore: number | null;
+  roiScore: number | null;
+  paybackScore: number | null;
+  growthScore: number | null;
+  valuationScore: number | null;
+  totalScore: number | null;
+  rating: "excellent" | "good" | "fair" | "risky" | "poor" | "unavailable";
 }
 
 /** The full output of running one business + financing + scenario through the engine. */

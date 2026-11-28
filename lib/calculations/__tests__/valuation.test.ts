@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { estimateValuation, calculateProfitMargin } from "@/lib/calculations/valuation";
+import { INDUSTRY_BENCHMARKS } from "@/lib/benchmarks/industryMultiples";
 import type { BusinessInputs } from "@/types/business";
 
 const baseInputs: BusinessInputs = {
@@ -42,6 +43,14 @@ describe("estimateValuation", () => {
   it("attaches the correct industry benchmark", () => {
     const result = estimateValuation(baseInputs);
     expect(result.industryBenchmark.industry).toBe("service");
+  });
+
+  it("labels every undated legacy range as an educational assumption", () => {
+    for (const benchmark of Object.values(INDUSTRY_BENCHMARKS)) {
+      expect(benchmark.source).toContain("Legacy educational assumption");
+      expect(benchmark.source).toContain("not verified market evidence");
+      expect(benchmark.source).not.toMatch(/BizBuySell|IBBA|Empire Flippers|FE International|SaaS Capital/);
+    }
   });
 });
 

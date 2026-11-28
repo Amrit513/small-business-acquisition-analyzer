@@ -6,6 +6,7 @@ import type {
   LoanSummary,
 } from "@/types/business";
 import { roundToCents, roundToHundredths } from "@/lib/calculations/valuation";
+import { sumCents } from "@/lib/calculations/precision";
 
 /**
  * Calculates the fixed monthly payment for an amortizing loan using the
@@ -28,13 +29,14 @@ export function calculateMonthlyLoanPayment(
 ): number {
   if (principal <= 0 || termYears <= 0) return 0;
 
-  const n = termYears * 12;
-  if (annualInterestRate === 0) {
-    return roundToCents(principal / n);
+  const principalCents = roundToCents(principal);
+  const n = Math.max(1, Math.round(termYears * 12));
+  const r = annualInterestRate / 12;
+  if (r === 0) {
+    return roundToCents(principalCents / n);
   }
 
-  const r = annualInterestRate / 12;
-  const payment = (principal * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1);
+  const payment = principalCents * (r / -Math.expm1(-n * Math.log1p(r)));
   return roundToCents(payment);
 }
 
@@ -46,12 +48,14 @@ export function buildAmortizationSchedule(
 ): AmortizationRow[] {
   if (principal <= 0 || termYears <= 0) return [];
 
-  const n = termYears * 12;
+  const principalCents = roundToCents(principal);
+  if (principalCents === 0) return [];
+  const n = Math.max(1, Math.round(termYears * 12));
   const monthlyPayment = calculateMonthlyLoanPayment(principal, annualInterestRate, termYears);
   const r = annualInterestRate / 12;
 
   const schedule: AmortizationRow[] = [];
-  let balance = principal;
+  let balance = principalCents;
 
   for (let month = 1; month <= n; month++) {
     const interest = roundToCents(balance * r);
@@ -60,7 +64,7 @@ export function buildAmortizationSchedule(
     const isLastMonth = month === n;
     const principalPortion = isLastMonth
       ? balance
-      : roundToCents(monthlyPayment - interest);
+      : Math.min(balance, Math.max(0, roundToCents(monthlyPayment - interest)));
     balance = roundToCents(balance - principalPortion);
 
     schedule.push({
@@ -109,15 +113,14 @@ export function summarizeLoan(financing: FinancingInputs): LoanSummary {
     : 0;
 
   const monthlyPayment = roundToCents(primaryMonthlyPayment + sellerMonthlyPayment);
-  const annualDebtService = roundToCents(monthlyPayment * 12);
+  const amortizationSchedule = mergeSchedules(primarySchedule, sellerSchedule);
+  const annualDebtService = roundToCents(
+    amortizationSchedule.slice(0, 12).reduce((total, row) => total + row.payment, 0)
+  );
 
   const totalInterestPaid = roundToCents(
     sumInterest(primarySchedule) + sumInterest(sellerSchedule)
   );
-
-  // Merge schedules month-by-month for a combined view when seller
-  // financing is present; otherwise just use the primary schedule.
-  const amortizationSchedule = mergeSchedules(primarySchedule, sellerSchedule);
 
   return {
     monthlyPayment,
@@ -125,6 +128,15 @@ export function summarizeLoan(financing: FinancingInputs): LoanSummary {
     totalInterestPaid,
     amortizationSchedule,
   };
+}
+
+/** Purchase price not covered by the proposed sources of funds. */
+export function calculateFundingGap(
+  purchasePrice: number,
+  financing: FinancingInputs
+): number {
+  const sellerAmount = financing.sellerFinancing?.amount ?? 0;
+  return sumCents(purchasePrice, -financing.downPayment, -financing.loanAmount, -sellerAmount);
 }
 
 function sumInterest(schedule: AmortizationRow[]): number {
@@ -158,21 +170,14 @@ function mergeSchedules(
 }
 
 /**
- * Debt Service Coverage Ratio (DSCR) — the single most important metric
- * a lender (especially SBA lenders) looks at when underwriting a business
- * acquisition loan.
- *
- *   DSCR = Annual Net Operating Income (SDE) / Annual Total Debt Service
- *
- * Interpretation (aligned with common SBA underwriting norms):
- *   >= 1.25 : strong / bankable
- *   1.0 - 1.25 : acceptable but thin — many lenders require 1.15-1.25 minimum
- *   0.8 - 1.0 : weak — the business barely or doesn't cover its own debt
- *   < 0.8 : critical — the business cannot service this debt load as structured
+ * Legacy screening coverage = reported SDE / scheduled annual debt service.
+ * The labels and 1.25x comparison are educational model conventions, not a
+ * lender rule or approval signal. With no scheduled debt the ratio does not
+ * exist, so every coverage classification remains explicitly inapplicable.
  */
 export function calculateDSCR(inputs: BusinessInputs, loan: LoanSummary): DSCRResult {
   if (loan.annualDebtService === 0) {
-    return { dscr: Infinity, rating: "strong", meetsTypicalLenderMinimum: true };
+    return { dscr: null, rating: "not-applicable", meetsIllustrativeThreshold: null };
   }
 
   const dscr = roundToHundredths(inputs.sde / loan.annualDebtService);
@@ -186,6 +191,6 @@ export function calculateDSCR(inputs: BusinessInputs, loan: LoanSummary): DSCRRe
   return {
     dscr,
     rating,
-    meetsTypicalLenderMinimum: dscr >= 1.25,
+    meetsIllustrativeThreshold: dscr >= 1.25,
   };
 }

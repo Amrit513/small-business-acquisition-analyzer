@@ -1,4 +1,6 @@
-# Financial Formulas Reference
+# Historical engine formulas (not the current workbench)
+
+The active version 3.0 model is documented in [WORKBENCH-MODEL.md](WORKBENCH-MODEL.md). The definitions below apply only to retained legacy library code and tests; the current interface and memo do not use its blended benchmark valuation, lender flag, or score.
 
 This document is the source of truth for every calculation in the engine. If code and this doc ever disagree, that's a bug — file it. Every formula below links to its implementation.
 
@@ -13,9 +15,9 @@ Three independent methods, then a blended estimate. Small-business valuation is 
 | Revenue method | `Annual Revenue × industry revenue multiple` | Sanity check when margins are unclear |
 
 **Blended estimate:** `SDE method × 0.5 + EBITDA method × 0.3 + Revenue method × 0.2`
-SDE is weighted heaviest because it's the standard method for the size of business this tool targets.
+This 50/30/20 weighting is a retained educational assumption, not a sourced market convention.
 
-Industry multiples come from `lib/benchmarks/industryMultiples.ts`, each with a cited source (BizBuySell Insight Reports, IBBA Market Pulse Surveys, or sector-specific marketplace data). These are directional ranges, not appraisals — a real acquisition should always get a professional valuation.
+The retained ranges in `lib/benchmarks/industryMultiples.ts` do not have an exact dated source in the repository. Each is labeled as a legacy educational assumption rather than attributed to a market-data provider. They are not comparables, market evidence or appraisals. A future sourced replacement must record the exact publication, date, covered period and relevant segment beside the number.
 
 Implementation: `lib/calculations/valuation.ts` → `estimateValuation()`
 
@@ -24,7 +26,7 @@ Implementation: `lib/calculations/valuation.ts` → `estimateValuation()`
 ```
 Implied Revenue Multiple = Purchase Price / Annual Revenue
 ```
-Compare against the industry benchmark range to sanity-check whether the asking price is in a normal range for the sector.
+The legacy engine compares this ratio with its educational range. That comparison does not establish a normal market range for the sector.
 
 ## 3. Profit Margin
 
@@ -43,23 +45,39 @@ Monthly Payment = Principal × [ r(1+r)ⁿ ] / [ (1+r)ⁿ − 1 ]
 ```
 Special case: at 0% interest, payment is simply `Principal / n` (straight-line), since the formula above divides by zero at r = 0.
 
+The financed principal is normalized to cents before applying either formula. Every scheduled payment, principal portion, interest amount and remaining balance is then kept at cent precision, with the final payment adjusted to reconcile the rounded principal exactly.
+
 Implementation: `lib/calculations/financing.ts` → `calculateMonthlyLoanPayment()`, `buildAmortizationSchedule()`
 
 If seller financing is present, it's calculated as a second, independent amortizing loan and combined with the primary loan (`summarizeLoan()`).
 
-## 5. Debt Service Coverage Ratio (DSCR)
+The funding check verifies that the proposed sources match the purchase price:
+```
+Funding Gap = Purchase Price − Down Payment − Primary Loan − Seller Note
+```
+A positive result is still unfunded; a negative result means the proposed sources exceed the purchase price.
+Each monetary operand is rounded to cents before subtraction, then the difference is rounded to cents. This prevents separate fractional-cent sources from cancelling at a precision the model does not report. The legacy structural preflight flags either a shortfall or excess of at least one cent, matching the active workbench completeness rule.
 
-The single most important number to a lender:
+Implementation: `lib/calculations/financing.ts` → `calculateFundingGap()`
+
+## 5. Legacy screening debt coverage
+
+This retained engine divides reported SDE by annual scheduled debt service. The result is an educational screening ratio, not a lender standard or approval decision:
 ```
 DSCR = Annual SDE / Annual Total Debt Service
+Annual Total Debt Service = sum of actual scheduled payments in months 1–12
 ```
+
+A note that matures during the first year contributes only its scheduled payments through maturity; the engine does not extend its opening monthly payment across all twelve months.
 
 | DSCR | Rating | Meaning |
 |---|---|---|
-| ≥ 1.25 | Strong | Meets typical SBA lender minimums |
-| 1.00 – 1.25 | Acceptable | Thin coverage; some lenders may still decline |
+| ≥ 1.25 | Strong | Clears the model's illustrative comparison threshold |
+| 1.00 – 1.25 | Acceptable | Covers modeled debt with a limited cushion |
 | 0.80 – 1.00 | Weak | Business barely/doesn't cover its own debt |
 | < 0.80 | Critical | Cannot service this debt as structured |
+
+With no scheduled debt, the ratio, rating and threshold comparison are not applicable. The calculation returns `null` rather than infinity, and the legacy score receives no favorable coverage points from that missing ratio.
 
 Implementation: `lib/calculations/financing.ts` → `calculateDSCR()`
 
@@ -79,7 +97,7 @@ Implementation: `lib/calculations/returns.ts` → `calculateCashFlow()`
 Total Cash Invested = Down Payment + Closing Costs
 Cash-on-Cash ROI = Annual Cash Flow After Debt / Total Cash Invested
 ```
-This is the metric buyers use to compare an acquisition against alternatives (index funds, other deals, real estate).
+The ratio is available only when total buyer cash invested is positive. Zero buyer cash returns `null`; it does not imply a 0% return or a fully financed transaction.
 
 Implementation: `lib/calculations/returns.ts` → `calculateReturns()`
 
@@ -88,7 +106,7 @@ Implementation: `lib/calculations/returns.ts` → `calculateReturns()`
 ```
 Payback Period (years) = Total Cash Invested / Annual Cash Flow After Debt
 ```
-Returns `Infinity` if cash flow after debt is zero or negative — the investment never pays back under current assumptions.
+The period is available only when buyer cash invested and annual cash flow are both positive. Zero buyer cash or nonpositive cash flow returns `null`, with the reason determined from the inputs; neither state is represented as zero or infinity.
 
 ## 9. Break-Even Timeline
 
@@ -102,9 +120,18 @@ Growth is applied compounding, year over year:
 ```
 Revenue(year n) = Revenue(year 0) × (1 + revenue growth rate)ⁿ
 Expenses(year n) = Expenses(year 0) × (1 + expense growth rate)ⁿ
-SDE(year n) = Revenue(year n) − Expenses(year n)
+Reconciliation = Entered SDE − (Revenue(year 0) − Expenses(year 0))
+SDE(year n) = Revenue(year n) − Expenses(year n) + Reconciliation
+Debt service(year n) = sum of scheduled payments in months 12(n−1)+1 through 12n
+Pretax cash flow after debt(year n) = SDE(year n) − Debt service(year n)
 ```
-Debt service is held constant (fixed-rate loans don't change with performance), so an improved SDE flows directly through to improved cash flow.
+The reconciliation is held constant in nominal dollars and displayed explicitly. It preserves the entered earnings baseline; it does not authenticate add-backs or resolve contradictory evidence. A nonzero value requires diligence. Revenue and expenses compound independently with annual cent rounding; the model does not assume a constant earnings margin.
+
+Debt service uses the combined bank/seller amortization schedule, including partial years and the final payment adjustment, and becomes zero after both debts mature. It does not use the initial monthly payment multiplied by twelve forever. Supported horizons are 1–10 whole years; growth inputs are finite decimals from -1 to 10. These are technical bounds, not recommended assumptions.
+
+Independent examples: $24,000 bank debt at zero interest for two years plus $12,000 seller debt at zero interest for one year gives annual payments of $24,000, $12,000, then $0. With flat SDE of $180,000 the corresponding cash flows are $156,000, $168,000, and $180,000. A baseline of $800,000 revenue, $620,000 expenses and $150,000 entered SDE has a -$30,000 reconciliation; zero-growth scenarios must retain $150,000 SDE.
+
+These outputs remain simplified pretax screening cash flows. Buyer labor, replacement management, maintenance capex, working capital and taxes are not separately deducted in this milestone; they are outstanding model work, not assumed to be zero economic costs.
 
 | Scenario | Default revenue growth | Default expense growth |
 |---|---|---|
@@ -120,9 +147,11 @@ Implementation: `lib/calculations/scenarios.ts` → `projectScenario()`, `projec
 
 A weighted composite, fully transparent — every sub-score is independently computed and shown, not hidden behind a single number.
 
+Each available component is bounded from 0 to 100. Negative growth or margin performance bottoms out at zero rather than pulling the component below its intended scale. An inapplicable coverage, return, payback, growth/margin or valuation component remains `null`; the overall legacy index and rating are then unavailable instead of substituting neutral or favorable points. These weights are educational conventions, not validated predictors of acquisition quality or financing approval.
+
 | Factor | Weight | Rationale |
 |---|---|---|
-| DSCR | 30% | Can this deal get financed / survive its own debt |
+| DSCR | 30% | Modeled cushion above scheduled debt |
 | Cash-on-cash ROI | 25% | Is the return competitive with alternatives |
 | Payback period | 20% | Faster payback = lower risk |
 | Revenue growth + profit margin | 15% | Quality of the underlying business |
@@ -148,4 +177,8 @@ Implementation: `lib/calculations/scoring.ts` → `calculateAcquisitionScore()`,
 
 ---
 
-**A note on precision:** every number this tool produces is an estimate built from the inputs a user provides and general market benchmark data. It is not a substitute for a professional valuation, accountant, attorney, or lender's own underwriting. The goal is to help someone reason clearly about a potential deal — not to replace due diligence.
+**A note on precision:** cent and ratio rounding is sign-symmetric; exact halfway cases round away from zero so a gain and equal loss do not receive different treatment. A magnitude below the displayed precision that rounds to zero is normalized to unsigned zero, avoiding a misleading negative-zero amount. Every number this tool produces is an estimate built from the inputs a user provides and educational assumptions. It is not a substitute for a professional valuation, accountant, attorney, or lender's own underwriting. The goal is to help someone reason clearly about a potential deal — not to replace due diligence.
+
+## Listing screening ratios
+
+The extension reports asking price / SDE when both figures are present and SDE is positive. SDE margin is SDE / annual revenue when both are present and revenue is positive. Missing, nonfinite or negative inputs produce no ratio. These describe reported listing claims; they are not valuations or investment recommendations. Implementation: `lib/calculations/listingScreen.ts`.
