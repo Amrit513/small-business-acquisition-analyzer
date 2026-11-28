@@ -531,3 +531,7 @@ Every available retained-engine score component is now bounded to 0–100. Finit
 ## Honest legacy valuation assumptions
 
 The retained sector multiple ranges no longer cite broad provider names without an exact report, date, covered period or matching segment. Every range now identifies itself as a legacy educational assumption and explicitly says it is not verified market evidence. The valuation calculation, diligence insights and disabled research packet carry that limitation; falling within the illustration is a review item rather than positive evidence of market value. Regression coverage protects all ten labels and prevents the removed provider attributions from returning without supporting documentation. The active workbench continues to use user-entered educational multiples and does not present an appraisal.
+
+## Strict imported timestamps
+
+Saved-deal and listing timestamps now require a valid timezone-aware ISO instant rather than relying on JavaScript's permissive date parser. Informal dates, timezone-free values and impossible calendar dates are rejected before they can distort saved-library ordering or provenance; valid UTC and offset timestamps remain supported with the existing five-minute device-clock tolerance. Regression coverage protects leap dates, offset forms, future skew and both legacy and current deal-import boundaries. Real file-picker and device-clock acceptance remain pending.
