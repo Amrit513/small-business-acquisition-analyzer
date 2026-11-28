@@ -527,3 +527,7 @@ The retained financial engine now keeps cash-on-cash return unavailable when buy
 ## Bounded legacy index
 
 Every available retained-engine score component is now bounded to 0–100. Finite negative growth and earnings margins bottom out at zero instead of pulling the component or weighted total below its documented scale. Inapplicable coverage, return, payback, growth/margin or valuation remains null and suppresses the overall legacy index and rating rather than receiving automatic neutral or favorable points. Regression cases cover both extremes and unavailable inputs. The active workbench already suppressed its optional index for unresolved components; this aligns the secondary path without presenting the weights as validated predictors.
+
+## Honest legacy valuation assumptions
+
+The retained sector multiple ranges no longer cite broad provider names without an exact report, date, covered period or matching segment. Every range now identifies itself as a legacy educational assumption and explicitly says it is not verified market evidence. The valuation calculation, diligence insights and disabled research packet carry that limitation; falling within the illustration is a review item rather than positive evidence of market value. Regression coverage protects all ten labels and prevents the removed provider attributions from returning without supporting documentation. The active workbench continues to use user-entered educational multiples and does not present an appraisal.

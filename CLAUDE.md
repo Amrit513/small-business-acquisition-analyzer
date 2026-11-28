@@ -14,7 +14,7 @@ This file gives Claude Code (or any contributor) the context needed to work on t
 
 1. **Never put calculation logic in a component.** All math lives in `lib/calculations/*.ts` as pure, exported, unit-tested functions. Components only call these functions and render the result. If you're about to write `revenue * multiple` inside a `.tsx` file, stop — it belongs in `lib/calculations`.
 2. **Every calculation function needs a test.** `lib/calculations/__tests__/` mirrors `lib/calculations/` one-to-one. Run `npm test` before considering any calculation change done. Currently: 35/35 tests passing across valuation, financing, returns, scenarios, and scoring — keep it green.
-3. **No invented financial data.** Industry benchmark multiples (`lib/benchmarks/industryMultiples.ts`) must cite a source in the `source` field. If you don't have a sourced number, mark it clearly as an estimate rather than presenting it as authoritative — this tool's credibility depends on not pretending precision it doesn't have.
+3. **No invented financial data.** A benchmark number must cite an exact source, publication date, covered period and relevant segment. If that evidence is absent, label the number as an educational assumption rather than attributing it broadly to a provider or presenting it as market evidence.
 4. **Formulas must match `docs/FORMULAS.md` exactly.** If you change a formula or a scoring weight in code, update that doc in the same commit. They must never drift apart — a contributor should be able to read the doc and verify the code does what it says.
 5. **TypeScript strict mode stays on.** Don't add `any` to get past a type error — fix the type. `noUncheckedIndexedAccess` is on for a reason (array access safety); don't turn it off.
 6. **Privacy-first architecture.** This tool analyzes potentially sensitive business financials. Default behavior is fully client-side (IndexedDB, no server round-trip for analysis data). Don't add a backend/database for analysis data without discussing it first — that's an intentional design decision, not an oversight.
@@ -37,7 +37,7 @@ lib/
     scoring.ts               weighted acquisition score (0-100)
     index.ts                 runAnalysis() — the single orchestrator, wires everything together
     __tests__/                one test file per module above
-  benchmarks/               industry multiple datasets (sourced)
+  benchmarks/               retained educational multiple assumptions
   storage/                  IndexedDB read/write, validated versioned JSON export/import
 types/business.ts           the shared contract — BusinessInputs, FinancingInputs, AnalysisResult, etc.
 docs/

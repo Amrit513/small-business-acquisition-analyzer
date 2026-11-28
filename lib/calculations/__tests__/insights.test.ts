@@ -10,7 +10,7 @@ describe("generateDealInsights", () => {
   it("recognizes adequate debt coverage and aligned valuation", () => {
     const insights = generateDealInsights(runAnalysis("Healthy", business, financing));
     expect(insights.some((item) => item.id === "dscr-positive")).toBe(true);
-    expect(insights.some((item) => item.id === "valuation-aligned")).toBe(true);
+    expect(insights).toContainEqual(expect.objectContaining({ id: "valuation-within-illustration", severity: "review" }));
   });
 
   it("flags a debt structure that earnings cannot cover", () => {

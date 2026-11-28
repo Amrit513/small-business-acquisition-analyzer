@@ -55,6 +55,7 @@ export function buildUnderwritingPacket(analysis: AnalysisResult, evidence: Evid
     financing_unverified: analysis.financing,
     engine_outputs: {
       blendedValuation: analysis.valuation.blendedEstimate,
+      valuationBasis: analysis.valuation.industryBenchmark.source,
       annualDebtService: analysis.loan.annualDebtService,
       annualCashFlowAfterDebt: analysis.cashFlow.annualCashFlowAfterDebt,
       dscr: analysis.dscr.dscr,

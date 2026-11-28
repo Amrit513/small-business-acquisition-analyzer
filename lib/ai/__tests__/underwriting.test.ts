@@ -8,6 +8,7 @@ describe("AI underwriting controls", () => {
   it("builds a compact packet with deterministic downside evidence", () => {
     const packet = buildUnderwritingPacket(analysis);
     expect(packet.downside_checks.earningsDown20RateUp200bps).not.toBeNull();
+    expect(packet.engine_outputs.valuationBasis).toContain("Legacy educational assumption");
     expect(JSON.stringify(packet)).not.toContain("amortizationSchedule");
   });
 

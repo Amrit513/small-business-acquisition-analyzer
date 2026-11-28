@@ -15,9 +15,9 @@ Three independent methods, then a blended estimate. Small-business valuation is 
 | Revenue method | `Annual Revenue × industry revenue multiple` | Sanity check when margins are unclear |
 
 **Blended estimate:** `SDE method × 0.5 + EBITDA method × 0.3 + Revenue method × 0.2`
-SDE is weighted heaviest because it's the standard method for the size of business this tool targets.
+This 50/30/20 weighting is a retained educational assumption, not a sourced market convention.
 
-Industry multiples come from `lib/benchmarks/industryMultiples.ts`, each with a cited source (BizBuySell Insight Reports, IBBA Market Pulse Surveys, or sector-specific marketplace data). These are directional ranges, not appraisals — a real acquisition should always get a professional valuation.
+The retained ranges in `lib/benchmarks/industryMultiples.ts` do not have an exact dated source in the repository. Each is labeled as a legacy educational assumption rather than attributed to a market-data provider. They are not comparables, market evidence or appraisals. A future sourced replacement must record the exact publication, date, covered period and relevant segment beside the number.
 
 Implementation: `lib/calculations/valuation.ts` → `estimateValuation()`
 
@@ -26,7 +26,7 @@ Implementation: `lib/calculations/valuation.ts` → `estimateValuation()`
 ```
 Implied Revenue Multiple = Purchase Price / Annual Revenue
 ```
-Compare against the industry benchmark range to sanity-check whether the asking price is in a normal range for the sector.
+The legacy engine compares this ratio with its educational range. That comparison does not establish a normal market range for the sector.
 
 ## 3. Profit Margin
 
