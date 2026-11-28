@@ -142,9 +142,11 @@ Implementation: `lib/calculations/scenarios.ts` → `projectScenario()`, `projec
 
 A weighted composite, fully transparent — every sub-score is independently computed and shown, not hidden behind a single number.
 
+Each available component is bounded from 0 to 100. Negative growth or margin performance bottoms out at zero rather than pulling the component below its intended scale. An inapplicable coverage, return, payback, growth/margin or valuation component remains `null`; the overall legacy index and rating are then unavailable instead of substituting neutral or favorable points. These weights are educational conventions, not validated predictors of acquisition quality or financing approval.
+
 | Factor | Weight | Rationale |
 |---|---|---|
-| DSCR | 30% | Can this deal get financed / survive its own debt |
+| DSCR | 30% | Modeled cushion above scheduled debt |
 | Cash-on-cash ROI | 25% | Is the return competitive with alternatives |
 | Payback period | 20% | Faster payback = lower risk |
 | Revenue growth + profit margin | 15% | Quality of the underlying business |

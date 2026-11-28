@@ -129,13 +129,13 @@ export interface BreakEvenPoint {
 }
 
 export interface AcquisitionScoreBreakdown {
-  dscrScore: number;
-  roiScore: number;
-  paybackScore: number;
-  growthScore: number;
-  valuationScore: number;
-  totalScore: number;
-  rating: "excellent" | "good" | "fair" | "risky" | "poor";
+  dscrScore: number | null;
+  roiScore: number | null;
+  paybackScore: number | null;
+  growthScore: number | null;
+  valuationScore: number | null;
+  totalScore: number | null;
+  rating: "excellent" | "good" | "fair" | "risky" | "poor" | "unavailable";
 }
 
 /** The full output of running one business + financing + scenario through the engine. */

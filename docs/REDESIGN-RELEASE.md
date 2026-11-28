@@ -523,3 +523,7 @@ The retained financial engine now reports debt coverage, its rating and its illu
 ## Undefined legacy returns
 
 The retained financial engine now keeps cash-on-cash return unavailable when buyer cash invested is zero and keeps simple payback unavailable when buyer cash is zero or modeled annual cash is nonpositive. It no longer substitutes a fake 0% return or serializes an infinite payback. The legacy score awards no return points for unavailable ratios, diligence insights distinguish an unfunded draft from a nonpositive-cash case, and the disabled research packet preserves null values. Regression coverage protects calculation, serialization, scoring, insight and packet behavior. The active workbench already enforced the same economic distinction; this closes the secondary path without claiming investment performance.
+
+## Bounded legacy index
+
+Every available retained-engine score component is now bounded to 0–100. Finite negative growth and earnings margins bottom out at zero instead of pulling the component or weighted total below its documented scale. Inapplicable coverage, return, payback, growth/margin or valuation remains null and suppresses the overall legacy index and rating rather than receiving automatic neutral or favorable points. Regression cases cover both extremes and unavailable inputs. The active workbench already suppressed its optional index for unresolved components; this aligns the secondary path without presenting the weights as validated predictors.
