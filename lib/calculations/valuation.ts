@@ -1,5 +1,8 @@
 import type { BusinessInputs, ValuationEstimate } from "@/types/business";
 import { getIndustryBenchmark, midpoint } from "@/lib/benchmarks/industryMultiples";
+import {roundDecimal,roundToCents} from "./precision";
+
+export {roundToCents} from "./precision";
 
 /**
  * Applies three retained educational multiple assumptions, then blends them
@@ -46,10 +49,6 @@ export function calculateProfitMargin(inputs: BusinessInputs): number {
   return roundToHundredths(inputs.sde / inputs.annualRevenue);
 }
 
-export function roundToCents(value: number): number {
-  return Math.round(value * 100) / 100;
-}
-
 export function roundToHundredths(value: number): number {
-  return Math.round(value * 10000) / 10000;
+  return roundDecimal(value,4);
 }

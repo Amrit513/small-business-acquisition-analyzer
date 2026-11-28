@@ -10,6 +10,10 @@ describe("listing import boundary", () => {
     expect(draft.quotes.annualRevenue).toContain("$520K");
   });
   it.each(["$1M-$2M", "$10,000 / month", "€400000", "CAD 100000", "3.5x", "-1000", "1,23", "Undisclosed", "$500,000+", "£20K", "1e8"])("leaves unsupported amount %s unknown", raw => expect(parseListingAmount(raw)).toBeUndefined());
+  it("rounds positive claims and reported losses symmetrically to cents",()=>{
+    expect(parseListingAmount("$1.005","purchasePrice")).toBe(1.01);
+    expect(parseListingAmount("-$1.005","sde")).toBe(-1.01);
+  });
   it("does not convert ambiguous cash flow to SDE or select one of conflicting revenue figures", () => {
     const draft = extractListing("Cash Flow: $100,000\nRevenue: $300,000\nRevenue: $500,000");
     expect(draft.values).toEqual({});

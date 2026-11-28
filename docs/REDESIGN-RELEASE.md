@@ -559,3 +559,7 @@ The editor, current snapshot validator and pure workbench calculation now share 
 ## Partial-year legacy debt service
 
 The retained financial engine now derives first-year debt service from the actual combined amortization rows in months one through twelve. A six-month seller note no longer has its opening monthly payment incorrectly extended across a full year, so retained cash flow, coverage and scoring consume the same maturity-aware amount. An independently worked zero-interest case confirms that six $500 payments on a $3,000 note total $3,000 rather than $6,000. The active workbench already used actual scheduled payments; this aligns the secondary path without claiming lender underwriting.
+
+## Symmetric financial rounding
+
+Active workbench calculations, retained calculations and listing-amount normalization now use one pure decimal-rounding function. Exact half-cent gains and losses round away from zero, so $1.005 becomes $1.01 and −$1.005 becomes −$1.01 instead of giving the loss a one-cent favorable bias. Regression cases cover both signs, larger magnitudes, four-decimal ratios and the listing boundary. This improves deterministic arithmetic; it does not make source figures more accurate than the underlying evidence.

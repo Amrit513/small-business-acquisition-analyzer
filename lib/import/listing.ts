@@ -1,5 +1,6 @@
 import { parseJsonDocument } from "./json";
 import { plausiblePastInstant } from "./time";
+import {roundToCents} from "@/lib/calculations/precision";
 
 export const listingFields = ["purchasePrice", "annualRevenue", "sde", "ebitda"] as const;
 export const MAX_LISTING_IMPORT_BYTES = 12000;
@@ -44,7 +45,7 @@ export function parseListingAmount(raw: string, field?: ListingField): number | 
   const suffix = match[2]?.toLowerCase();
   const factor = suffix === "k" || suffix === "thousand" ? 1e3 : suffix === "m" || suffix === "million" ? 1e6 : suffix === "b" || suffix === "billion" ? 1e9 : 1;
   const value = Number(match[1].replace(/,/g, "")) * factor;
-  return Number.isFinite(value) && value >= 0 && value <= 1e12 ? (negative ? -1 : 1) * Math.round(value * 100) / 100 : undefined;
+  return Number.isFinite(value) && value >= 0 && value <= 1e12 ? roundToCents((negative ? -1 : 1) * value) : undefined;
 }
 
 export function reviewListingAmounts(draft: ListingDraft, rawAmounts: Partial<Record<ListingField, string>>):
