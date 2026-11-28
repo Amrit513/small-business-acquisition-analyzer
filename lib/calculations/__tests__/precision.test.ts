@@ -1,5 +1,5 @@
 import {describe,expect,it} from "vitest";
-import {roundDecimal,roundToCents} from "../precision";
+import {roundDecimal,roundToCents,sumCents} from "../precision";
 
 describe("financial decimal rounding",()=>{
   it.each([
@@ -16,5 +16,11 @@ describe("financial decimal rounding",()=>{
     const rounded=roundToCents(-0.004);
     expect(rounded).toBe(0);
     expect(Object.is(rounded,-0)).toBe(false);
+  });
+
+  it("normalizes each monetary operand before adding",()=>{
+    expect(sumCents(0.005,0.005)).toBe(0.02);
+    expect(sumCents(-0.005,-0.005)).toBe(-0.02);
+    expect(sumCents(1.005,-1.005)).toBe(0);
   });
 });

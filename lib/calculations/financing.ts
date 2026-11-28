@@ -6,6 +6,7 @@ import type {
   LoanSummary,
 } from "@/types/business";
 import { roundToCents, roundToHundredths } from "@/lib/calculations/valuation";
+import { sumCents } from "@/lib/calculations/precision";
 
 /**
  * Calculates the fixed monthly payment for an amortizing loan using the
@@ -135,9 +136,7 @@ export function calculateFundingGap(
   financing: FinancingInputs
 ): number {
   const sellerAmount = financing.sellerFinancing?.amount ?? 0;
-  return roundToCents(
-    purchasePrice - financing.downPayment - financing.loanAmount - sellerAmount
-  );
+  return sumCents(purchasePrice, -financing.downPayment, -financing.loanAmount, -sellerAmount);
 }
 
 function sumInterest(schedule: AmortizationRow[]): number {

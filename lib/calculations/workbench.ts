@@ -1,11 +1,11 @@
 import { buildAmortizationSchedule } from "./financing";
-import {roundToCents} from "./precision";
+import {roundToCents,sumCents} from "./precision";
 import { fieldKeys, fields, MAX_DEAL_NAME_LENGTH, MAX_EARNINGS_NOTE_LENGTH, MAX_REPORTING_PERIOD_LENGTH, validAmount, type Deal, type Field, type Values } from "@/lib/workspace/deal";
 
 export const modelVersion="3.0";
 type N=number|null;
 const cents=roundToCents;
-function sum(...ns:N[]):N {return ns.some(n=>n===null||!Number.isFinite(n))?null:cents(ns.reduce<number>((s,n)=>s+(n??0),0));}
+function sum(...ns:N[]):N {return ns.some(n=>n===null||!Number.isFinite(n))?null:sumCents(...(ns as number[]));}
 function subtract(a:N,...bs:N[]):N {return sum(a,...bs.map(b=>b===null?null:-b));}
 function ratio(a:N,b:N):N{return a===null||b===null||b<=0?null:a/b;}
 function validatedValues(values:Values):Values {

@@ -115,6 +115,12 @@ describe("calculateFundingGap", () => {
     expect(calculateFundingGap(400000, financing)).toBe(50000);
     expect(calculateFundingGap(300000, financing)).toBe(-50000);
   });
+
+  it("normalizes every source before comparing it with the purchase price", () => {
+    expect(calculateFundingGap(.01, {
+      downPayment:.005, loanAmount:.005, interestRate:0, loanTermYears:1,
+    })).toBe(-.01);
+  });
 });
 
 describe("calculateDSCR", () => {

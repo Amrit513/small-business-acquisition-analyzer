@@ -12,3 +12,6 @@ export function roundDecimal(value:number,places:number):number {
 }
 
 export const roundToCents=(value:number)=>roundDecimal(value,2);
+
+/** Normalize each monetary operand before totaling so fractional cents cannot cancel. */
+export const sumCents=(...values:number[])=>roundToCents(values.reduce((total,value)=>total+roundToCents(value),0));

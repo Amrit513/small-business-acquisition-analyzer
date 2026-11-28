@@ -56,7 +56,7 @@ The funding check verifies that the proposed sources match the purchase price:
 Funding Gap = Purchase Price − Down Payment − Primary Loan − Seller Note
 ```
 A positive result is still unfunded; a negative result means the proposed sources exceed the purchase price.
-The legacy calculation rounds the difference to cents. Its structural preflight flags either a shortfall or excess of at least one cent, matching the active workbench completeness rule.
+Each monetary operand is rounded to cents before subtraction, then the difference is rounded to cents. This prevents separate fractional-cent sources from cancelling at a precision the model does not report. The legacy structural preflight flags either a shortfall or excess of at least one cent, matching the active workbench completeness rule.
 
 Implementation: `lib/calculations/financing.ts` → `calculateFundingGap()`
 

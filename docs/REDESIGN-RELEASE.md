@@ -571,3 +571,7 @@ The shared rounding boundary now normalizes a sub-cent negative amount that roun
 ## Cent-precise financed principal
 
 The shared loan schedule now rounds the financed principal to cents before calculating the regular payment and monthly rows. A fractional-cent input can no longer survive into the final principal row while the displayed payment and balance use cents; the last payment instead reconciles the same rounded principal used by sources and uses. An independent two-month, zero-interest case confirms that $1.005 becomes $1.01, produces only cent-precise rows and repays exactly $1.01. This is arithmetic consistency, not evidence that the proposed loan amount or terms are available.
+
+## Operand-level funding precision
+
+Sources, uses and the retained funding-gap calculation now normalize each monetary operand to cents before totaling. Two separate $0.005 sources therefore become $0.02 rather than cancelling into a $0.01 total after raw addition, so they correctly show one cent of excess sources against a $0.01 use. The same pure summation boundary governs active earnings and cash-flow arithmetic. Regression cases cover positive, negative and offsetting operands plus both funding entry points. This defines calculation precision; it does not authenticate any source amount.
